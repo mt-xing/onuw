@@ -1,10 +1,10 @@
-//@ts-check
+// @ts-check
 
-import State from "./state";
+import State from './state';
 
 export default class OnuwGame {
-    /**
+	/**
      * @type {State}
      */
-    state;
+	state;
 }
