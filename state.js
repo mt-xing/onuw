@@ -1,9 +1,8 @@
-// @ts-check
-
 import Role from './role';
+import Player from './player';
 import { shuffle } from './utils';
 
-const CENTER_SIZE = 3;
+export const CENTER_SIZE = 3;
 
 /**
  * State of the game
@@ -15,17 +14,13 @@ export default class State {
 	#centerRoles;
 
 	/**
-     * @type {Role[]}
-     */
-	#playerRoles;
-
-	/**
-     * @type {string[]}
-     */
-	#playerNames;
+	 * @type {Player[]}
+	 */
+	#players;
 
 	/**
      * @param {Role[]} roles
+	 * @param {string[]} names
      */
 	constructor(roles, names) {
 		if (roles.length !== names.length + CENTER_SIZE) {
@@ -33,8 +28,10 @@ export default class State {
 		}
 		const r = shuffle(roles);
 		this.#centerRoles = r.slice(0, CENTER_SIZE);
-		this.#playerRoles = r.slice(CENTER_SIZE);
-		this.#playerNames = r.slice();
+
+		const playerRoles = r.slice(CENTER_SIZE);
+		const playerNames = names.slice();
+		this.#players = playerNames.map((name, i) => new Player(name, playerRoles[i]));
 	}
 
 	/**
@@ -43,9 +40,9 @@ export default class State {
      * @param {number} b
      */
 	swap(a, b) {
-		const t = this.#playerRoles[a];
-		this.#playerRoles[a] = this.#playerRoles[b];
-		this.#playerRoles[b] = t;
+		const t = this.#players[a].currentRole;
+		this.#players[a].currentRole = this.#players[b].currentRole;
+		this.#players[b].currentRole = t;
 	}
 
 	/**
@@ -54,20 +51,37 @@ export default class State {
      * @param {number} center Center ID, [0, 2]
      */
 	swapCenter(player, center) {
-		const t = this.#playerRoles[player];
-		this.#playerRoles[player] = this.#centerRoles[center];
+		const t = this.#players[player].currentRole;
+		this.#players[player].currentRole = this.#centerRoles[center];
 		this.#centerRoles[center] = t;
 	}
 
-	getPlayer(id) {
-		return this.#playerRoles[id];
+	get numPlayers() {
+		return this.#players.length;
 	}
 
+	/**
+     * Get a particular player role
+     * @param {number} id Player ID
+     * @returns {Player}
+     */
+	getPlayer(id) {
+		return this.#players[id];
+	}
+
+	/**
+	 * @param {number} id
+	 * @returns {Role}
+	 */
 	getCenter(id) {
 		return this.#centerRoles[id];
 	}
 
+	/**
+	 * @param {number} id
+	 * @returns {string}
+	 */
 	getName(id) {
-		return this.#playerNames[id];
+		return this.#players[id].name;
 	}
 }
