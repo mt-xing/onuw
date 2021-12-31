@@ -289,6 +289,11 @@ export class Robber extends Role {
      * @param {number} id Current player ID
      */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
+		if (this.modifier.has(Modifiers.SENTINEL)) {
+			giveInfo('Your role has been guarded by the sentinel. You will not be swapping roles tonight.');
+			return;
+		}
+
 		const cards = await pickPlayers(1, false);
 		if (cards.length === 1) {
 			const swapID = cards[0];
@@ -377,6 +382,11 @@ export class Drunk extends Role {
      * @param {number} id Current player ID
      */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
+		if (this.modifier.has(Modifiers.SENTINEL)) {
+			giveInfo('Your role has been guarded by the sentinel. You will not be swapping roles tonight.');
+			return;
+		}
+
 		const cards = await pickCenters(1);
 		const card = cards.length === 1 ? cards[0] : Math.floor(Math.random() * CENTER_SIZE);
 		state.swapCenter(id, card);
@@ -403,6 +413,10 @@ export class Insomniac extends Role {
      * @param {number} id Current player ID
      */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
+		if (this.modifier.has(Modifiers.SENTINEL)) {
+			giveInfo('Your role has been guarded by the sentinel. You will not see your current role tonight.');
+			return;
+		}
 		giveInfo(`Your current role is ${state.getPlayer(id).currentRole.role}`);
 	}
 }
