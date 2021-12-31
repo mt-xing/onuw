@@ -15,6 +15,11 @@
         "indent": ["warn", "tab"],
         "no-tabs": "off",
         "import/no-cycle": "off",
-        "max-classes-per-file": "off"
+        "max-classes-per-file": "off",
+        "class-methods-use-this": "off",
+        "no-use-before-define": "off",
+        "no-plusplus": "off",
+        "import/prefer-default-export": "warn",
+        "no-empty-function": "off"
     }
 }
