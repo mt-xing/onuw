@@ -2,31 +2,31 @@ import State from './state';
 
 export default class Role {
 	/**
-     * The numeric role, from enum `Roles`
-     * @type {Roles}
-     */
+	 * The numeric role, from enum `Roles`
+	 * @type {Roles}
+	 */
 	role;
 
 	/**
-     * Role description
-     * @type {string}
-     */
+	 * Role description
+	 * @type {string}
+	 */
 	description;
 
 	/**
-     * Role instructions for during the game
-     * @type {string}
-     */
+	 * Role instructions for during the game
+	 * @type {string}
+	 */
 	instructions;
 
 	/**
-     * Wake order.
+	 * Wake order.
 	 *
-     * Lower goes first, starting from front, lexicographic order.
+	 * Lower goes first, starting from front, lexicographic order.
 	 *
 	 * If this is `null`, this role does not wake.
-     * @type {number[]|null}
-     */
+	 * @type {number[]|null}
+	 */
 	wakeOrder;
 
 	/**
@@ -37,12 +37,12 @@ export default class Role {
 	modifiers;
 
 	/**
-     * Create a new role object
-     * @param {Roles} role
-     * @param {string} description
-     * @param {string} instructions
-     * @param {number[]|null} wakeOrder
-     */
+	 * Create a new role object
+	 * @param {Roles} role
+	 * @param {string} description
+	 * @param {string} instructions
+	 * @param {number[]|null} wakeOrder
+	 */
 	constructor(role, description, instructions, wakeOrder) {
 		if (this.constructor === Role) {
 			throw new Error('Role is an abstract class');
@@ -57,14 +57,14 @@ export default class Role {
 	// #region Abstract methods
 
 	/**
-     * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
+	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
 	 * Number of players and whether self selection is allowed to ids
-     * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
-     * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
-     * @param {(msg: string) => void} giveInfo Show information to the player
-     * @param {State} state Reference to the current game state
-     * @param {number} id Current player ID
-     */
+	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
+	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
+	 * @param {(msg: string) => void} giveInfo Show information to the player
+	 * @param {State} state Reference to the current game state
+	 * @param {number} id Current player ID
+	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		throw new Error('Unimplemented');
 	}
@@ -72,21 +72,21 @@ export default class Role {
 	// #endregion
 
 	/**
-     * The team that this role WINS with.
-     *
-     * eg: A minion wins with the werewolves
-     * @returns {Teams}
-     */
+	 * The team that this role WINS with.
+	 *
+	 * eg: A minion wins with the werewolves
+	 * @returns {Teams}
+	 */
 	get winTeam() {
 		return Math.floor(this.role / TEAM_MULT);
 	}
 
 	/**
-     * The team that loses if this role is KILLED.
-     *
-     * eg: A minion counts as a villager
-     * @returns {Teams}
-     */
+	 * The team that loses if this role is KILLED.
+	 *
+	 * eg: A minion counts as a villager
+	 * @returns {Teams}
+	 */
 	get killTeam() {
 		if (this.role === Roles.MINION) {
 			return Teams.VILLAGER;
@@ -95,9 +95,9 @@ export default class Role {
 	}
 
 	/**
-     * @param {number|Role} other
-     * @returns {boolean} True if and only if this is the same role as `other`
-     */
+	 * @param {number|Role} other
+	 * @returns {boolean} True if and only if this is the same role as `other`
+	 */
 	equals(other) {
 		if (typeof other === 'number') {
 			return this.role === other;
@@ -106,10 +106,10 @@ export default class Role {
 	}
 
 	/**
-     * @param {number|Role} first
-     * @param {number|Role} second
-     * @returns {boolean} True if and only if `first` is the same role as `second`
-     */
+	 * @param {number|Role} first
+	 * @param {number|Role} second
+	 * @returns {boolean} True if and only if `first` is the same role as `second`
+	 */
 	static equals(first, second) {
 		if (typeof first === 'number' && typeof second === 'number') {
 			return first === second;

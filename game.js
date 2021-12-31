@@ -4,7 +4,7 @@ import State from './state';
 
 export default class OnuwGame {
 	/**
-     * @type {State}
-     */
+	 * @type {State}
+	 */
 	state;
 }

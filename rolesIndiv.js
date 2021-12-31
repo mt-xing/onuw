@@ -39,14 +39,14 @@ export class Werewolf extends Role {
 	}
 
 	/**
-     * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
+	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
 	 * Number of players and whether self selection is allowed to ids
-     * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
-     * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
-     * @param {(msg: string) => void} giveInfo Show information to the player
-     * @param {State} state Reference to the current game state
-     * @param {number} id Current player ID
-     */
+	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
+	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
+	 * @param {(msg: string) => void} giveInfo Show information to the player
+	 * @param {State} state Reference to the current game state
+	 * @param {number} id Current player ID
+	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		const wolves = getAllWerewolves(state);
 		giveInfo(werewolfString(wolves));
@@ -70,14 +70,14 @@ export class MysticWolf extends Role {
 	}
 
 	/**
-     * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
+	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
 	 * Number of players and whether self selection is allowed to ids
-     * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
-     * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
-     * @param {(msg: string) => void} giveInfo Show information to the player
-     * @param {State} state Reference to the current game state
-     * @param {number} id Current player ID
-     */
+	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
+	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
+	 * @param {(msg: string) => void} giveInfo Show information to the player
+	 * @param {State} state Reference to the current game state
+	 * @param {number} id Current player ID
+	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		const wolves = getAllWerewolves(state);
 		giveInfo(werewolfString(wolves));
@@ -103,14 +103,14 @@ export class DreamWolf extends Role {
 	}
 
 	/**
-     * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
+	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
 	 * Number of players and whether self selection is allowed to ids
-     * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
-     * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
-     * @param {(msg: string) => void} giveInfo Show information to the player
-     * @param {State} state Reference to the current game state
-     * @param {number} id Current player ID
-     */
+	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
+	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
+	 * @param {(msg: string) => void} giveInfo Show information to the player
+	 * @param {State} state Reference to the current game state
+	 * @param {number} id Current player ID
+	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {}
 }
 
@@ -125,14 +125,14 @@ export class Minion extends Role {
 	}
 
 	/**
-     * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
+	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
 	 * Number of players and whether self selection is allowed to ids
-     * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
-     * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
-     * @param {(msg: string) => void} giveInfo Show information to the player
-     * @param {State} state Reference to the current game state
-     * @param {number} id Current player ID
-     */
+	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
+	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
+	 * @param {(msg: string) => void} giveInfo Show information to the player
+	 * @param {State} state Reference to the current game state
+	 * @param {number} id Current player ID
+	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		giveInfo(werewolfString(getAllWerewolves(state)));
 	}
@@ -151,14 +151,14 @@ export class Sentinel extends Role {
 	}
 
 	/**
-     * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
+	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
 	 * Number of players and whether self selection is allowed to ids
-     * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
-     * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
-     * @param {(msg: string) => void} giveInfo Show information to the player
-     * @param {State} state Reference to the current game state
-     * @param {number} id Current player ID
-     */
+	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
+	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
+	 * @param {(msg: string) => void} giveInfo Show information to the player
+	 * @param {State} state Reference to the current game state
+	 * @param {number} id Current player ID
+	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		const protect = await pickPlayers(1, false);
 		if (protect.length === 1) {
@@ -179,14 +179,14 @@ export class Mason extends Role {
 	}
 
 	/**
-     * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
+	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
 	 * Number of players and whether self selection is allowed to ids
-     * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
-     * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
-     * @param {(msg: string) => void} giveInfo Show information to the player
-     * @param {State} state Reference to the current game state
-     * @param {number} id Current player ID
-     */
+	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
+	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
+	 * @param {(msg: string) => void} giveInfo Show information to the player
+	 * @param {State} state Reference to the current game state
+	 * @param {number} id Current player ID
+	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		const masons = [];
 		for (let i = 0; i < state.numPlayers; i++) {
@@ -213,14 +213,14 @@ export class Seer extends Role {
 	}
 
 	/**
-     * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
+	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
 	 * Number of players and whether self selection is allowed to ids
-     * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
-     * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
-     * @param {(msg: string) => void} giveInfo Show information to the player
-     * @param {State} state Reference to the current game state
-     * @param {number} id Current player ID
-     */
+	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
+	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
+	 * @param {(msg: string) => void} giveInfo Show information to the player
+	 * @param {State} state Reference to the current game state
+	 * @param {number} id Current player ID
+	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		const choice = await pickChoice(['View two center cards', 'View one other player\'s card']);
 		if (choice === 0) {
@@ -252,14 +252,14 @@ export class ApprenticeSeer extends Role {
 	}
 
 	/**
-     * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
+	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
 	 * Number of players and whether self selection is allowed to ids
-     * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
-     * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
-     * @param {(msg: string) => void} giveInfo Show information to the player
-     * @param {State} state Reference to the current game state
-     * @param {number} id Current player ID
-     */
+	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
+	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
+	 * @param {(msg: string) => void} giveInfo Show information to the player
+	 * @param {State} state Reference to the current game state
+	 * @param {number} id Current player ID
+	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		const cards = await pickCenters(1);
 		if (pickCenters.length === 1) {
@@ -280,14 +280,14 @@ export class Robber extends Role {
 	}
 
 	/**
-     * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
+	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
 	 * Number of players and whether self selection is allowed to ids
-     * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
-     * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
-     * @param {(msg: string) => void} giveInfo Show information to the player
-     * @param {State} state Reference to the current game state
-     * @param {number} id Current player ID
-     */
+	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
+	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
+	 * @param {(msg: string) => void} giveInfo Show information to the player
+	 * @param {State} state Reference to the current game state
+	 * @param {number} id Current player ID
+	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		if (this.modifiers.has(Modifiers.SENTINEL)) {
 			giveInfo('Your role has been guarded by the sentinel. You will not be swapping roles tonight.');
@@ -314,14 +314,14 @@ export class Witch extends Role {
 	}
 
 	/**
-     * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
+	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
 	 * Number of players and whether self selection is allowed to ids
-     * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
-     * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
-     * @param {(msg: string) => void} giveInfo Show information to the player
-     * @param {State} state Reference to the current game state
-     * @param {number} id Current player ID
-     */
+	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
+	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
+	 * @param {(msg: string) => void} giveInfo Show information to the player
+	 * @param {State} state Reference to the current game state
+	 * @param {number} id Current player ID
+	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		const cards = await pickCenters(1);
 		if (cards.length === 1) {
@@ -346,14 +346,14 @@ export class Troublemaker extends Role {
 	}
 
 	/**
-     * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
+	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
 	 * Number of players and whether self selection is allowed to ids
-     * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
-     * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
-     * @param {(msg: string) => void} giveInfo Show information to the player
-     * @param {State} state Reference to the current game state
-     * @param {number} id Current player ID
-     */
+	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
+	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
+	 * @param {(msg: string) => void} giveInfo Show information to the player
+	 * @param {State} state Reference to the current game state
+	 * @param {number} id Current player ID
+	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		const cards = await pickPlayers(2, false);
 		if (cards.length === 2) {
@@ -373,14 +373,14 @@ export class Drunk extends Role {
 	}
 
 	/**
-     * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
+	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
 	 * Number of players and whether self selection is allowed to ids
-     * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
-     * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
-     * @param {(msg: string) => void} giveInfo Show information to the player
-     * @param {State} state Reference to the current game state
-     * @param {number} id Current player ID
-     */
+	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
+	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
+	 * @param {(msg: string) => void} giveInfo Show information to the player
+	 * @param {State} state Reference to the current game state
+	 * @param {number} id Current player ID
+	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		if (this.modifiers.has(Modifiers.SENTINEL)) {
 			giveInfo('Your role has been guarded by the sentinel. You will not be swapping roles tonight.');
@@ -404,14 +404,14 @@ export class Insomniac extends Role {
 	}
 
 	/**
-     * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
+	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
 	 * Number of players and whether self selection is allowed to ids
-     * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
-     * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
-     * @param {(msg: string) => void} giveInfo Show information to the player
-     * @param {State} state Reference to the current game state
-     * @param {number} id Current player ID
-     */
+	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
+	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
+	 * @param {(msg: string) => void} giveInfo Show information to the player
+	 * @param {State} state Reference to the current game state
+	 * @param {number} id Current player ID
+	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		if (this.modifiers.has(Modifiers.SENTINEL)) {
 			giveInfo('Your role has been guarded by the sentinel. You will not see your current role tonight.');
@@ -432,14 +432,14 @@ export class Revealer extends Role {
 	}
 
 	/**
-     * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
+	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
 	 * Number of players and whether self selection is allowed to ids
-     * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
-     * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
-     * @param {(msg: string) => void} giveInfo Show information to the player
-     * @param {State} state Reference to the current game state
-     * @param {number} id Current player ID
-     */
+	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
+	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
+	 * @param {(msg: string) => void} giveInfo Show information to the player
+	 * @param {State} state Reference to the current game state
+	 * @param {number} id Current player ID
+	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		const cards = await pickPlayers(1, false);
 		if (cards.length === 1) {
@@ -469,13 +469,13 @@ export class Tanner extends Role {
 	}
 
 	/**
-     * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
+	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
 	 * Number of players and whether self selection is allowed to ids
-     * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
-     * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
-     * @param {(msg: string) => void} giveInfo Show information to the player
-     * @param {State} state Reference to the current game state
-     * @param {number} id Current player ID
-     */
+	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
+	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
+	 * @param {(msg: string) => void} giveInfo Show information to the player
+	 * @param {State} state Reference to the current game state
+	 * @param {number} id Current player ID
+	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {}
 }

@@ -9,8 +9,8 @@ export const CENTER_SIZE = 3;
  */
 export default class State {
 	/**
-     * @type {Role[]}
-     */
+	 * @type {Role[]}
+	 */
 	#centerRoles;
 
 	/**
@@ -19,9 +19,9 @@ export default class State {
 	#players;
 
 	/**
-     * @param {Role[]} roles
+	 * @param {Role[]} roles
 	 * @param {string[]} names
-     */
+	 */
 	constructor(roles, names) {
 		if (roles.length !== names.length + CENTER_SIZE) {
 			throw new Error('Invalid number of roles selected');
@@ -35,10 +35,10 @@ export default class State {
 	}
 
 	/**
-     * Swap the roles of two players
-     * @param {number} a
-     * @param {number} b
-     */
+	 * Swap the roles of two players
+	 * @param {number} a
+	 * @param {number} b
+	 */
 	swap(a, b) {
 		const t = this.#players[a].currentRole;
 		this.#players[a].currentRole = this.#players[b].currentRole;
@@ -46,10 +46,10 @@ export default class State {
 	}
 
 	/**
-     * Swap the role of a player with the center
-     * @param {number} player
-     * @param {number} center Center ID, [0, 2]
-     */
+	 * Swap the role of a player with the center
+	 * @param {number} player
+	 * @param {number} center Center ID, [0, 2]
+	 */
 	swapCenter(player, center) {
 		const t = this.#players[player].currentRole;
 		this.#players[player].currentRole = this.#centerRoles[center];
@@ -61,10 +61,10 @@ export default class State {
 	}
 
 	/**
-     * Get a particular player role
-     * @param {number} id Player ID
-     * @returns {Player}
-     */
+	 * Get a particular player role
+	 * @param {number} id Player ID
+	 * @returns {Player}
+	 */
 	getPlayer(id) {
 		return this.#players[id];
 	}
