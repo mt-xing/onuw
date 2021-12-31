@@ -34,7 +34,7 @@ export default class Role {
 	 *
 	 * @type {Set<Modifiers>}
 	 */
-	modifier;
+	modifiers;
 
 	/**
      * Create a new role object
@@ -51,7 +51,7 @@ export default class Role {
 		this.description = description;
 		this.instructions = instructions;
 		this.wakeOrder = wakeOrder;
-		this.modifier = new Set();
+		this.modifiers = new Set();
 	}
 
 	// #region Abstract methods

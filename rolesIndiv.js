@@ -163,7 +163,7 @@ export class Sentinel extends Role {
 		const protect = await pickPlayers(1, false);
 		if (protect.length === 1) {
 			const i = protect[0];
-			state.getPlayer(i).currentRole.modifier.add(Modifiers.SENTINEL);
+			state.getPlayer(i).currentRole.modifiers.add(Modifiers.SENTINEL);
 		}
 	}
 }
@@ -289,7 +289,7 @@ export class Robber extends Role {
      * @param {number} id Current player ID
      */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
-		if (this.modifier.has(Modifiers.SENTINEL)) {
+		if (this.modifiers.has(Modifiers.SENTINEL)) {
 			giveInfo('Your role has been guarded by the sentinel. You will not be swapping roles tonight.');
 			return;
 		}
@@ -382,7 +382,7 @@ export class Drunk extends Role {
      * @param {number} id Current player ID
      */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
-		if (this.modifier.has(Modifiers.SENTINEL)) {
+		if (this.modifiers.has(Modifiers.SENTINEL)) {
 			giveInfo('Your role has been guarded by the sentinel. You will not be swapping roles tonight.');
 			return;
 		}
@@ -413,7 +413,7 @@ export class Insomniac extends Role {
      * @param {number} id Current player ID
      */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
-		if (this.modifier.has(Modifiers.SENTINEL)) {
+		if (this.modifiers.has(Modifiers.SENTINEL)) {
 			giveInfo('Your role has been guarded by the sentinel. You will not see your current role tonight.');
 			return;
 		}
@@ -449,7 +449,7 @@ export class Revealer extends Role {
 			giveInfo(`The role ${state.getName(pid)} has is ${pRole.role}`);
 
 			if (pRole.winTeam === Teams.VILLAGER) {
-				pRole.modifier.add(Modifiers.REVEALER);
+				pRole.modifiers.add(Modifiers.REVEALER);
 			} else {
 				giveInfo('Because this role is not on the villager team, it will not be shown to other players');
 			}
