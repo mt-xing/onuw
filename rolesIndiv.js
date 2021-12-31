@@ -1,5 +1,4 @@
 import Role, { Modifiers, Roles, Teams } from './role';
-import Player from './player';
 import State, { CENTER_SIZE } from './state';
 import { makeList } from './utils';
 
