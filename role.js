@@ -1,4 +1,3 @@
-// @ts-check
 import State from './state';
 
 export default class Role {
@@ -21,18 +20,28 @@ export default class Role {
 	instructions;
 
 	/**
-     * Wake order
-     * Lower goes first, starting from front, lexicographic order
-     * @type {number[]}
+     * Wake order.
+	 *
+     * Lower goes first, starting from front, lexicographic order.
+	 *
+	 * If this is `null`, this role does not wake.
+     * @type {number[]|null}
      */
 	wakeOrder;
+
+	/**
+	 * Any modifiers applied, if any
+	 *
+	 * @type {Set<Modifiers>}
+	 */
+	modifier;
 
 	/**
      * Create a new role object
      * @param {Roles} role
      * @param {string} description
      * @param {string} instructions
-     * @param {number[]} wakeOrder
+     * @param {number[]|null} wakeOrder
      */
 	constructor(role, description, instructions, wakeOrder) {
 		if (this.constructor === Role) {
@@ -42,17 +51,21 @@ export default class Role {
 		this.description = description;
 		this.instructions = instructions;
 		this.wakeOrder = wakeOrder;
+		this.modifier = new Set();
 	}
 
 	// #region Abstract methods
 
 	/**
-     * @param {(num: number) => Promise<number[]>} pickPlayers Number of players to pick to ids
+     * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
+	 * Number of players and whether self selection is allowed to ids
      * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
+     * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
+     * @param {(msg: string) => void} giveInfo Show information to the player
      * @param {State} state Reference to the current game state
      * @param {number} id Current player ID
      */
-	async act(pickPlayers, pickCenters, state, id) {
+	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		throw new Error('Unimplemented');
 	}
 
@@ -130,8 +143,8 @@ const TEAM_MULT = 100;
 export const Roles = {
 	// Werewolves
 	WEREWOLF: Teams.WEREWOLF * TEAM_MULT + 0,
-	ALPHA_WOLF: Teams.WEREWOLF * TEAM_MULT + 1,
-	MYSTIC_WOLF: Teams.WEREWOLF * TEAM_MULT + 2,
+	MYSTIC_WOLF: Teams.WEREWOLF * TEAM_MULT + 1,
+	DREAM_WOLF: Teams.WEREWOLF * TEAM_MULT + 2,
 	MINION: Teams.WEREWOLF * TEAM_MULT + 5, // Special
 
 	// Villagers
@@ -150,13 +163,12 @@ export const Roles = {
 	TANNER: Teams.TANNER * TEAM_MULT,
 };
 
-// #region Individual Roles
-export class Werewolf extends Role {
-	constructor() {
-		super(Roles.WEREWOLF, 'You a bad guy', 'Look at other bad guys lol', [2, 0]);
-	}
-
-	async act(pickPlayers, pickCenters, state, id) {
-	}
-}
-// #endregion
+/**
+ * List of all modifiers a player can take on
+ * @readonly
+ * @enum {number}
+ */
+export const Modifiers = {
+	SENTINEL: 0,
+	REVEALER: 1,
+};
