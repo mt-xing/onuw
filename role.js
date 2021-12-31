@@ -1,4 +1,5 @@
 import State from './state';
+import { toTitleCase } from './utils';
 
 export default class Role {
 	/**
@@ -94,6 +95,10 @@ export default class Role {
 		return Math.floor(this.role / TEAM_MULT);
 	}
 
+	get roleName() {
+		return roleToName[this.role];
+	}
+
 	/**
 	 * @param {number|Role} other
 	 * @returns {boolean} True if and only if this is the same role as `other`
@@ -162,6 +167,14 @@ export const Roles = {
 	// lol
 	TANNER: Teams.TANNER * TEAM_MULT,
 };
+
+/**
+ * Lookup from role id to name of role
+ * @type {Record<Roles, string>}
+ */
+export const roleToName = {};
+// @ts-ignore
+Object.keys(Roles).forEach((key) => { roleToName[Roles[key]] = toTitleCase(key.replace('_', ' ')); });
 
 /**
  * List of all modifiers a player can take on

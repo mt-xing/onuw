@@ -53,7 +53,7 @@ export class Werewolf extends Role {
 		if (wolves.length === 1) {
 			const pick = await pickCenters(1);
 			if (pick.length === 1) {
-				giveInfo(`The center card you picked was ${state.getCenter(pick[0]).role}`);
+				giveInfo(`The center card you picked was ${state.getCenter(pick[0]).roleName}`);
 			}
 		}
 	}
@@ -84,11 +84,11 @@ export class MysticWolf extends Role {
 		if (wolves.length === 1) {
 			const pick = await pickCenters(1);
 			if (pick.length === 1) {
-				giveInfo(`The center card you picked was ${state.getCenter(pick[0]).role}`);
+				giveInfo(`The center card you picked was ${state.getCenter(pick[0]).roleName}`);
 			}
 		}
 		const view = await pickPlayers(1, false);
-		giveInfo(`The card ${state.getName(view[0])} has is ${state.getPlayer(view[0]).currentRole.role}`);
+		giveInfo(`The card ${state.getName(view[0])} has is ${state.getPlayer(view[0]).currentRole.roleName}`);
 	}
 }
 
@@ -235,7 +235,7 @@ export class Seer extends Role {
 			const card = await pickPlayers(1, false);
 			if (card.length === 1) {
 				const pid = card[0];
-				giveInfo(`The card that ${state.getName(pid)} has is ${state.getPlayer(pid).currentRole.role}`);
+				giveInfo(`The card that ${state.getName(pid)} has is ${state.getPlayer(pid).currentRole.roleName}`);
 			}
 		}
 	}
@@ -298,7 +298,7 @@ export class Robber extends Role {
 		if (cards.length === 1) {
 			const swapID = cards[0];
 			state.swap(id, swapID);
-			giveInfo(`Your new role is ${state.getPlayer(id).currentRole.role}`);
+			giveInfo(`Your new role is ${state.getPlayer(id).currentRole.roleName}`);
 		}
 	}
 }
@@ -327,7 +327,7 @@ export class Witch extends Role {
 		if (cards.length === 1) {
 			const centerCard = cards[0];
 			const fallbackPlayer = Math.floor(Math.random() * state.numPlayers);
-			giveInfo(`The center card was ${state.getCenter(centerCard).role}. You must swap it with a player. If you do not select in time, it will be swapped with the following randomly selected player: ${state.getName(fallbackPlayer)}`);
+			giveInfo(`The center card was ${state.getCenter(centerCard).roleName}. You must swap it with a player. If you do not select in time, it will be swapped with the following randomly selected player: ${state.getName(fallbackPlayer)}`);
 			const selectedPlayer = await pickPlayers(1, true);
 			const actualPlayer = selectedPlayer.length === 1 ? selectedPlayer[0] : fallbackPlayer;
 			state.swapCenter(actualPlayer, centerCard);
@@ -417,7 +417,7 @@ export class Insomniac extends Role {
 			giveInfo('Your role has been guarded by the sentinel. You will not see your current role tonight.');
 			return;
 		}
-		giveInfo(`Your current role is ${state.getPlayer(id).currentRole.role}`);
+		giveInfo(`Your current role is ${state.getPlayer(id).currentRole.roleName}`);
 	}
 }
 
@@ -446,7 +446,7 @@ export class Revealer extends Role {
 			const pid = cards[0];
 			const pRole = state.getPlayer(pid).currentRole;
 
-			giveInfo(`The role ${state.getName(pid)} has is ${pRole.role}`);
+			giveInfo(`The role ${state.getName(pid)} has is ${pRole.roleName}`);
 
 			if (pRole.winTeam === Teams.VILLAGER) {
 				pRole.modifiers.add(Modifiers.REVEALER);
