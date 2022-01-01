@@ -42,7 +42,17 @@ export default class OnuwGame {
 		);
 
 		wakeOrder.forEach((pid) => {
-			const timeLeft = this.roleTime; // TODO
+			let timeLeft = this.roleTime; // TODO
+			let lastTime = new Date();
+
+			const updateTimeLeft = () => {
+				const newTime = new Date();
+				timeLeft -= (newTime.getTime() - lastTime.getTime());
+				if (timeLeft < 0) {
+					timeLeft = 0;
+				}
+				lastTime = newTime;
+			};
 
 			/**
 			 * Generate the map for banned players when selecting
@@ -70,9 +80,21 @@ export default class OnuwGame {
 			this.comm.wake(pid);
 			const player = this.state.getPlayer(pid);
 			player.startingRole.act(
-				(num, allowSelf) => this.comm.pickPlayers(pid, timeLeft, num, getBanned(allowSelf)),
-				this.comm.pickCenters.bind(this.comm, pid, timeLeft),
-				this.comm.pickChoices.bind(this.comm, pid, timeLeft),
+				async (num, allowSelf) => {
+					const r = await this.comm.pickPlayers(pid, timeLeft, num, getBanned(allowSelf));
+					updateTimeLeft();
+					return r;
+				},
+				async (num) => {
+					const r = await this.comm.pickCenters(pid, timeLeft, num);
+					updateTimeLeft();
+					return r;
+				},
+				async (choices) => {
+					const r = await this.comm.pickChoices(pid, timeLeft, choices);
+					updateTimeLeft();
+					return r;
+				},
 				this.comm.message.bind(this.comm, pid),
 				this.state,
 				pid,
