@@ -125,6 +125,36 @@ export default class Role {
 		}
 		throw new Error();
 	}
+
+	/**
+	 * Comparator method for wake orders, after null has been filtered
+	 * @param {number[]} a
+	 * @param {number[]} b
+	 * @returns {number}
+	 */
+	static sortWakeOrder(a, b) {
+		if (a.length === 0) {
+			if (b.length === 0) {
+				return 0;
+			}
+			return b[0];
+		}
+		if (b.length === 0) {
+			return a[0];
+		}
+		// Both are non-zero length
+		const aIsShorter = a.length < b.length;
+		const shorterLength = aIsShorter ? a.length : b.length;
+		for (let i = 0; i < shorterLength; i++) {
+			if (a[i] !== b[i]) {
+				return a[i] - b[i];
+			}
+		}
+		if (a.length === b.length) {
+			return 0;
+		}
+		return aIsShorter ? a[shorterLength] : b[shorterLength];
+	}
 }
 
 /**
