@@ -216,7 +216,7 @@ export default class Communicator {
 	 *
 	 * @param {number[]} votes Player ID each player voted for
 	 * @param {Roles[]} playerRoles
-	 * @param {Teams} winTeam
+	 * @param {Teams[]} winTeam
 	 */
 	sendResults(votes, playerRoles, winTeam) {
 		this.#broadcast('result', JSON.stringify({

@@ -1,6 +1,7 @@
 import Communicator from './comms.js';
 import Role, { Modifiers } from '../game/role.js';
 import State from '../game/state.js';
+import computeWinner from '../game/winLogic.js';
 
 export default class OnuwGame {
 	/**
@@ -40,8 +41,8 @@ export default class OnuwGame {
 	}
 
 	async play() {
-		const wakeOrder = Array
-			.from(Array(this.state.numPlayers).keys())
+		const playerIDarray = Array.from(Array(this.state.numPlayers).keys());
+		const wakeOrder = playerIDarray
 			.filter((p) => this.state.getPlayer(p).startingRole.wakeOrder !== null);
 		wakeOrder.sort(
 			(a, b) => Role.sortWakeOrder(
@@ -71,8 +72,7 @@ export default class OnuwGame {
 			const getBanned = (allowSelf) => {
 				/** @type {Record<number, string>} */
 				const banned = {};
-				Array
-					.from(Array(this.state.numPlayers).keys())
+				playerIDarray
 					.forEach((ppid) => {
 						if (this.state.getPlayer(ppid).currentRole.modifiers.has(Modifiers.SENTINEL)) {
 							banned[ppid] = 'This player\'s role is being protected by the sentinel';
@@ -122,7 +122,7 @@ export default class OnuwGame {
 
 		/** @type {Record<number, string>} */
 		const boardInfo = {};
-		for (const pid of Array(this.state.numPlayers).keys()) {
+		playerIDarray.forEach((pid) => {
 			const role = this.state.getPlayer(pid).currentRole;
 			const playerMods = role.modifiers;
 			if (playerMods.has(Modifiers.SENTINEL)) {
@@ -130,7 +130,7 @@ export default class OnuwGame {
 			} else if (playerMods.has(Modifiers.REVEALER)) {
 				boardInfo[pid] = `This player has been revealed to be a ${role.roleName}`;
 			}
-		}
+		});
 		this.comm.transitionToDay(boardInfo);
 
 		// TODO accept ready-ups
@@ -153,6 +153,9 @@ export default class OnuwGame {
 			}
 		}
 
-		// TODO
+		const roleArray = playerIDarray.map((pid) => this.state.getPlayer(pid).currentRole.role);
+		const voteArray = playerIDarray.map((pid) => votes.get(pid) ?? 0);
+		const winningTeams = computeWinner(roleArray, voteArray);
+		this.comm.sendResults(voteArray, roleArray, winningTeams);
 	}
 }
