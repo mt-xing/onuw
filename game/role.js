@@ -1,5 +1,9 @@
+import {
+	ApprenticeSeer, DreamWolf, Drunk, Insomniac, Mason, Minion, MysticWolf, Revealer, Robber,
+	Seer, Sentinel, Tanner, Troublemaker, Werewolf, Witch,
+} from './rolesIndiv';
 import State from './state';
-import { toTitleCase } from './utils';
+import { assertUnreachable, toTitleCase } from './utils';
 
 export default class Role {
 	/**
@@ -79,7 +83,7 @@ export default class Role {
 	 * @returns {Teams}
 	 */
 	get winTeam() {
-		return Math.floor(this.role / TEAM_MULT);
+		return /** @type {Teams} */(Math.floor(this.role / TEAM_MULT));
 	}
 
 	/**
@@ -92,7 +96,7 @@ export default class Role {
 		if (this.role === Roles.MINION) {
 			return Teams.VILLAGER;
 		}
-		return Math.floor(this.role / TEAM_MULT);
+		return /** @type {Teams} */(Math.floor(this.role / TEAM_MULT));
 	}
 
 	get roleName() {
@@ -155,63 +159,111 @@ export default class Role {
 		}
 		return aIsShorter ? a[shorterLength] : b[shorterLength];
 	}
+
+	/**
+	 * Factory to construct a role object from a role ID
+	 * @param {Roles} role Role ID
+	 * @returns {Role}
+	 */
+	static construct(role) {
+		switch (role) {
+		case Roles.WEREWOLF:
+			return new Werewolf();
+		case Roles.MYSTIC_WOLF:
+			return new MysticWolf();
+		case Roles.DREAM_WOLF:
+			return new DreamWolf();
+		case Roles.MINION:
+			return new Minion();
+		case Roles.SENTINEL:
+			return new Sentinel();
+		case Roles.MASON:
+			return new Mason();
+		case Roles.SEER:
+			return new Seer();
+		case Roles.APPRENTICE_SEER:
+			return new ApprenticeSeer();
+		case Roles.ROBBER:
+			return new Robber();
+		case Roles.WITCH:
+			return new Witch();
+		case Roles.TROUBLEMAKER:
+			return new Troublemaker();
+		case Roles.DRUNK:
+			return new Drunk();
+		case Roles.INSOMNIAC:
+			return new Insomniac();
+		case Roles.REVEALER:
+			return new Revealer();
+		case Roles.TANNER:
+			return new Tanner();
+		default:
+			return assertUnreachable(role);
+		}
+	}
 }
 
 /**
  * Teams that win or lose
  * @readonly
- * @enum {number}
+ * @enum {(typeof Teams)[keyof typeof Teams]}
  */
-export const Teams = {
-	VILLAGER: 0,
-	WEREWOLF: 1,
-	TANNER: 2,
-};
+export const Teams = Object.freeze({
+	VILLAGER: /** @type {const} */(0),
+	WEREWOLF: /** @type {const} */(1),
+	TANNER: /** @type {const} */(2),
+});
 
-const TEAM_MULT = 100;
+const TEAM_MULT = /** @type {const} */(100);
+
+export const MAX_ROLES = 17;
 
 /**
  * List of all possible roles
  * @readonly
- * @enum {number}
+ * @enum {(typeof Roles)[keyof typeof Roles]}
  */
-export const Roles = {
+export const Roles = Object.freeze({
 	// Werewolves
-	WEREWOLF: Teams.WEREWOLF * TEAM_MULT + 0,
-	MYSTIC_WOLF: Teams.WEREWOLF * TEAM_MULT + 1,
-	DREAM_WOLF: Teams.WEREWOLF * TEAM_MULT + 2,
-	MINION: Teams.WEREWOLF * TEAM_MULT + 5, // Special
+	WEREWOLF: /** @type {100} */(Teams.WEREWOLF * TEAM_MULT + 0),
+	MYSTIC_WOLF: /** @type {101} */(Teams.WEREWOLF * TEAM_MULT + 1),
+	DREAM_WOLF: /** @type {102} */(Teams.WEREWOLF * TEAM_MULT + 2),
+	MINION: /** @type {105} */(Teams.WEREWOLF * TEAM_MULT + 5), // Special
 
 	// Villagers
-	SENTINEL: Teams.VILLAGER * TEAM_MULT + 0,
-	MASON: Teams.VILLAGER * TEAM_MULT + 1,
-	SEER: Teams.VILLAGER * TEAM_MULT + 2,
-	APPRENTICE_SEER: Teams.VILLAGER * TEAM_MULT + 3,
-	ROBBER: Teams.VILLAGER * TEAM_MULT + 4,
-	WITCH: Teams.VILLAGER * TEAM_MULT + 5,
-	TROUBLEMAKER: Teams.VILLAGER * TEAM_MULT + 6,
-	DRUNK: Teams.VILLAGER * TEAM_MULT + 7,
-	INSOMNIAC: Teams.VILLAGER * TEAM_MULT + 8,
-	REVEALER: Teams.VILLAGER * TEAM_MULT + 9,
+	SENTINEL: /** @type {0} */(Teams.VILLAGER * TEAM_MULT + 0),
+	MASON: /** @type {1} */(Teams.VILLAGER * TEAM_MULT + 1),
+	SEER: /** @type {2} */(Teams.VILLAGER * TEAM_MULT + 2),
+	APPRENTICE_SEER: /** @type {3} */(Teams.VILLAGER * TEAM_MULT + 3),
+	ROBBER: /** @type {4} */(Teams.VILLAGER * TEAM_MULT + 4),
+	WITCH: /** @type {5} */(Teams.VILLAGER * TEAM_MULT + 5),
+	TROUBLEMAKER: /** @type {6} */(Teams.VILLAGER * TEAM_MULT + 6),
+	DRUNK: /** @type {7} */(Teams.VILLAGER * TEAM_MULT + 7),
+	INSOMNIAC: /** @type {8} */(Teams.VILLAGER * TEAM_MULT + 8),
+	REVEALER: /** @type {9} */(Teams.VILLAGER * TEAM_MULT + 9),
 
 	// lol
-	TANNER: Teams.TANNER * TEAM_MULT,
-};
+	TANNER: /** @type {200} */(Teams.TANNER * TEAM_MULT),
+});
 
 /**
  * Lookup from role id to name of role
- * @type {Record<Roles, string>}
+ * @type {Readonly<Record<Roles, string>>}
  */
-export const roleToName = {};
-// @ts-ignore
-Object.keys(Roles).forEach((key) => { roleToName[Roles[key]] = toTitleCase(key.replace('_', ' ')); });
+export const roleToName = (() => {
+	/** @type {Partial<Record<Roles, string>>} */
+	const t = {};
+	/** @type {(keyof typeof Roles)[]} */(Object.keys(Roles))
+		.forEach((key) => { t[Roles[key]] = toTitleCase(key.replace('_', ' ')); });
+	return Object.freeze(/** @type {Record<Roles, string>} */(t));
+})();
 
 /**
  * List of all modifiers a player can take on
  * @readonly
- * @enum {number}
+ * @enum {(typeof Modifiers)[keyof typeof Modifiers]}
  */
-export const Modifiers = {
-	SENTINEL: 0,
-	REVEALER: 1,
-};
+export const Modifiers = Object.freeze({
+	SENTINEL: /** @type {const} */(0),
+	REVEALER: /** @type {const} */(1),
+});
