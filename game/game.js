@@ -51,7 +51,7 @@ export default class OnuwGame {
 		);
 
 		wakeOrder.forEach((pid) => {
-			let timeLeft = this.roleTime; // TODO
+			let timeLeft = this.roleTime;
 			let lastTime = new Date();
 
 			const updateTimeLeft = () => {
