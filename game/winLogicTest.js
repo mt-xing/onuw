@@ -23,7 +23,7 @@ const winTests = {
 		[2, 2, 1, 1, 0],
 		[Teams.VILLAGER],
 	],
-	'no werewolves': [
+	'no one died and no werewolves': [
 		[Roles.MASON, Roles.MASON, Roles.INSOMNIAC], [1, 2, 0],
 		[Teams.VILLAGER],
 	],
@@ -55,6 +55,35 @@ const winTests = {
 		[Roles.INSOMNIAC, Roles.APPRENTICE_SEER, Roles.MASON, Roles.MASON, Roles.TANNER],
 		[4, 4, 0, 4, 0],
 		[Teams.TANNER],
+	],
+	'no werewolves, killed villager': [
+		[Roles.INSOMNIAC, Roles.APPRENTICE_SEER, Roles.MASON, Roles.MASON],
+		[3, 3, 0, 3],
+		[],
+	],
+	'minion villagers lose': [
+		[Roles.WEREWOLF, Roles.MINION, Roles.MASON], [1, 1, 0],
+		[Teams.WEREWOLF],
+	],
+	'minion villagers win': [
+		[Roles.WEREWOLF, Roles.MINION, Roles.MASON, Roles.MASON], [1, 2, 0, 0],
+		[Teams.VILLAGER],
+	],
+	'minion villagers tie win': [
+		[Roles.WEREWOLF, Roles.MINION, Roles.MASON, Roles.MASON], [1, 1, 0, 0],
+		[Teams.VILLAGER],
+	],
+	'minion no werewolf minion wins': [
+		[Roles.MINION, Roles.MASON, Roles.MASON], [1, 0, 1],
+		[Teams.WEREWOLF],
+	],
+	'minion no werewolf minion loses': [
+		[Roles.MINION, Roles.MASON, Roles.MASON], [1, 0, 0],
+		[Teams.VILLAGER],
+	],
+	'minion no werewolf everyone loses': [
+		[Roles.MINION, Roles.MASON, Roles.MASON, Roles.INSOMNIAC], [1, 0, 0, 1],
+		[],
 	],
 };
 

@@ -9,7 +9,6 @@ import { constructRole } from './rolesIndiv.js';
  */
 export default function computeWinner(rolesID, votes) {
 	const allRoles = new Set(rolesID);
-	const hasTanner = allRoles.has(Roles.TANNER);
 	const roles = rolesID.map((r) => constructRole(r));
 	const hasWerewolfNonMinion = roles.some(
 		(r) => r.killTeam === Teams.WEREWOLF,
@@ -21,50 +20,69 @@ export default function computeWinner(rolesID, votes) {
 
 	const maxVotes = votesForPlayer.reduce((a, x) => (x > a ? x : a), -1);
 	const killedPlayers = votesForPlayer
-		.map((v, i) => (v === maxVotes ? i : NaN))
+		.map((v, i) => (v === maxVotes && v > 1 ? i : NaN))
 		.filter((x) => !Number.isNaN(x));
 
-	if (!hasTanner) {
-		// Werewolves win if and only if there is a werewolf and none were killed
-		if (hasWerewolfNonMinion) {
-			if (maxVotes <= 1) { return [Teams.WEREWOLF]; }
-			if (killedPlayers.every((k) => roles[k].killTeam !== Teams.WEREWOLF)) {
-				return [Teams.WEREWOLF];
-			}
-		}
-		return [Teams.VILLAGER];
-	}
-
 	// There is a tanner
-
-	if (maxVotes <= 1) {
+	if (allRoles.has(Roles.TANNER)) {
 		// No one was killed
-		if (hasWerewolfNonMinion) { return [Teams.WEREWOLF]; }
+		if (maxVotes <= 1) {
+			if (hasWerewolfNonMinion) { return [Teams.WEREWOLF]; }
+			return [Teams.VILLAGER];
+		}
+
+		// Tanner died
+		if (killedPlayers.some((p) => roles[p].winTeam === Teams.TANNER)) {
+			// Killed a werewolf too => villagers ALSO win
+			if (
+				hasWerewolfNonMinion
+				&& killedPlayers.some((k) => roles[k].killTeam === Teams.WEREWOLF)
+			) {
+				return [Teams.TANNER, Teams.VILLAGER];
+			}
+
+			// No werewolves died => werewolves do NOT win
+			return [Teams.TANNER];
+		}
+	}
+
+	// Either no tanner at all, or tanner didn't die (but someone did)
+	// Either way, tanner is now irrelevant
+
+	const werewolfDied = killedPlayers.some((k) => roles[k].killTeam === Teams.WEREWOLF);
+
+	// If at least one werewolf died => villagers win
+	if (werewolfDied) {
 		return [Teams.VILLAGER];
 	}
 
-	if (killedPlayers.some((p) => roles[p].winTeam === Teams.TANNER)) {
-		// Tanner died
-
-		// Killed a werewolf too => villagers ALSO win
-		if (
-			hasWerewolfNonMinion
-			&& killedPlayers.some((k) => roles[k].killTeam === Teams.WEREWOLF)
-		) {
-			return [Teams.TANNER, Teams.VILLAGER];
-		}
-
-		// No werewolves died => werewolves do NOT win
-		return [Teams.TANNER];
+	// If no werewolves and no one died => villagers win
+	if (!hasWerewolfNonMinion && maxVotes <= 1) {
+		return [Teams.VILLAGER];
 	}
 
-	// Tanner did not die
 	// Werewolves win if and only if there is a werewolf and none were killed
-	if (
-		hasWerewolfNonMinion
-		&& killedPlayers.every((k) => roles[k].killTeam !== Teams.WEREWOLF)
-	) {
+	if (hasWerewolfNonMinion) {
 		return [Teams.WEREWOLF];
 	}
-	return [Teams.VILLAGER];
+
+	// No werewolves AND someone died
+
+	// If no minion, then no one wins
+	if (!allRoles.has(Roles.MINION)) {
+		return [];
+	}
+
+	// Special case - we have a minion but no werewolves
+	// Rules are iffy, so here's what I'm doing:
+	// Kill only minion = villagers win
+	// Kill only non-minion = minion wins <- rules do specify this
+	// Kill both = no one wins
+	if (killedPlayers.length === 1 && roles[killedPlayers[0]].role === Roles.MINION) {
+		return [Teams.VILLAGER];
+	} else if (killedPlayers.every((id) => roles[id].role !== Roles.MINION)) {
+		return [Teams.WEREWOLF];
+	} else {
+		return [];
+	}
 }
