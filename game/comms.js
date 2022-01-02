@@ -1,5 +1,16 @@
+import * as io from '../node_modules/socket.io/dist/index';
+
 export default class Communicator {
-	static routeSocket() {
+	/**
+	 * @type {io.Socket[]}
+	 */
+	#playerToSocket;
+
+	/**
+	 * @param {io.Socket[]} playerToSocket
+	 */
+	constructor(playerToSocket) {
+		this.#playerToSocket = playerToSocket;
 	}
 
 	/**
@@ -54,4 +65,23 @@ export default class Communicator {
 	 * @param {number} pid Player ID
 	 */
 	sleep(pid) { }
+
+	/**
+	 * Send a message to a particular player
+	 * @param {number} pid Player ID
+	 * @param {string} tag Tag of the message
+	 * @param {string} msg Message content
+	 */
+	sendToPlayer(pid, tag, msg) {
+		this.#playerToSocket[pid].emit(tag, msg);
+	}
+
+	/**
+	 * Process the response from a player when they have finished picking a selection
+	 * @param {number} nonce Unique identifier for a selection
+	 * @param {number[]} selection The player's choice (indices)
+	 */
+	processPlayerResponse(nonce, selection) {
+
+	}
 }
