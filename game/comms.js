@@ -1,5 +1,14 @@
 import * as io from '../node_modules/socket.io/dist/index';
 
+/**
+ * @typedef {{
+ * 	nonce: number,
+ * 	resolve: (choices: number[]|number) => void,
+ * 	valid: Set<number>,
+ * 	num: number | null
+ * }} PendingResponse
+ */
+
 export default class Communicator {
 	/**
 	 * @type {io.Socket[]}
@@ -7,10 +16,16 @@ export default class Communicator {
 	#playerToSocket;
 
 	/**
+	 * @type {PendingResponse | null}
+	 */
+	#pendingResponse;
+
+	/**
 	 * @param {io.Socket[]} playerToSocket
 	 */
 	constructor(playerToSocket) {
 		this.#playerToSocket = playerToSocket;
+		this.#pendingResponse = null;
 	}
 
 	/**
@@ -77,11 +92,27 @@ export default class Communicator {
 	}
 
 	/**
-	 * Process the response from a player when they have finished picking a selection
+	 * Process the response from a player when they have finished picking a selection.
+	 * Will silently drop invalid responses.
 	 * @param {number} nonce Unique identifier for a selection
 	 * @param {number[]} selection The player's choice (indices)
 	 */
 	processPlayerResponse(nonce, selection) {
-
+		if (this.#pendingResponse === null) {
+			return;
+		}
+		const pend = this.#pendingResponse;
+		if (pend.nonce !== nonce) {
+			return;
+		}
+		if (selection.length !== (pend.num === null ? 1 : pend.num)) {
+			return;
+		}
+		if (selection.some((x) => !pend.valid.has(x))) {
+			return;
+		}
+		// All valid
+		this.#pendingResponse = null;
+		pend.resolve(pend.num === null ? selection[0] : selection);
 	}
 }
