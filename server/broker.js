@@ -1,6 +1,6 @@
-import * as io from '../node_modules/socket.io/dist/index';
-import { MAX_ROLES, Roles } from '../game/role';
-import { CENTER_SIZE } from '../game/state';
+import * as io from '../node_modules/socket.io/dist/index.js';
+import { MAX_ROLES, Roles } from '../game/role.js';
+import { CENTER_SIZE } from '../game/state.js';
 
 export default class Broker {
 	/**
@@ -50,9 +50,10 @@ export default class Broker {
 	/**
 	 * Add a player to the game
 	 * @param {string} name
+	 * @param {io.Socket} socket
 	 * @returns {number|'full'|'duplicate'|'done'} Whether joining was successful or not
 	 */
-	addPlayer(name) {
+	addPlayer(socket, name) {
 		if (!this.#acceptingPlayers) {
 			return 'done';
 		}
@@ -63,6 +64,7 @@ export default class Broker {
 			return 'duplicate';
 		}
 		this.#names.push(name);
+		this.playerToSocket.push(socket);
 		return this.#names.length - 1;
 	}
 

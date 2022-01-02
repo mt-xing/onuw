@@ -1,6 +1,6 @@
-import * as io from '../node_modules/socket.io/dist/index';
-import { Roles, Teams } from '../game/role';
-import { CENTER_SIZE } from '../game/state';
+import * as io from '../node_modules/socket.io/dist/index.js';
+import { Roles, Teams } from '../game/role.js';
+import { CENTER_SIZE } from '../game/state.js';
 
 /**
  * @typedef {{
@@ -25,9 +25,19 @@ export default class Communicator {
 	#playerToSocket;
 
 	/**
+	 * @type {Map<io.Socket, number>}
+	 */
+	socketToPlayer;
+
+	/**
 	 * @type {PendingResponse | null}
 	 */
 	#pendingResponse;
+
+	/**
+	 * @type {((pid: number, voteTarget: number) => void) | null}
+	 */
+	#pendingVote;
 
 	/**
 	 * @type {(tag: string, msg: string) => void}
@@ -41,7 +51,10 @@ export default class Communicator {
 	constructor(playerToSocket, broadcast) {
 		this.#playerToSocket = playerToSocket;
 		this.#pendingResponse = null;
+		this.#pendingVote = null;
 		this.#broadcast = broadcast;
+		this.socketToPlayer = new Map();
+		playerToSocket.forEach((socket, id) => this.socketToPlayer.set(socket, id));
 	}
 
 	/**
@@ -178,8 +191,18 @@ export default class Communicator {
 		this.#broadcast('time', JSON.stringify({ time: timeLeft / 1000 }));
 	}
 
-	startTheVote() {
+	/**
+	 * @returns {AsyncGenerator<[number, number], never, void>}
+	 * Async generator that yields a tuple of player ID that voted and player ID they voted for
+	 */
+	async* startTheVote() {
 		this.#broadcast('voteStart', '');
+		// eslint-disable-next-line no-constant-condition
+		while (true) {
+			yield await new Promise((resolve) => {
+				this.#pendingVote = (a, b) => resolve([a, b]);
+			});
+		}
 	}
 
 	/**
@@ -239,6 +262,19 @@ export default class Communicator {
 		} else {
 			pend.resolve(selection);
 		}
+	}
+
+	/**
+	 * Handle a vote submitted by a player.
+	 *
+	 * Will silently drop if not expecting a vote.
+	 * @param {number} pid Player ID voting
+	 * @param {number} selection Player ID of who they voted for
+	 */
+	processPlayerVote(pid, selection) {
+		if (Number.isNaN(pid)) { return; }
+		if (this.#pendingVote === null) { return; }
+		this.#pendingVote(pid, selection);
 	}
 
 	/**

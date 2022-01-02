@@ -1,9 +1,5 @@
-import {
-	ApprenticeSeer, DreamWolf, Drunk, Insomniac, Mason, Minion, MysticWolf, Revealer, Robber,
-	Seer, Sentinel, Tanner, Troublemaker, Werewolf, Witch,
-} from './rolesIndiv';
-import State from './state';
-import { assertUnreachable, toTitleCase } from './utils';
+import State from './state.js';
+import { assertUnreachable, toTitleCase } from './utils.js';
 
 export default class Role {
 	/**
@@ -158,48 +154,6 @@ export default class Role {
 			return 0;
 		}
 		return aIsShorter ? a[shorterLength] : b[shorterLength];
-	}
-
-	/**
-	 * Factory to construct a role object from a role ID
-	 * @param {Roles} role Role ID
-	 * @returns {Role}
-	 */
-	static construct(role) {
-		switch (role) {
-		case Roles.WEREWOLF:
-			return new Werewolf();
-		case Roles.MYSTIC_WOLF:
-			return new MysticWolf();
-		case Roles.DREAM_WOLF:
-			return new DreamWolf();
-		case Roles.MINION:
-			return new Minion();
-		case Roles.SENTINEL:
-			return new Sentinel();
-		case Roles.MASON:
-			return new Mason();
-		case Roles.SEER:
-			return new Seer();
-		case Roles.APPRENTICE_SEER:
-			return new ApprenticeSeer();
-		case Roles.ROBBER:
-			return new Robber();
-		case Roles.WITCH:
-			return new Witch();
-		case Roles.TROUBLEMAKER:
-			return new Troublemaker();
-		case Roles.DRUNK:
-			return new Drunk();
-		case Roles.INSOMNIAC:
-			return new Insomniac();
-		case Roles.REVEALER:
-			return new Revealer();
-		case Roles.TANNER:
-			return new Tanner();
-		default:
-			return assertUnreachable(role);
-		}
 	}
 }
 

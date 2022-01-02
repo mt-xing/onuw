@@ -1,6 +1,6 @@
-import Communicator from './comms';
-import Role, { Modifiers } from '../game/role';
-import State from '../game/state';
+import Communicator from './comms.js';
+import Role, { Modifiers } from '../game/role.js';
+import State from '../game/state.js';
 
 export default class OnuwGame {
 	/**
@@ -119,5 +119,40 @@ export default class OnuwGame {
 
 			this.comm.sleep(pid);
 		}
+
+		/** @type {Record<number, string>} */
+		const boardInfo = {};
+		for (const pid of Array(this.state.numPlayers).keys()) {
+			const role = this.state.getPlayer(pid).currentRole;
+			const playerMods = role.modifiers;
+			if (playerMods.has(Modifiers.SENTINEL)) {
+				boardInfo[pid] = 'This player\'s role was guarded by the sentinel';
+			} else if (playerMods.has(Modifiers.REVEALER)) {
+				boardInfo[pid] = `This player has been revealed to be a ${role.roleName}`;
+			}
+		}
+		this.comm.transitionToDay(boardInfo);
+
+		// TODO accept ready-ups
+		await new Promise((resolve) => {
+			setTimeout(resolve, this.thinkTime);
+		});
+
+		/**
+		 * @type {Map<number, number>}
+		 */
+		const votes = new Map();
+		{
+			// Scoping the generator to this block so it can get garbage collected
+			// when all the votes are in
+			const voteGenerator = this.comm.startTheVote();
+			while (votes.size < this.state.numPlayers) {
+				const t = (await voteGenerator.next()).value;
+				votes.set(t[0], t[1]);
+				this.comm.voteReceived(t[0]);
+			}
+		}
+
+		// TODO
 	}
 }

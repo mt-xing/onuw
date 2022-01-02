@@ -1,9 +1,10 @@
-import * as io from '../node_modules/socket.io/dist/index';
-import Broker from './broker';
-import Communicator from './comms';
-import OnuwGame from './game';
-import Role, { Roles } from '../game/role';
-import { CENTER_SIZE } from '../game/state';
+import * as io from '../node_modules/socket.io/dist/index.js';
+import Broker from './broker.js';
+import Communicator from './comms.js';
+import OnuwGame from './game.js';
+import Role, { Roles } from '../game/role.js';
+import { CENTER_SIZE } from '../game/state.js';
+import { constructRole } from '../game/rolesIndiv.js';
 
 export default class OnuwServer {
 	/**
@@ -17,7 +18,7 @@ export default class OnuwServer {
 	#socketRoom;
 
 	/**
-	 * @type {Map<string, OnuwGame}
+	 * @type {Map<string, OnuwGame>}
 	 */
 	#games;
 
@@ -43,6 +44,7 @@ export default class OnuwServer {
 			socket.on('setupInfo', this.#setupInfo.bind(this, socket));
 			socket.on('setupDone', this.#completeSetup.bind(this, socket));
 			socket.on('pick', this.#selectionMade.bind(this, socket));
+			socket.on('vote', this.#voteReceived.bind(this, socket));
 		});
 	}
 
@@ -85,7 +87,7 @@ export default class OnuwServer {
 			socket.emit('joinNo', JSON.stringify({ reason: 'This game code does not exist' }));
 			return;
 		}
-		const addResult = game.addPlayer(name);
+		const addResult = game.addPlayer(socket, name);
 		switch (addResult) {
 		case 'full':
 			socket.emit('joinNo', JSON.stringify({ reason: 'This game is full' }));
@@ -153,7 +155,7 @@ export default class OnuwServer {
 
 		const communicator = new Communicator(game.playerToSocket, this.#namespace.to(room).emit);
 		const newGame = new OnuwGame(
-			Array.from(game.roles).map((roleID) => Role.construct(roleID)),
+			Array.from(game.roles).map((roleID) => constructRole(roleID)),
 			game.players,
 			game.roleTime,
 			game.talkTime,
@@ -194,5 +196,20 @@ export default class OnuwServer {
 		/** @type {{nonce: number, id: number[]}} */
 		const { nonce, id } = JSON.parse(info);
 		game.comm.processPlayerResponse(nonce, id);
+	}
+
+	/**
+	 * @param {io.Socket} socket
+	 * @param {string} info
+	 */
+	#voteReceived(socket, info) {
+		const room = this.#socketRoom.get(socket);
+		const game = this.#games.get(room ?? '');
+		if (game === undefined) {
+			return;
+		}
+		/** @type {{id: number}} */
+		const { id } = JSON.parse(info);
+		game.comm.processPlayerVote(game.comm.socketToPlayer.get(socket) ?? NaN, id);
 	}
 }

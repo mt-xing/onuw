@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "test": "node test.js"
+  },
   "dependencies": {
     "socket.io": "^4.4.0"
   },
@@ -6,5 +9,6 @@
     "eslint": "^8.5.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.25.3"
-  }
+  },
+  "type": "module"
 }

@@ -1,6 +1,6 @@
-import Role, { Modifiers, Roles, Teams } from './role';
-import State, { CENTER_SIZE } from './state';
-import { makeList } from './utils';
+import Role, { Modifiers, Roles, Teams } from './role.js';
+import State, { CENTER_SIZE } from './state.js';
+import { assertUnreachable, makeList } from './utils.js';
 
 // #region Werewolves
 
@@ -478,4 +478,45 @@ export class Tanner extends Role {
 	 * @param {number} id Current player ID
 	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {}
+}
+/**
+ * Factory to construct a role object from a role ID
+ * @param {Roles} role Role ID
+ * @returns {Role}
+ */
+export function constructRole(role) {
+   switch (role) {
+   case Roles.WEREWOLF:
+	   return new Werewolf();
+   case Roles.MYSTIC_WOLF:
+	   return new MysticWolf();
+   case Roles.DREAM_WOLF:
+	   return new DreamWolf();
+   case Roles.MINION:
+	   return new Minion();
+   case Roles.SENTINEL:
+	   return new Sentinel();
+   case Roles.MASON:
+	   return new Mason();
+   case Roles.SEER:
+	   return new Seer();
+   case Roles.APPRENTICE_SEER:
+	   return new ApprenticeSeer();
+   case Roles.ROBBER:
+	   return new Robber();
+   case Roles.WITCH:
+	   return new Witch();
+   case Roles.TROUBLEMAKER:
+	   return new Troublemaker();
+   case Roles.DRUNK:
+	   return new Drunk();
+   case Roles.INSOMNIAC:
+	   return new Insomniac();
+   case Roles.REVEALER:
+	   return new Revealer();
+   case Roles.TANNER:
+	   return new Tanner();
+   default:
+	   return assertUnreachable(role);
+   }
 }

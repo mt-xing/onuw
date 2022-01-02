@@ -1,6 +1,6 @@
-import Role from './role';
-import Player from './player';
-import { shuffle } from './utils';
+import Role from './role.js';
+import Player from './player.js';
+import { shuffle } from './utils.js';
 
 export const CENTER_SIZE = 3;
 
