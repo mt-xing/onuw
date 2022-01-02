@@ -22,6 +22,7 @@
         "import/prefer-default-export": "warn",
         "no-empty-function": "off",
         "no-restricted-syntax": "off",
-        "no-useless-return": "off"
+        "no-useless-return": "off",
+        "no-await-in-loop": "off"
     }
 }

@@ -50,7 +50,7 @@ export default class OnuwGame {
 			),
 		);
 
-		wakeOrder.forEach((pid) => {
+		for (const pid of wakeOrder) {
 			let timeLeft = this.roleTime;
 			let lastTime = new Date();
 
@@ -88,7 +88,7 @@ export default class OnuwGame {
 
 			this.comm.wake(pid);
 			const player = this.state.getPlayer(pid);
-			player.startingRole.act(
+			await player.startingRole.act(
 				async (num, allowSelf) => {
 					const r = await this.comm.pickPlayers(pid, timeLeft, num, getBanned(allowSelf));
 					updateTimeLeft();
@@ -109,7 +109,14 @@ export default class OnuwGame {
 				pid,
 			);
 
+			if (timeLeft > 0) {
+				// Need to stall
+				await new Promise((resolve) => {
+					setTimeout(resolve, timeLeft);
+				});
+			}
+
 			this.comm.sleep(pid);
-		});
+		}
 	}
 }
