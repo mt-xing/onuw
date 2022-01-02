@@ -1,4 +1,5 @@
 import * as io from '../node_modules/socket.io/dist/index';
+import { CENTER_SIZE } from './state';
 
 /**
  * @typedef {{
@@ -54,7 +55,19 @@ export default class Communicator {
 	 * @returns {Promise<number[]>}
 	 */
 	pickCenters(pid, timeout, num) {
-		throw new Error('TODO');
+		return new Promise((resolve) => {
+			const nonce = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+			/** @type {PendingResponse} */
+			this.#pendingResponse = {
+				nonce,
+				valid: new Set(Array(CENTER_SIZE).keys()),
+				num,
+				resolve,
+			};
+			this.sendToPlayer(pid, 'pickCenters', JSON.stringify({
+				nonce, num,
+			}));
+		});
 	}
 
 	/**
@@ -78,13 +91,17 @@ export default class Communicator {
 	 */
 	pickChoices(pid, timeout, choices) {
 		return new Promise((resolve) => {
+			const nonce = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
 			/** @type {PendingResponse} */
 			this.#pendingResponse = {
-				nonce: Math.floor(Math.random() * Number.MAX_SAFE_INTEGER),
+				nonce,
 				valid: new Set(choices.map((_, i) => i)),
 				num: null,
 				resolve,
 			};
+			this.sendToPlayer(pid, 'pickChoices', JSON.stringify({
+				nonce, choices,
+			}));
 		});
 	}
 
