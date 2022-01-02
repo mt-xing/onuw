@@ -3,10 +3,10 @@
 import runWinTests from './game/winLogicTest.js';
 
 console.log('Running Test Cases');
-console.log('\n\n');
+console.log('\n');
 let fails = 0;
 fails += runWinTests();
-console.log('\n\n');
+console.log('\n');
 console.log('All tests completed');
 console.log(`Total Failures: ${fails}`);
 if (fails > 0) {

@@ -15,8 +15,9 @@ export default function computeWinner(rolesID, votes) {
 		(r) => r.killTeam === Teams.WEREWOLF,
 	);
 
-	const votesForPlayer = votes.map((_) => 0);
-	votes.forEach((v) => votesForPlayer[v]++);
+	const votesForPlayerRaw = votes.map((_) => 0);
+	votes.forEach((v) => votesForPlayerRaw[v]++);
+	const votesForPlayer = votesForPlayerRaw.map((x) => (x > 1 ? x : 0));
 
 	const maxVotes = votesForPlayer.reduce((a, x) => (x > a ? x : a), -1);
 	const killedPlayers = votesForPlayer
