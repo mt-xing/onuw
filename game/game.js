@@ -86,8 +86,9 @@ export default class OnuwGame {
 				return banned;
 			};
 
-			this.comm.wake(pid);
 			const player = this.state.getPlayer(pid);
+			this.comm.wake(pid, player.startingRole.role);
+
 			await player.startingRole.act(
 				async (num, allowSelf) => {
 					const r = await this.comm.pickPlayers(pid, timeLeft, num, getBanned(allowSelf));

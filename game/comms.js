@@ -1,4 +1,5 @@
 import * as io from '../node_modules/socket.io/dist/index';
+import { Roles } from './role';
 import { CENTER_SIZE } from './state';
 
 /**
@@ -29,19 +30,28 @@ export default class Communicator {
 	#pendingResponse;
 
 	/**
-	 * @param {io.Socket[]} playerToSocket
+	 * @type {(tag: string, msg: string) => void}
 	 */
-	constructor(playerToSocket) {
+	#broadcast;
+
+	/**
+	 * @param {io.Socket[]} playerToSocket
+	 * @param {(tag: string, msg: string) => void} broadcast
+	 */
+	constructor(playerToSocket, broadcast) {
 		this.#playerToSocket = playerToSocket;
 		this.#pendingResponse = null;
+		this.#broadcast = broadcast;
 	}
 
 	/**
 	 * Wake up a player
 	 * @param {number} pid Player ID
+	 * @param {Roles} role Player Role
 	 */
-	wake(pid) {
+	wake(pid, role) {
 		this.sendToPlayer(pid, 'wake', '');
+		this.#broadcast('roleStart', JSON.stringify({ role }));
 	}
 
 	/**

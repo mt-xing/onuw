@@ -150,7 +150,7 @@ export default class OnuwServer {
 			return;
 		}
 
-		const communicator = new Communicator(game.playerToSocket);
+		const communicator = new Communicator(game.playerToSocket, this.#namespace.to(room).emit);
 		const newGame = new OnuwGame(
 			Array.from(game.roles).map((roleID) => Role.construct(roleID)),
 			game.players,
