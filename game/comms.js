@@ -83,7 +83,27 @@ export default class Communicator {
 	 * @returns {Promise<number[]>}
 	 */
 	pickPlayers(pid, timeout, num, banned) {
-		throw new Error('TODO');
+		const nonce = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+		this.sendToPlayer(pid, 'pickPlayers', JSON.stringify({
+			nonce, num, banned,
+		}));
+		const timeoutObj = setTimeout(this.timeoutPlayerResponse.bind(this, pid, nonce), timeout);
+
+		const valid = new Set(Array(this.#playerToSocket.length).keys());
+		Object.keys(banned).forEach((bannedID) => {
+			valid.delete(parseInt(bannedID, 10));
+		});
+
+		return new Promise((resolve) => {
+			/** @type {PendingResponse} */
+			this.#pendingResponse = {
+				nonce,
+				valid,
+				num,
+				resolve,
+				timeout: timeoutObj,
+			};
+		});
 	}
 
 	/**
