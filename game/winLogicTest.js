@@ -85,6 +85,31 @@ const winTests = {
 		[Roles.MINION, Roles.MASON, Roles.MASON, Roles.INSOMNIAC], [1, 0, 0, 1],
 		[],
 	],
+	'minion tanner no werewolf everyone loses': [
+		[Roles.MINION, Roles.MASON, Roles.MASON, Roles.INSOMNIAC, Roles.TANNER],
+		[1, 0, 0, 1, 2],
+		[],
+	],
+	'minion tanner no werewolf minion wins': [
+		[Roles.MINION, Roles.MASON, Roles.MASON, Roles.INSOMNIAC, Roles.TANNER],
+		[1, 0, 2, 1, 2],
+		[Teams.WEREWOLF],
+	],
+	'minion tanner no werewolf minion loses': [
+		[Roles.MINION, Roles.MASON, Roles.MASON, Roles.INSOMNIAC, Roles.TANNER],
+		[1, 0, 0, 1, 0],
+		[Teams.VILLAGER],
+	],
+	'minion tanner no werewolf tanner wins': [
+		[Roles.MINION, Roles.MASON, Roles.MASON, Roles.INSOMNIAC, Roles.TANNER],
+		[4, 0, 4, 4, 1],
+		[Teams.TANNER],
+	],
+	'minion tanner no werewolf tanner wins kill minion': [
+		[Roles.MINION, Roles.MASON, Roles.MASON, Roles.INSOMNIAC, Roles.TANNER, Roles.WITCH],
+		[4, 0, 4, 4, 0, 0],
+		[Teams.TANNER],
+	],
 };
 
 export default function runWinTests() {
