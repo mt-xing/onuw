@@ -42,6 +42,7 @@ export default class OnuwServer {
 			socket.on('setupStart', this.#enterSetup.bind(this, socket));
 			socket.on('setupInfo', this.#setupInfo.bind(this, socket));
 			socket.on('setupDone', this.#completeSetup.bind(this, socket));
+			socket.on('pick', this.#selectionMade.bind(this, socket));
 		});
 	}
 
@@ -174,8 +175,24 @@ export default class OnuwServer {
 			newGame.comm.sendToPlayer(playerID, 'setupRole', JSON.stringify(r));
 		}
 
+		// Kick off the game :D
 		setTimeout(() => {
 			newGame.play();
 		}, 1000);
+	}
+
+	/**
+	 * @param {io.Socket} socket
+	 * @param {string} info
+	 */
+	#selectionMade(socket, info) {
+		const room = this.#socketRoom.get(socket);
+		const game = this.#games.get(room ?? '');
+		if (game === undefined) {
+			return;
+		}
+		/** @type {{nonce: number, id: number[]}} */
+		const { nonce, id } = JSON.parse(info);
+		game.comm.processPlayerResponse(nonce, id);
 	}
 }
