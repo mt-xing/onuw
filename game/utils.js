@@ -52,3 +52,12 @@ export function toTitleCase(str) {
 		(word) => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase(),
 	);
 }
+
+/**
+ * Assert a code path is unreachable
+ * @param {never} never Something that should never have a value
+ * @returns {never}
+ */
+export function assertUnreachable(never) {
+	throw new Error(`This should be unreachable, but got ${never}`);
+}
