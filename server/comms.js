@@ -1,5 +1,5 @@
 import * as io from '../node_modules/socket.io/dist/index';
-import { Roles } from '../game/role';
+import { Roles, Teams } from '../game/role';
 import { CENTER_SIZE } from '../game/state';
 
 /**
@@ -160,6 +160,45 @@ export default class Communicator {
 	 */
 	sleep(pid) {
 		this.sendToPlayer(pid, 'sleep', '');
+	}
+
+	/**
+	 * Alert players that day has begun
+	 * @param {Record<number, string>} boardInfo Mapping from player id to descriptors
+	 */
+	transitionToDay(boardInfo) {
+		this.#broadcast('day', JSON.stringify(boardInfo));
+	}
+
+	/**
+	 * Periodic time sync during day phase
+	 * @param {number} timeLeft Milliseconds left
+	 */
+	timeUpdate(timeLeft) {
+		this.#broadcast('time', JSON.stringify({ time: timeLeft / 1000 }));
+	}
+
+	startTheVote() {
+		this.#broadcast('voteStart', '');
+	}
+
+	/**
+	 * @param {number} playerID Player ID that sent the vote
+	 */
+	voteReceived(playerID) {
+		this.#broadcast('voteReceived', JSON.stringify({ playerID }));
+	}
+
+	/**
+	 *
+	 * @param {number[]} votes Player ID each player voted for
+	 * @param {Roles[]} playerRoles
+	 * @param {Teams} winTeam
+	 */
+	sendResults(votes, playerRoles, winTeam) {
+		this.#broadcast('result', JSON.stringify({
+			votes, playerRoles, winTeam,
+		}));
 	}
 
 	/**
