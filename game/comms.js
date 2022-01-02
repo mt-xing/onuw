@@ -3,9 +3,14 @@ import * as io from '../node_modules/socket.io/dist/index';
 /**
  * @typedef {{
  * 	nonce: number,
- * 	resolve: (choices: number[]|number) => void,
+ * 	resolve: (choices: number[]) => void,
  * 	valid: Set<number>,
- * 	num: number | null
+ * 	num: number
+ * } | {
+ * 	nonce: number,
+ * 	resolve: (choice: number) => void,
+ * 	valid: Set<number>,
+ * 	num: null
  * }} PendingResponse
  */
 
@@ -72,7 +77,15 @@ export default class Communicator {
 	 * @returns {Promise<number>}
 	 */
 	pickChoices(pid, timeout, choices) {
-		throw new Error('TODO');
+		return new Promise((resolve) => {
+			/** @type {PendingResponse} */
+			this.#pendingResponse = {
+				nonce: Math.floor(Math.random() * Number.MAX_SAFE_INTEGER),
+				valid: new Set(choices.map((_, i) => i)),
+				num: null,
+				resolve,
+			};
+		});
 	}
 
 	/**
@@ -113,6 +126,10 @@ export default class Communicator {
 		}
 		// All valid
 		this.#pendingResponse = null;
-		pend.resolve(pend.num === null ? selection[0] : selection);
+		if (pend.num === null) {
+			pend.resolve(selection[0]);
+		} else {
+			pend.resolve(selection);
+		}
 	}
 }
