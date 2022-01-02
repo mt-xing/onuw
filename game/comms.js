@@ -40,14 +40,18 @@ export default class Communicator {
 	 * Wake up a player
 	 * @param {number} pid Player ID
 	 */
-	wake(pid) { }
+	wake(pid) {
+		this.sendToPlayer(pid, 'wake', '');
+	}
 
 	/**
 	 * Send message to a player
 	 * @param {number} pid Player ID
 	 * @param {string} msg Message
 	 */
-	message(pid, msg) { }
+	message(pid, msg) {
+		this.sendToPlayer(pid, 'msg', msg);
+	}
 
 	/**
 	 * Ask player to pick center cards
@@ -135,7 +139,9 @@ export default class Communicator {
 	 * Make a player sleep
 	 * @param {number} pid Player ID
 	 */
-	sleep(pid) { }
+	sleep(pid) {
+		this.sendToPlayer(pid, 'sleep', '');
+	}
 
 	/**
 	 * Send a message to a particular player
