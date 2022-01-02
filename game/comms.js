@@ -4,14 +4,16 @@ import { CENTER_SIZE } from './state';
 /**
  * @typedef {{
  * 	nonce: number,
- * 	resolve: (choices: number[]) => void,
  * 	valid: Set<number>,
- * 	num: number
+ * 	num: number,
+ * 	resolve: (choices: number[]) => void,
+ * 	timeout: NodeJS.Timeout
  * } | {
  * 	nonce: number,
- * 	resolve: (choice: number) => void,
  * 	valid: Set<number>,
- * 	num: null
+ * 	num: null,
+ * 	resolve: (choice: number) => void,
+ * 	timeout: NodeJS.Timeout
  * }} PendingResponse
  */
 
@@ -55,18 +57,20 @@ export default class Communicator {
 	 * @returns {Promise<number[]>}
 	 */
 	pickCenters(pid, timeout, num) {
+		const nonce = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+		this.sendToPlayer(pid, 'pickCenters', JSON.stringify({
+			nonce, num,
+		}));
+		const timeoutObj = setTimeout(this.timeoutPlayerResponse.bind(this, pid, nonce), timeout);
 		return new Promise((resolve) => {
-			const nonce = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
 			/** @type {PendingResponse} */
 			this.#pendingResponse = {
 				nonce,
 				valid: new Set(Array(CENTER_SIZE).keys()),
 				num,
 				resolve,
+				timeout: timeoutObj,
 			};
-			this.sendToPlayer(pid, 'pickCenters', JSON.stringify({
-				nonce, num,
-			}));
 		});
 	}
 
@@ -90,18 +94,20 @@ export default class Communicator {
 	 * @returns {Promise<number>}
 	 */
 	pickChoices(pid, timeout, choices) {
+		const nonce = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+		this.sendToPlayer(pid, 'pickChoices', JSON.stringify({
+			nonce, choices,
+		}));
+		const timeoutObj = setTimeout(this.timeoutPlayerResponse.bind(this, pid, nonce), timeout);
 		return new Promise((resolve) => {
-			const nonce = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
 			/** @type {PendingResponse} */
 			this.#pendingResponse = {
 				nonce,
 				valid: new Set(choices.map((_, i) => i)),
 				num: null,
 				resolve,
+				timeout: timeoutObj,
 			};
-			this.sendToPlayer(pid, 'pickChoices', JSON.stringify({
-				nonce, choices,
-			}));
 		});
 	}
 
@@ -143,10 +149,26 @@ export default class Communicator {
 		}
 		// All valid
 		this.#pendingResponse = null;
+		clearTimeout(pend.timeout);
 		if (pend.num === null) {
 			pend.resolve(selection[0]);
 		} else {
 			pend.resolve(selection);
 		}
+	}
+
+	/**
+	 * Timeout a request.
+	 *
+	 * Silently ignores if request nonce is not valid.
+	 * @param {number} pid
+	 * @param {number} nonce
+	 */
+	timeoutPlayerResponse(pid, nonce) {
+		if (this.#pendingResponse === null || this.#pendingResponse.nonce !== nonce) {
+			return;
+		}
+		this.sendToPlayer(pid, 'timeout', JSON.stringify({ nonce }));
+		this.#pendingResponse = null;
 	}
 }
