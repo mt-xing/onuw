@@ -168,7 +168,12 @@ export default class Communicator {
 		if (this.#pendingResponse === null || this.#pendingResponse.nonce !== nonce) {
 			return;
 		}
-		this.sendToPlayer(pid, 'timeout', JSON.stringify({ nonce }));
+		if (this.#pendingResponse.num === null) {
+			this.#pendingResponse.resolve(NaN);
+		} else {
+			this.#pendingResponse.resolve([]);
+		}
 		this.#pendingResponse = null;
+		this.sendToPlayer(pid, 'timeout', JSON.stringify({ nonce }));
 	}
 }

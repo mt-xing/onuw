@@ -230,7 +230,7 @@ export class Seer extends Role {
 				const roles = cards.map((c) => state.getCenter(c).role);
 				giveInfo(`The cards you selected in the center were ${makeList(roles)}`);
 			}
-		} else {
+		} else if (choice === 1) {
 			// View one other player
 			const card = await pickPlayers(1, false);
 			if (card.length === 1) {
