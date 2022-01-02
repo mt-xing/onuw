@@ -1,6 +1,6 @@
 import * as io from '../node_modules/socket.io/dist/index';
-import { Roles } from './role';
-import { CENTER_SIZE } from './state';
+import { Roles } from '../game/role';
+import { CENTER_SIZE } from '../game/state';
 
 /**
  * @typedef {{

@@ -1,6 +1,6 @@
 import Communicator from './comms';
-import Role, { Modifiers } from './role';
-import State from './state';
+import Role, { Modifiers } from '../game/role';
+import State from '../game/state';
 
 export default class OnuwGame {
 	/**

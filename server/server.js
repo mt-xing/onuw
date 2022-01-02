@@ -2,8 +2,8 @@ import * as io from '../node_modules/socket.io/dist/index';
 import Broker from './broker';
 import Communicator from './comms';
 import OnuwGame from './game';
-import Role, { Roles } from './role';
-import { CENTER_SIZE } from './state';
+import Role, { Roles } from '../game/role';
+import { CENTER_SIZE } from '../game/state';
 
 export default class OnuwServer {
 	/**
