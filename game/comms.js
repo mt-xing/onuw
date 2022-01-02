@@ -61,6 +61,9 @@ export default class Communicator {
 	 * @returns {Promise<number[]>}
 	 */
 	pickCenters(pid, timeout, num) {
+		if (timeout <= 0) {
+			return Promise.resolve([]);
+		}
 		const nonce = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
 		this.sendToPlayer(pid, 'pickCenters', JSON.stringify({
 			nonce, num,
@@ -87,6 +90,9 @@ export default class Communicator {
 	 * @returns {Promise<number[]>}
 	 */
 	pickPlayers(pid, timeout, num, banned) {
+		if (timeout <= 0) {
+			return Promise.resolve([]);
+		}
 		const nonce = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
 		this.sendToPlayer(pid, 'pickPlayers', JSON.stringify({
 			nonce, num, banned,
@@ -118,6 +124,9 @@ export default class Communicator {
 	 * @returns {Promise<number>}
 	 */
 	pickChoices(pid, timeout, choices) {
+		if (timeout <= 0) {
+			return Promise.resolve(NaN);
+		}
 		const nonce = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
 		this.sendToPlayer(pid, 'pickChoices', JSON.stringify({
 			nonce, choices,
