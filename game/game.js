@@ -20,14 +20,23 @@ export default class OnuwGame {
 	roleTime;
 
 	/**
+	 * Milliseconds to think
+	 * @type {number}
+	 */
+	thinkTime;
+
+	/**
 	 * @param {Role[]} roles
 	 * @param {string[]} names
 	 * @param {number} roleTime Seconds per role
+	 * @param {number} thinkTime Seconds to think at end of game
+	 * @param {Communicator} comm
 	 */
-	constructor(roles, names, roleTime) {
+	constructor(roles, names, roleTime, thinkTime, comm) {
 		this.state = new State(roles, names);
-		this.comm = new Communicator();
+		this.comm = comm;
 		this.roleTime = roleTime * 1000;
+		this.thinkTime = thinkTime * 1000;
 	}
 
 	async play() {
