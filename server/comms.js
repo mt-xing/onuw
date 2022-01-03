@@ -35,6 +35,11 @@ export default class Communicator {
 	#pendingResponse;
 
 	/**
+	 * @type {((pid: number) => void) | null}
+	 */
+	#pendingVoteReady;
+
+	/**
 	 * @type {((pid: number, voteTarget: number) => void) | null}
 	 */
 	#pendingVote;
@@ -51,6 +56,7 @@ export default class Communicator {
 	constructor(playerToSocket, broadcast) {
 		this.#playerToSocket = playerToSocket;
 		this.#pendingResponse = null;
+		this.#pendingVoteReady = null;
 		this.#pendingVote = null;
 		this.#broadcast = broadcast;
 		this.socketToPlayer = new Map();
@@ -184,6 +190,30 @@ export default class Communicator {
 	}
 
 	/**
+	 * @returns {AsyncGenerator<number, void, void>}
+	 * Async generator that yields the player ID that is ready to vote
+	 */
+	async* waitForPlayersReadyToVote() {
+		while (true) {
+			try {
+				yield await new Promise((resolve) => {
+					this.#pendingVoteReady = resolve;
+				});
+			} catch (_) {
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Broadcast to all that a player is ready to vote
+	 * @param {number} id
+	 */
+	playerReadyToVote(id) {
+		this.#broadcast('voteReady', JSON.stringify({ id }));
+	}
+
+	/**
 	 * Periodic time sync during day phase
 	 * @param {number} timeLeft Milliseconds left
 	 */
@@ -196,8 +226,8 @@ export default class Communicator {
 	 * Async generator that yields a tuple of player ID that voted and player ID they voted for
 	 */
 	async* startTheVote() {
+		this.#pendingVoteReady = null;
 		this.#broadcast('voteStart', '');
-		// eslint-disable-next-line no-constant-condition
 		while (true) {
 			yield await new Promise((resolve) => {
 				this.#pendingVote = (a, b) => resolve([a, b]);
@@ -262,6 +292,18 @@ export default class Communicator {
 		} else {
 			pend.resolve(selection);
 		}
+	}
+
+	/**
+	 * Handle a vote submitted by a player.
+	 *
+	 * Will silently drop if not expecting a vote.
+	 * @param {number} pid Player ID voting
+	 */
+	processPlayerVoteReady(pid) {
+		if (Number.isNaN(pid)) { return; }
+		if (this.#pendingVoteReady === null) { return; }
+		this.#pendingVoteReady(pid);
 	}
 
 	/**

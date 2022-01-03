@@ -133,9 +133,39 @@ export default class OnuwGame {
 		});
 		this.comm.transitionToDay(boardInfo);
 
-		// TODO accept ready-ups
 		await new Promise((resolve) => {
-			setTimeout(resolve, this.thinkTime);
+			const readyUpGenerator = this.comm.waitForPlayersReadyToVote();
+
+			/** @type {NodeJS.Timeout | null} */
+			let timeout = null;
+			let timeRemaining = this.thinkTime;
+			const updateInterval = 15 * 1000; // 15 sec
+			if (timeRemaining > updateInterval) {
+				timeout = setTimeout(() => {
+					timeRemaining -= updateInterval;
+					this.comm.timeUpdate(timeRemaining);
+				}, updateInterval);
+			} else {
+				timeout = setTimeout(() => {
+					readyUpGenerator.throw('Unneeded');
+					resolve(undefined);
+				}, this.thinkTime);
+			}
+
+			(async () => {
+				/** @type {Set<number>} */
+				const readyPlayers = new Set();
+				while (readyPlayers.size < this.state.numPlayers) {
+					const t = (await readyUpGenerator.next()).value;
+					if (typeof t !== 'number') {
+						return;
+					}
+					readyPlayers.add(t);
+					this.comm.playerReadyToVote(t);
+				}
+				clearTimeout(timeout);
+				resolve(undefined);
+			})();
 		});
 
 		/**

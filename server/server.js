@@ -44,6 +44,7 @@ export default class OnuwServer {
 			socket.on('setupInfo', this.#setupInfo.bind(this, socket));
 			socket.on('setupDone', this.#completeSetup.bind(this, socket));
 			socket.on('pick', this.#selectionMade.bind(this, socket));
+			socket.on('voteReady', this.#voteReady.bind(this, socket));
 			socket.on('vote', this.#voteReceived.bind(this, socket));
 		});
 	}
@@ -196,6 +197,18 @@ export default class OnuwServer {
 		/** @type {{nonce: number, id: number[]}} */
 		const { nonce, id } = JSON.parse(info);
 		game.comm.processPlayerResponse(nonce, id);
+	}
+
+	/**
+	 * @param {io.Socket} socket
+	 */
+	#voteReady(socket) {
+		const room = this.#socketRoom.get(socket);
+		const game = this.#games.get(room ?? '');
+		if (game === undefined) {
+			return;
+		}
+		game.comm.processPlayerVoteReady(game.comm.socketToPlayer.get(socket) ?? NaN);
 	}
 
 	/**
