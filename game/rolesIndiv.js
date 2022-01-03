@@ -326,7 +326,15 @@ export class Witch extends Role {
 		const cards = await pickCenters(1);
 		if (cards.length === 1) {
 			const centerCard = cards[0];
-			const fallbackPlayer = Math.floor(Math.random() * state.numPlayers);
+			const fallbackPlayer = (() => {
+				const a = Math.floor(Math.random() * state.numPlayers);
+				if (state.getPlayer(a).currentRole.modifiers.has(Modifiers.SENTINEL)) {
+					// Fallback player cannot be sentinel
+					if (a === 0) { return 1; }
+					return a - 1;
+				}
+				return a;
+			})();
 			giveInfo(`The center card was ${state.getCenter(centerCard).roleName}. You must swap it with a player. If you do not select in time, it will be swapped with the following randomly selected player: ${state.getName(fallbackPlayer)}`);
 			const selectedPlayer = await pickPlayers(1, true);
 			const actualPlayer = selectedPlayer.length === 1 ? selectedPlayer[0] : fallbackPlayer;
