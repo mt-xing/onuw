@@ -27,6 +27,12 @@ export default class OnuwGame {
 	thinkTime;
 
 	/**
+	 * Whether the game is over
+	 * @type {boolean}
+	 */
+	over;
+
+	/**
 	 * @param {Role[]} roles
 	 * @param {string[]} names
 	 * @param {number} roleTime Seconds per role
@@ -38,6 +44,7 @@ export default class OnuwGame {
 		this.comm = comm;
 		this.roleTime = roleTime * 1000;
 		this.thinkTime = thinkTime * 1000;
+		this.over = false;
 	}
 
 	async play() {
@@ -187,5 +194,7 @@ export default class OnuwGame {
 		const voteArray = playerIDarray.map((pid) => votes.get(pid) ?? 0);
 		const winningTeams = computeWinner(roleArray, voteArray);
 		this.comm.sendResults(voteArray, roleArray, winningTeams);
+
+		this.over = true;
 	}
 }

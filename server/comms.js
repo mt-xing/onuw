@@ -22,7 +22,7 @@ export default class Communicator {
 	/**
 	 * @type {io.Socket[]}
 	 */
-	#playerToSocket;
+	playerToSocket;
 
 	/**
 	 * @type {Map<io.Socket, number>}
@@ -54,7 +54,7 @@ export default class Communicator {
 	 * @param {(tag: string, msg: string) => void} broadcast
 	 */
 	constructor(playerToSocket, broadcast) {
-		this.#playerToSocket = playerToSocket;
+		this.playerToSocket = playerToSocket;
 		this.#pendingResponse = null;
 		this.#pendingVoteReady = null;
 		this.#pendingVote = null;
@@ -128,7 +128,7 @@ export default class Communicator {
 		}));
 		const timeoutObj = setTimeout(this.timeoutPlayerResponse.bind(this, pid, nonce), timeout);
 
-		const valid = new Set(Array(this.#playerToSocket.length).keys());
+		const valid = new Set(Array(this.playerToSocket.length).keys());
 		Object.keys(banned).forEach((bannedID) => {
 			valid.delete(parseInt(bannedID, 10));
 		});
@@ -261,7 +261,7 @@ export default class Communicator {
 	 * @param {string} msg Message content
 	 */
 	sendToPlayer(pid, tag, msg) {
-		this.#playerToSocket[pid].emit(tag, msg);
+		this.playerToSocket[pid].emit(tag, msg);
 	}
 
 	/**

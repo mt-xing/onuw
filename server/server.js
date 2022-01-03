@@ -46,6 +46,7 @@ export default class OnuwServer {
 			socket.on('pick', this.#selectionMade.bind(this, socket));
 			socket.on('voteReady', this.#voteReady.bind(this, socket));
 			socket.on('vote', this.#voteReceived.bind(this, socket));
+			socket.on('restart', this.#restartGame.bind(this, socket));
 		});
 	}
 
@@ -224,5 +225,26 @@ export default class OnuwServer {
 		/** @type {{id: number}} */
 		const { id } = JSON.parse(info);
 		game.comm.processPlayerVote(game.comm.socketToPlayer.get(socket) ?? NaN, id);
+	}
+
+	/**
+	 * @param {io.Socket} socket
+	 */
+	#restartGame(socket) {
+		const room = this.#socketRoom.get(socket);
+		const game = this.#games.get(room ?? '');
+		if (game === undefined || room === undefined) { return; }
+		if (game.comm.socketToPlayer.get(socket) !== 0) { return; }
+		if (!game.over) { return; }
+		this.#namespace.to(room).emit('restart');
+		this.#games.delete(room);
+
+		const broker = new Broker(game.state.getName(0), socket);
+		this.#setups.set(room, broker);
+		for (let i = 1; i < game.state.numPlayers; i++) {
+			broker.addPlayer(game.comm.playerToSocket[i], game.state.getName(i));
+		}
+		broker.startSetup();
+		this.#namespace.to(room).emit('setupStart');
 	}
 }
