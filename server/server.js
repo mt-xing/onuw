@@ -47,6 +47,8 @@ export default class OnuwServer {
 			socket.on('voteReady', this.#voteReady.bind(this, socket));
 			socket.on('vote', this.#voteReceived.bind(this, socket));
 			socket.on('restart', this.#restartGame.bind(this, socket));
+
+			socket.on('disconnect', this.#endGame.bind(this, socket));
 		});
 	}
 
@@ -246,5 +248,31 @@ export default class OnuwServer {
 		}
 		broker.startSetup();
 		this.#namespace.to(room).emit('setupStart');
+	}
+
+	/**
+	 * @param {io.Socket} socket
+	 */
+	#endGame(socket) {
+		const room = this.#socketRoom.get(socket);
+		if (room === undefined) { return; }
+		this.#namespace.to(room).emit('disconn');
+		const game = this.#games.get(room);
+		const setup = this.#setups.get(room);
+		this.#games.delete(room);
+		this.#setups.delete(room);
+
+		/** @param {io.Socket} soc */
+		const deleteSocket = (soc) => {
+			this.#socketRoom.delete(soc);
+			soc.disconnect(true);
+		};
+
+		if (game !== undefined) {
+			game.comm.playerToSocket.forEach(deleteSocket);
+		}
+		if (setup !== undefined) {
+			setup.playerToSocket.forEach(deleteSocket);
+		}
 	}
 }
