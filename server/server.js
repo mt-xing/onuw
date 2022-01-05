@@ -139,8 +139,8 @@ export default class OnuwServer {
 		} = JSON.parse(info);
 		game.roleTime = roleTime;
 		game.talkTime = talkTime;
-		roleAdd.forEach((role) => game.roles.add(role));
-		roleSub.forEach((role) => game.roles.delete(role));
+		roleAdd.forEach((role) => game.addRole(role));
+		roleSub.forEach((role) => game.removeRole(role));
 
 		this.#namespace.to(room).emit('setupInfo', info);
 	}
@@ -154,13 +154,13 @@ export default class OnuwServer {
 		if (game === undefined || room === undefined) {
 			return;
 		}
-		if (game.roles.size - CENTER_SIZE !== game.players.length) {
+		if (game.numRoles - CENTER_SIZE !== game.players.length) {
 			return;
 		}
 
 		const communicator = new Communicator(game.playerToSocket, this.#namespace.to(room).emit);
 		const newGame = new OnuwGame(
-			Array.from(game.roles).map((roleID) => constructRole(roleID)),
+			game.roleArr.map((roleID) => constructRole(roleID)),
 			game.players,
 			game.roleTime,
 			game.talkTime,
@@ -170,7 +170,7 @@ export default class OnuwServer {
 		this.#setups.delete(room);
 
 		const allInfo = {
-			roles: Array.from(game.roles),
+			roles: game.roleArr,
 			roleTime: game.roleTime,
 			talkTime: game.talkTime,
 			names: game.players,

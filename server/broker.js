@@ -1,5 +1,5 @@
 import * as io from '../node_modules/socket.io/dist/index.js';
-import { MAX_ROLES, Roles } from '../game/role.js';
+import { DoubleRoles, MAX_ROLES, Roles } from '../game/role.js';
 import { CENTER_SIZE } from '../game/state.js';
 
 export default class Broker {
@@ -9,9 +9,9 @@ export default class Broker {
 	#names;
 
 	/**
-	 * @type {Set<Roles>}
+	 * @type {Map<Roles, number>}
 	 */
-	roles;
+	#roles;
 
 	/**
 	 * @type {number}
@@ -40,7 +40,7 @@ export default class Broker {
 	 */
 	constructor(hostPlayerName, hostPlayerSocket) {
 		this.#names = [hostPlayerName];
-		this.roles = new Set();
+		this.#roles = new Map();
 		this.#acceptingPlayers = true;
 		this.roleTime = 15;
 		this.talkTime = 5 * 60;
@@ -70,6 +70,46 @@ export default class Broker {
 
 	get players() {
 		return this.#names;
+	}
+
+	/** @param {Roles} role */
+	addRole(role) {
+		const r = this.#roles.get(role);
+		if (r === undefined) {
+			this.#roles.set(role, 1);
+		} else {
+			this.#roles.set(role, r + 1);
+		}
+	}
+
+	/** @param {Roles} role */
+	removeRole(role) {
+		const r = this.#roles.get(role);
+		if (r === undefined) { return; }
+		if (r - 1 <= 0) {
+			this.#roles.delete(role);
+		} else {
+			this.#roles.set(role, r - 1);
+		}
+	}
+
+	get numRoles() {
+		let i = 0;
+		this.#roles.forEach((v) => { i += v; });
+		return i;
+	}
+
+	get roleArr() {
+		/** @type {Roles[]} */
+		const i = [];
+		this.#roles.forEach((v, role) => {
+			let r = v;
+			while (r > 0) {
+				i.push(role);
+				r--;
+			}
+		});
+		return i;
 	}
 
 	startSetup() {
