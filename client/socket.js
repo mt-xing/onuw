@@ -12,12 +12,12 @@ export default class Socket {
 		// eslint-disable-next-line no-undef
 		this.#socket = io(url);
 		this.#socket.on('connect', () => {
-			console.info(`Socket connected; id: ${this.#socket.id}`);
+			console.debug(`Socket connected; id: ${this.#socket.id}`);
 		});
 		// @ts-ignore
 		this.#socket.io.engine.on('packet', (packet) => {
 			if (packet.type === 'message') {
-				console.info(packet);
+				console.debug(packet);
 			}
 		});
 	}
@@ -37,7 +37,7 @@ export default class Socket {
 	 * @param {string} msg
 	 */
 	emit(type, msg) {
-		console.info(`Sending data type "${type}" message: ${msg}`);
+		console.debug(`Sending data type "${type}" message: ${msg}`);
 		this.#socket.emit(type, msg);
 	}
 
