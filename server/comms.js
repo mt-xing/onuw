@@ -4,13 +4,11 @@ import { CENTER_SIZE } from '../game/state.js';
 
 /**
  * @typedef {{
- * 	nonce: number,
  * 	valid: Set<number>,
  * 	num: number,
  * 	resolve: (choices: number[]) => void,
  * 	timeout: NodeJS.Timeout
  * } | {
- * 	nonce: number,
  * 	valid: Set<number>,
  * 	num: null,
  * 	resolve: (choice: number) => void,
@@ -30,7 +28,7 @@ export default class Communicator {
 	socketToPlayer;
 
 	/**
-	 * @type {PendingResponse | null}
+	 * @type {Map<number, PendingResponse>}
 	 */
 	#pendingResponse;
 
@@ -55,7 +53,7 @@ export default class Communicator {
 	 */
 	constructor(playerToSocket, broadcast) {
 		this.playerToSocket = playerToSocket;
-		this.#pendingResponse = null;
+		this.#pendingResponse = new Map();
 		this.#pendingVoteReady = null;
 		this.#pendingVote = null;
 		this.#broadcast = broadcast;
@@ -99,14 +97,12 @@ export default class Communicator {
 		}));
 		const timeoutObj = setTimeout(this.timeoutPlayerResponse.bind(this, pid, nonce), timeout);
 		return new Promise((resolve) => {
-			/** @type {PendingResponse} */
-			this.#pendingResponse = {
-				nonce,
+			this.#pendingResponse.set(nonce, {
 				valid: new Set(Array(CENTER_SIZE).keys()),
 				num,
 				resolve,
 				timeout: timeoutObj,
-			};
+			});
 		});
 	}
 
@@ -134,14 +130,12 @@ export default class Communicator {
 		});
 
 		return new Promise((resolve) => {
-			/** @type {PendingResponse} */
-			this.#pendingResponse = {
-				nonce,
+			this.#pendingResponse.set(nonce, {
 				valid,
 				num,
 				resolve,
 				timeout: timeoutObj,
-			};
+			});
 		});
 	}
 
@@ -163,13 +157,12 @@ export default class Communicator {
 		const timeoutObj = setTimeout(this.timeoutPlayerResponse.bind(this, pid, nonce), timeout);
 		return new Promise((resolve) => {
 			/** @type {PendingResponse} */
-			this.#pendingResponse = {
-				nonce,
+			this.#pendingResponse.set(nonce, {
 				valid: new Set(choices.map((_, i) => i)),
 				num: null,
 				resolve,
 				timeout: timeoutObj,
-			};
+			});
 		});
 	}
 
@@ -274,8 +267,8 @@ export default class Communicator {
 		if (this.#pendingResponse === null) {
 			return;
 		}
-		const pend = this.#pendingResponse;
-		if (pend.nonce !== nonce) {
+		const pend = this.#pendingResponse.get(nonce);
+		if (pend === undefined) {
 			return;
 		}
 		if (selection.length !== (pend.num === null ? 1 : pend.num)) {
@@ -285,7 +278,7 @@ export default class Communicator {
 			return;
 		}
 		// All valid
-		this.#pendingResponse = null;
+		this.#pendingResponse.delete(nonce);
 		clearTimeout(pend.timeout);
 		if (pend.num === null) {
 			pend.resolve(selection[0]);
@@ -327,15 +320,16 @@ export default class Communicator {
 	 * @param {number} nonce
 	 */
 	timeoutPlayerResponse(pid, nonce) {
-		if (this.#pendingResponse === null || this.#pendingResponse.nonce !== nonce) {
+		const pend = this.#pendingResponse.get(nonce);
+		if (pend === undefined) {
 			return;
 		}
-		if (this.#pendingResponse.num === null) {
-			this.#pendingResponse.resolve(NaN);
+		if (pend.num === null) {
+			pend.resolve(NaN);
 		} else {
-			this.#pendingResponse.resolve([]);
+			pend.resolve([]);
 		}
-		this.#pendingResponse = null;
+		this.#pendingResponse.delete(nonce);
 		this.sendToPlayer(pid, 'timeout', JSON.stringify({ nonce }));
 	}
 }
