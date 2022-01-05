@@ -105,6 +105,7 @@ export default class OnuwServer {
 		default:
 			socket.emit('joinYes', JSON.stringify({ playerID: addResult, players: game.players }));
 			this.#namespace.to(id).emit('joinNew', JSON.stringify({ playerID: addResult, name }));
+			socket.join(id);
 			break;
 		}
 	}
