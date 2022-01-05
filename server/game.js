@@ -48,17 +48,32 @@ export default class OnuwGame {
 	}
 
 	async play() {
+		/** @param {number} pid */
+		const pRole = (pid) => this.state.getPlayer(pid).startingRole;
 		const playerIDarray = Array.from(Array(this.state.numPlayers).keys());
 		const wakeOrder = playerIDarray
-			.filter((p) => this.state.getPlayer(p).startingRole.wakeOrder !== null);
-		wakeOrder.sort(
-			(a, b) => Role.sortWakeOrder(
-				this.state.getPlayer(a).startingRole.wakeOrder ?? [],
-				this.state.getPlayer(b).startingRole.wakeOrder ?? [],
-			),
-		);
+			.filter((p) => pRole(p).wakeOrder !== null)
+			.sort((a, b) => Role.sortWakeOrder(
+				pRole(a).wakeOrder ?? [],
+				pRole(b).wakeOrder ?? [],
+			))
+			.reduce((a, x) => {
+				if (a.length === 0) {
+					return [[x]];
+				}
+				const lastWake = a[a.length - 1];
+				if (pRole(lastWake[0]).role === pRole(x).role) {
+					lastWake.push(x);
+					return a;
+				}
+				a.push([x]);
+				return a;
+			}, /** @type {number[][]} */([]));
 
-		for (const pid of wakeOrder) {
+		/**
+		 * @param {number} pid
+		 */
+		const playerAct = async (pid) => {
 			let timeLeft = this.roleTime;
 			let lastTime = new Date();
 
@@ -125,6 +140,9 @@ export default class OnuwGame {
 			}
 
 			this.comm.sleep(pid);
+		};
+		for (const pids of wakeOrder) {
+			await Promise.all(pids.map(playerAct));
 		}
 
 		/** @type {Record<number, string>} */
