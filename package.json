@@ -1,8 +1,8 @@
 {
   "scripts": {
     "test": "node test.js",
-    "client": "ruby -run -e httpd ./client -p 3000",
-    "client-silent": "ruby -run -e httpd ./client -p 3000 > /dev/null 2>&1",
+    "client": "ruby -run -e httpd . -p 3000",
+    "client-silent": "ruby -run -e httpd . -p 3000 > /dev/null 2>&1",
     "server": "node server/index.js",
     "start": "npm-run-all --parallel client-silent server"
   },
