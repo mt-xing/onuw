@@ -58,4 +58,8 @@ export default class Dom {
 		}
 		return d;
 	}
+
+	static hr() {
+		return document.createElement('hr');
+	}
 }

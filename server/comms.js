@@ -63,14 +63,20 @@ export default class Communicator {
 
 	/**
 	 * Wake up a player
-	 * @param {number} pid Player ID
 	 * @param {Roles} role Player Role
 	 */
-	wake(pid, role) {
+	roleStart(role) {
+		this.#broadcast('roleStart', JSON.stringify({ role }));
+	}
+
+	/**
+	 * Wake up a player
+	 * @param {number} pid Player ID
+	 */
+	wake(pid) {
 		if (!Number.isNaN(pid)) {
 			this.sendToPlayer(pid, 'wake', '');
 		}
-		this.#broadcast('roleStart', JSON.stringify({ role }));
 	}
 
 	/**

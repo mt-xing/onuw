@@ -98,6 +98,7 @@ export default class Connections {
 	 * @param {string} id
 	 */
 	createYes(id) {
+		this.#dom.textContent = null;
 		this.#dom.appendChild(Dom.p(`New game id: ${id}`));
 		this.#dom.appendChild(Dom.button('Start Game', this.#hostConfirm.bind(this)));
 		this.#game.playerID = 0;
@@ -116,6 +117,7 @@ export default class Connections {
 	 * @param {string[]} players
 	 */
 	joinYes(playerID, players) {
+		this.#dom.textContent = null;
 		this.#dom.appendChild(Dom.p(
 			`You are player ${playerID}, with these other players: ${makeList(players.map((name, i) => `${name} as player ${i}`))}`,
 		));

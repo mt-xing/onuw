@@ -64,6 +64,7 @@ export default class Gameplay {
 	#roleStart(raw) {
 		/** @type {{role: Roles}} */
 		const { role } = JSON.parse(raw);
+		this.#dom.appendChild(Dom.hr());
 		this.#dom.appendChild(Dom.p(`Current Turn: ${roleToName[role]}`));
 	}
 
@@ -128,7 +129,7 @@ export default class Gameplay {
 		const wrap = document.createElement('div');
 		wrap.appendChild(Dom.p(heading));
 		// eslint-disable-next-line operator-linebreak
-		const choiceChecks = /** @type {HTMLInputElement[]} */
+		const choiceChecks = /** @type {(HTMLInputElement|null)[]} */
 			(choices.map((choice) => {
 				if (choice[1] !== null) {
 					wrap.appendChild(Dom.p(`${choice[0]} - ${choice[1]}`));
@@ -140,10 +141,11 @@ export default class Gameplay {
 				label.appendChild(document.createTextNode(choice[0]));
 				wrap.appendChild(label);
 				return chk;
-			}).filter((x) => x !== null));
-		wrap.appendChild(Dom.button('Lock-In Choice', () => {
+			}));
+		wrap.appendChild(Dom.button('Lock-In Choice', (ev) => {
 			/** @type {number[]} */
-			const c = choiceChecks.map((chk) => (chk.checked ? 1 : 0));
+			// eslint-disable-next-line no-nested-ternary
+			const c = choiceChecks.map((chk) => (chk === null ? 0 : (chk.checked ? 1 : 0)));
 			const n = c.reduce((a, x) => a + x);
 			// eslint-disable-next-line no-alert
 			if (n !== num) { alert(`Error: Select ${num} choice(s)`); return; }
@@ -156,6 +158,9 @@ export default class Gameplay {
 				nonce,
 				id: ids,
 			});
+			// @ts-ignore
+			// eslint-disable-next-line no-param-reassign
+			ev.currentTarget.disabled = true;
 		}));
 		this.#dom.appendChild(wrap);
 	}
@@ -182,21 +187,26 @@ export default class Gameplay {
 	#endOfNight(raw) {
 		/** @type {{boardInfo: Record<number, string>}} */
 		const { boardInfo } = JSON.parse(raw);
+		this.#dom.appendChild(Dom.hr());
 		this.#dom.appendChild(Dom.p('Everybody, wake up.'));
 		this.#dom.appendChild(Dom.p('Good morning.'));
 		this.#dom.appendChild(Dom.p('State of the board, if any:'));
 		if (Object.keys(boardInfo).length === 0) {
-			this.#dom.appendChild(Dom.p('Nothing relevant')); return;
+			this.#dom.appendChild(Dom.p('Nothing relevant'));
+		} else {
+			Object.keys(boardInfo)
+				.map((s) => parseInt(s, 10))
+				.forEach((playerID) => {
+					this.#dom.appendChild(Dom.p(
+						`${this.#game.getPlayerName(playerID)}: ${boardInfo[playerID]}`,
+					));
+				});
 		}
-		Object.keys(boardInfo)
-			.map((s) => parseInt(s, 10))
-			.forEach((playerID) => {
-				this.#dom.appendChild(Dom.p(
-					`${this.#game.getPlayerName(playerID)}: ${boardInfo[playerID]}`,
-				));
-			});
-		this.#dom.appendChild(Dom.button('I\'m ready to vote', () => {
+		this.#dom.appendChild(Dom.button('I\'m ready to vote', (ev) => {
 			this.#socket.emit('voteReady', '');
+			// @ts-ignore
+			// eslint-disable-next-line no-param-reassign
+			ev.currentTarget.disabled = true;
 		}));
 		this.#dom.appendChild(Dom.p(`Time left: ${secondsToTime(this.#game.talkTime)}`));
 	}
@@ -212,6 +222,7 @@ export default class Gameplay {
 	}
 
 	#voteStart() {
+		this.#dom.appendChild(Dom.hr());
 		this.#dom.appendChild(Dom.p('Please vote for a player to kill:'));
 		Array.from(Array(this.#game.numPlayers).keys())
 			.forEach((playerID) => {
@@ -228,6 +239,7 @@ export default class Gameplay {
 	#showResults(raw) {
 		/** @type {{votes: number[], playerRoles: Roles[], winTeam: Teams[]}} */
 		const { votes, playerRoles, winTeam } = JSON.parse(raw);
+		this.#dom.appendChild(Dom.hr());
 		this.#dom.appendChild(Dom.p('And the votes are in:'));
 		votes.forEach((voteTarget, pID) => {
 			this.#dom.appendChild(Dom.p(`${this.#game.getPlayerName(pID)} voted to kill ${this.#game.getPlayerName(voteTarget)}`));
@@ -257,7 +269,7 @@ export default class Gameplay {
 		if (winTeam.some((w) => yourRole.winTeam === w)) {
 			this.#dom.appendChild(Dom.p('YOU WON!'));
 		} else {
-			this.#dom.appendChild(Dom.p('Better luck next time'));
+			this.#dom.appendChild(Dom.p('You lose. Better luck next time'));
 		}
 	}
 }
