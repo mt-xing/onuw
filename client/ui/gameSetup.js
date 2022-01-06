@@ -2,6 +2,7 @@ import Dom from '../dom.js';
 import Socket from '../socket.js';
 import OnuwGame from '../game.js';
 import { MultiRoles, Roles, roleToName } from '../../game/role.js';
+import { DEFAULT_ROLE_TIME, DEFAULT_TALK_TIME } from '../../game/constants.js';
 
 export default class GameSetup {
 	/**
@@ -30,6 +31,16 @@ export default class GameSetup {
 	#usedRoles;
 
 	/**
+	 * @type {HTMLElement}
+	 */
+	#roleTime;
+
+	/**
+	 * @type {HTMLElement}
+	 */
+	#talkTime;
+
+	/**
 	 * @param {Socket} socket
 	 * @param {OnuwGame} game
 	 * @param {HTMLElement} gameDom
@@ -43,17 +54,25 @@ export default class GameSetup {
 		this.#unusedRoles = new Map();
 		this.#usedRoles = new Map();
 
-		this.#dom.appendChild(Dom.p(game.isHost ? 'Select roles:' : 'Wait for roles'));
+		this.#dom.appendChild(Dom.p(game.isHost ? 'Select roles and set time limits' : 'Wait for game setup'));
 		this.#generateRolesDom();
+		this.#roleTime = Dom.p('Seconds per role: 15');
+		this.#talkTime = Dom.p('Minutes to discuss: 5');
+		this.#dom.appendChild(this.#roleTime);
+		this.#dom.appendChild(this.#talkTime);
 
 		if (!game.isHost) {
 			this.#socket.on('setupInfo', (msg) => {
-				// TODO time
-				/** @type {{roleAdd: Roles[], roleSub: Roles[]}} */
-				const { roleAdd, roleSub } = JSON.parse(msg);
+				/** @type {{roleAdd: Roles[], roleSub: Roles[], roleTime: number, talkTime: number}} */
+				const {
+					roleAdd, roleSub, roleTime, talkTime,
+				} = JSON.parse(msg);
 				roleAdd.forEach(this.addRole.bind(this));
 				roleSub.forEach(this.removeRole.bind(this));
+				this.#changeTimes(roleTime, talkTime);
 			});
+		} else {
+			this.#generateTimeDom();
 		}
 	}
 
@@ -115,6 +134,71 @@ export default class GameSetup {
 				this.#usedRoles.set(roleID, [b2]);
 			}
 		}
+	}
+
+	#generateTimeDom() {
+		if (!this.#game.isHost) {
+			throw new Error();
+		}
+		this.#roleTime.textContent = 'Seconds per role: ';
+		const role = Dom.input('number', undefined, `${DEFAULT_ROLE_TIME}`);
+		role.min = '1';
+		role.step = '1';
+		role.max = '60';
+		this.#roleTime.appendChild(role);
+		role.addEventListener(
+			'change',
+			/**
+			 * @param {Event} ev
+			 */
+			(ev) => {
+				this.#game.roleTime = parseInt(
+					/** @type {HTMLInputElement} */(ev.currentTarget).value,
+					10,
+				);
+				if (this.#game.roleTime < 1) {
+					this.#game.roleTime = 1;
+					// eslint-disable-next-line no-param-reassign
+					/** @type {HTMLInputElement} */(ev.currentTarget).value = '1';
+				}
+				this.#socket.send('setupInfo', {
+					roleAdd: [],
+					roleSub: [],
+					roleTime: this.#game.roleTime,
+					talkTime: this.#game.talkTime,
+				});
+			},
+		);
+
+		this.#talkTime.textContent = 'Minutes to discuss: ';
+		const talk = Dom.input('number', undefined, `${DEFAULT_TALK_TIME}`);
+		talk.min = '1';
+		talk.step = '1';
+		talk.max = '20';
+		this.#talkTime.appendChild(talk);
+		talk.addEventListener(
+			'change',
+			/**
+			 * @param {Event} ev
+			 */
+			(ev) => {
+				this.#game.talkTime = parseInt(
+					/** @type {HTMLInputElement} */(ev.currentTarget).value,
+					10,
+				) * 60;
+				if (this.#game.talkTime < 1) {
+					this.#game.talkTime = 60;
+					// eslint-disable-next-line no-param-reassign
+					/** @type {HTMLInputElement} */(ev.currentTarget).value = '1';
+				}
+				this.#socket.send('setupInfo', {
+					roleAdd: [],
+					roleSub: [],
+					roleTime: this.#game.roleTime,
+					talkTime: this.#game.talkTime,
+				});
+			},
+		);
 	}
 
 	/**
@@ -203,5 +287,18 @@ export default class GameSetup {
 			return;
 		}
 		u[n].style.display = 'none';
+	}
+
+	/**
+	 * Only to be called as non-host
+	 * @param {number} roleTime Seconds
+	 * @param {number} talkTime Seconds
+	 */
+	#changeTimes(roleTime, talkTime) {
+		if (this.#game.isHost) { throw new Error(); }
+		this.#roleTime.textContent = `Seconds per role: ${roleTime}`;
+		this.#talkTime.textContent = `Minutes to discuss: ${talkTime / 60}`;
+		this.#game.roleTime = roleTime;
+		this.#game.talkTime = talkTime;
 	}
 }

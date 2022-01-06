@@ -19,11 +19,25 @@ export default class OnuwGame {
 	 */
 	#numRoles;
 
+	/**
+	 * Seconds
+	 * @type {number}
+	 */
+	roleTime;
+
+	/**
+	 * Seconds
+	 * @type {number}
+	 */
+	talkTime;
+
 	constructor() {
 		this.playerID = NaN;
 		this.#players = [];
 		this.#roles = new Map();
 		this.#numRoles = 0;
+		this.roleTime = 15;
+		this.talkTime = 5 * 60;
 	}
 
 	reset() {
@@ -83,5 +97,9 @@ export default class OnuwGame {
 		const d = this.#roles.get(roleID);
 		if (d === undefined) { return 0; }
 		return d;
+	}
+
+	get numRoles() {
+		return this.#numRoles;
 	}
 }
