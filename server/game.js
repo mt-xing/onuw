@@ -48,7 +48,7 @@ export default class OnuwGame {
 	}
 
 	async play() {
-		const roles = this.state.allRoles;
+		const roles = this.state.allWakingRoles;
 
 		/** @param {number} pid */
 		const pRole = (pid) => this.state.getPlayer(pid).startingRole;
@@ -146,7 +146,10 @@ export default class OnuwGame {
 
 		let wakeOrderIndex = 0;
 		for (const role of roles) {
-			if (!role.equals(pRole(wakeOrder[wakeOrderIndex][0]))) {
+			if (
+				wakeOrderIndex >= wakeOrder.length
+				|| !role.equals(pRole(wakeOrder[wakeOrderIndex][0]))
+			) {
 				this.comm.wake(NaN, role.role);
 				await new Promise((resolve) => {
 					setTimeout(resolve, this.roleTime);

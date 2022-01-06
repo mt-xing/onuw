@@ -6,6 +6,7 @@
 .classSelect {
 	display: inline-block;
 	padding: 5px;
+	margin: 0;
 	border: 1px black solid;
 	font-size: 16px;
 }

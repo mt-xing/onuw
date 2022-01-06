@@ -86,12 +86,13 @@ export default class State {
 	}
 
 	/**
-	 * Returns an array of all roles in play in wake order.
+	 * Returns an array of all waking roles in play in wake order.
 	 */
-	get allRoles() {
+	get allWakingRoles() {
 		return this.#players
 			.map((p) => p.currentRole)
 			.concat(this.#centerRoles)
+			.filter((x) => x.wakeOrder !== null)
 			.sort((a, b) => Role.sortWakeOrder(
 				a.wakeOrder ?? [],
 				b.wakeOrder ?? [],
