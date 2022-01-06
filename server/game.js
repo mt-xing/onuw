@@ -48,6 +48,8 @@ export default class OnuwGame {
 	}
 
 	async play() {
+		const roles = this.state.allRoles;
+
 		/** @param {number} pid */
 		const pRole = (pid) => this.state.getPlayer(pid).startingRole;
 		const playerIDarray = Array.from(Array(this.state.numPlayers).keys());
@@ -141,9 +143,23 @@ export default class OnuwGame {
 
 			this.comm.sleep(pid);
 		};
-		for (const pids of wakeOrder) {
-			await Promise.all(pids.map(playerAct));
+
+		let wakeOrderIndex = 0;
+		for (const role of roles) {
+			if (!role.equals(pRole(wakeOrder[wakeOrderIndex][0]))) {
+				this.comm.wake(NaN, role.role);
+				await new Promise((resolve) => {
+					setTimeout(resolve, this.roleTime);
+				});
+				continue;
+			}
+			await Promise.all(wakeOrder[wakeOrderIndex].map(playerAct));
+			wakeOrderIndex++;
 		}
+
+		// for (const pids of wakeOrder) {
+		// 	await Promise.all(pids.map(playerAct));
+		// }
 
 		/** @type {Record<number, string>} */
 		const boardInfo = {};

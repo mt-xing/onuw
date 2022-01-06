@@ -84,4 +84,17 @@ export default class State {
 	getName(id) {
 		return this.#players[id].name;
 	}
+
+	/**
+	 * Returns an array of all roles in play in wake order.
+	 */
+	get allRoles() {
+		return this.#players
+			.map((p) => p.currentRole)
+			.concat(this.#centerRoles)
+			.sort((a, b) => Role.sortWakeOrder(
+				a.wakeOrder ?? [],
+				b.wakeOrder ?? [],
+			));
+	}
 }
