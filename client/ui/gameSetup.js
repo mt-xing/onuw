@@ -42,11 +42,24 @@ export default class GameSetup {
 	#talkTime;
 
 	/**
+	 * Number of things waiting on before we can start
+	 * 0 = ready to start
+	 * 1 = waiting on either final setup confirmation or role
+	 * 2 = waiting on both
+	 * @type {0|1|2}
+	 */
+	#waiting;
+
+	/** @type {(game: OnuwGame) => void} */
+	#allDone;
+
+	/**
 	 * @param {Socket} socket
 	 * @param {OnuwGame} game
 	 * @param {HTMLElement} gameDom
+	 * @param {(game: OnuwGame) => void} completeCallback
 	 */
-	constructor(socket, game, gameDom) {
+	constructor(socket, game, gameDom, completeCallback) {
 		this.#dom = gameDom;
 		this.#dom.textContent = null;
 		this.#socket = socket;
@@ -54,6 +67,9 @@ export default class GameSetup {
 
 		this.#unusedRoles = new Map();
 		this.#usedRoles = new Map();
+
+		this.#waiting = 2;
+		this.#allDone = completeCallback;
 
 		this.#dom.appendChild(Dom.p(game.isHost ? 'Select roles and set time limits' : 'Wait for game setup'));
 		this.#generateRolesDom();
@@ -76,6 +92,9 @@ export default class GameSetup {
 			this.#generateTimeDom();
 			this.#dom.appendChild(Dom.button('START THE GAME :D', this.#startGame.bind(this)));
 		}
+
+		socket.on('setupFinal', this.#finalSetup.bind(this));
+		socket.on('setupRole', this.#receiveRole.bind(this));
 	}
 
 	#generateRolesDom() {
@@ -312,5 +331,33 @@ export default class GameSetup {
 			return;
 		}
 		this.#socket.emit('setupDone', '');
+	}
+
+	/**
+	 * @param {string} data
+	 */
+	#finalSetup(data) {
+		/** @type {{roles: Roles[], roleTime: number, talkTime: number, names: string[]}} */
+		const {
+			roles, roleTime, talkTime, names,
+		} = JSON.parse(data);
+		this.#game.confirmData(roles, roleTime, talkTime, names);
+		this.#waiting--;
+		if (this.#waiting === 0) {
+			this.#allDone(this.#game);
+		}
+	}
+
+	/**
+	 * @param {string} data
+	 */
+	#receiveRole(data) {
+		/** @type {{role: Roles}} */
+		const { role } = JSON.parse(data);
+		this.#game.startingRole = role;
+		this.#waiting--;
+		if (this.#waiting === 0) {
+			this.#allDone(this.#game);
+		}
 	}
 }

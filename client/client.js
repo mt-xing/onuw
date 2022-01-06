@@ -1,5 +1,6 @@
 import Socket from './socket.js';
 import Connections from './ui/connections.js';
+import Gameplay from './ui/gameplay.js';
 import GameSetup from './ui/gameSetup.js';
 
 const socket = new Socket('http://localhost:8080/onuw');
@@ -11,5 +12,7 @@ if (gameDom === null) {
 }
 const c = new Connections(socket, gameDom);
 socket.on('setupStart', () => {
-	const s = new GameSetup(socket, c.game, gameDom);
+	const s = new GameSetup(socket, c.game, gameDom, (game) => {
+		const g = new Gameplay(socket, game, gameDom);
+	});
 });

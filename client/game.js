@@ -5,6 +5,9 @@ export default class OnuwGame {
 	/** @type {number} */
 	playerID;
 
+	/** @type {Roles | undefined} */
+	#playerStartRole;
+
 	/**
 	 * @type {string[]}
 	 */
@@ -91,6 +94,7 @@ export default class OnuwGame {
 	}
 
 	/**
+	 * Number of a particular role in play
 	 * @param {Roles} roleID
 	 * @returns {number}
 	 */
@@ -106,5 +110,32 @@ export default class OnuwGame {
 
 	get numPlayers() {
 		return this.#players.length;
+	}
+
+	/**
+	 * @param {Roles[]} roles
+	 * @param {number} roleTime
+	 * @param {number} talkTime
+	 * @param {string[]} names
+	 */
+	confirmData(roles, roleTime, talkTime, names) {
+		this.roleTime = roleTime;
+		this.talkTime = talkTime;
+		this.#players = names;
+
+		this.#roles.clear();
+		this.#numRoles = 0;
+		roles.forEach(this.addRole.bind(this));
+	}
+
+	get startingRole() {
+		if (this.#playerStartRole === undefined) {
+			throw new Error('No role assigned yet');
+		}
+		return this.#playerStartRole;
+	}
+
+	set startingRole(role) {
+		this.#playerStartRole = role;
 	}
 }
