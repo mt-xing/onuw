@@ -1,9 +1,10 @@
 import Socket from '../socket.js';
 import OnuwGame from '../game.js';
-import { Roles, roleToName } from '../../game/role.js';
+import { Roles, roleToName, Teams } from '../../game/role.js';
 import Dom from '../dom.js';
 import { constructRole } from '../../game/rolesIndiv.js';
 import { CENTER_SIZE } from '../../game/state.js';
+import { assertUnreachable, makeList, secondsToTime } from '../../game/utils.js';
 
 export default class Gameplay {
 	/**
@@ -41,7 +42,11 @@ export default class Gameplay {
 		this.#socket.on('timeout', this.#timeout.bind(this));
 		this.#socket.on('wake', this.#wake.bind(this));
 		this.#socket.on('sleep', this.#sleep.bind(this));
+
 		this.#socket.on('day', this.#endOfNight.bind(this));
+		this.#socket.on('time', this.#timeSync.bind(this));
+		this.#socket.on('voteStart', this.#voteStart.bind(this));
+		this.#socket.on('result', this.#showResults.bind(this));
 	}
 
 	#giveRoleInfo() {
@@ -189,5 +194,69 @@ export default class Gameplay {
 					`${this.#game.getPlayerName(playerID)}: ${boardInfo[playerID]}`,
 				));
 			});
+		this.#dom.appendChild(Dom.button('I\'m ready to vote', () => {
+			this.#socket.emit('voteReady', '');
+		}));
+		this.#dom.appendChild(Dom.p(`Time left: ${secondsToTime(this.#game.talkTime)}`));
+	}
+
+	/**
+	 * @param {string} raw
+	 */
+	#timeSync(raw) {
+		/** @type {{time: number}} */
+		const { time } = JSON.parse(raw);
+
+		this.#dom.appendChild(Dom.p(`Time left: ${secondsToTime(time)}`));
+	}
+
+	#voteStart() {
+		this.#dom.appendChild(Dom.p('Please vote for a player to kill:'));
+		Array.from(Array(this.#game.numPlayers).keys())
+			.forEach((playerID) => {
+				if (playerID === this.#game.playerID) { return; }
+				this.#dom.appendChild(Dom.button(this.#game.getPlayerName(playerID), () => {
+					this.#socket.send('vote', { id: playerID });
+				}));
+			});
+	}
+
+	/**
+	 * @param {string} raw
+	 */
+	#showResults(raw) {
+		/** @type {{votes: number[], playerRoles: Roles[], winTeam: Teams[]}} */
+		const { votes, playerRoles, winTeam } = JSON.parse(raw);
+		this.#dom.appendChild(Dom.p('And the votes are in:'));
+		votes.forEach((voteTarget, pID) => {
+			this.#dom.appendChild(Dom.p(`${this.#game.getPlayerName(pID)} voted to kill ${this.#game.getPlayerName(voteTarget)}`));
+		});
+		this.#dom.appendChild(Dom.p('The role everyone ended up with:'));
+		playerRoles.forEach((role, pID) => {
+			this.#dom.appendChild(Dom.p(`${this.#game.getPlayerName(pID)} was ${roleToName[role]}`));
+		});
+		this.#dom.appendChild(Dom.p('Winning team(s):'));
+		if (winTeam.length === 0) {
+			this.#dom.appendChild(Dom.p('Nobody. Everyone lost. Y\'all suck.'));
+		} else {
+			this.#dom.appendChild(Dom.p(makeList(winTeam.map((t) => {
+				switch (t) {
+				case Teams.WEREWOLF:
+					return 'Werewolves';
+				case Teams.VILLAGER:
+					return 'Villagers';
+				case Teams.TANNER:
+					return 'Tanner';
+				default:
+					return assertUnreachable(t);
+				}
+			}))));
+		}
+		const yourRole = constructRole(playerRoles[this.#game.playerID]);
+		if (winTeam.some((w) => yourRole.winTeam === w)) {
+			this.#dom.appendChild(Dom.p('YOU WON!'));
+		} else {
+			this.#dom.appendChild(Dom.p('Better luck next time'));
+		}
 	}
 }

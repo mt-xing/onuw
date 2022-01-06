@@ -61,3 +61,24 @@ export function toTitleCase(str) {
 export function assertUnreachable(never) {
 	throw new Error(`This should be unreachable, but got ${never}`);
 }
+
+/**
+ * Convert seconds to a time string
+ * @param {number} sec Seconds
+ * @returns {string}
+ */
+export function secondsToTime(sec) {
+	const min = Math.floor(sec / 60);
+	const s = sec % 60;
+	/**
+	 * @param {number} p
+	 * @returns {string}
+	 */
+	const padToTwo = (p) => {
+		if (p >= 10) { return `${p}`; }
+		if (p > 0) { return `0${p}`; }
+		if (p === 0) { return '00'; }
+		throw new Error(`Invalid time ${p}`);
+	};
+	return `${padToTwo(min)}:${padToTwo(s)}`;
+}
