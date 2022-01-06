@@ -43,6 +43,7 @@ export default class Gameplay {
 		this.#socket.on('wake', this.#wake.bind(this));
 		this.#socket.on('sleep', this.#sleep.bind(this));
 
+		// TODO vote status
 		this.#socket.on('day', this.#endOfNight.bind(this));
 		this.#socket.on('time', this.#timeSync.bind(this));
 		this.#socket.on('voteStart', this.#voteStart.bind(this));

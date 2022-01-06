@@ -102,8 +102,8 @@ export default class OnuwGame {
 							banned[ppid] = 'This player\'s role is being protected by the sentinel';
 						}
 					});
-				if (allowSelf) {
-					if (banned[pid] !== undefined) {
+				if (!allowSelf) {
+					if (banned[pid] === undefined) {
 						banned[pid] = 'You may not select yourself';
 					}
 				}
