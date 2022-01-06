@@ -2,7 +2,7 @@ import * as io from '../node_modules/socket.io/dist/index.js';
 import Broker from './broker.js';
 import Communicator from './comms.js';
 import OnuwGame from './game.js';
-import Role, { Roles } from '../game/role.js';
+import { Roles } from '../game/role.js';
 import { CENTER_SIZE } from '../game/state.js';
 import { constructRole } from '../game/rolesIndiv.js';
 
@@ -158,7 +158,11 @@ export default class OnuwServer {
 			return;
 		}
 
-		const communicator = new Communicator(game.playerToSocket, this.#namespace.to(room).emit);
+		const nameSpace = this.#namespace.to(room);
+		const communicator = new Communicator(
+			game.playerToSocket,
+			nameSpace.emit.bind(nameSpace),
+		);
 		const newGame = new OnuwGame(
 			game.roleArr.map((roleID) => constructRole(roleID)),
 			game.players,

@@ -1,3 +1,4 @@
+import { DEFAULT_ROLE_TIME, DEFAULT_TALK_TIME } from '../game/constants.js';
 import { Roles } from '../game/role.js';
 
 export default class OnuwGame {
@@ -36,8 +37,8 @@ export default class OnuwGame {
 		this.#players = [];
 		this.#roles = new Map();
 		this.#numRoles = 0;
-		this.roleTime = 15;
-		this.talkTime = 5 * 60;
+		this.roleTime = DEFAULT_ROLE_TIME;
+		this.talkTime = DEFAULT_TALK_TIME * 60;
 	}
 
 	reset() {
@@ -101,5 +102,9 @@ export default class OnuwGame {
 
 	get numRoles() {
 		return this.#numRoles;
+	}
+
+	get numPlayers() {
+		return this.#players.length;
 	}
 }

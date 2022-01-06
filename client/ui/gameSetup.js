@@ -3,6 +3,7 @@ import Socket from '../socket.js';
 import OnuwGame from '../game.js';
 import { MultiRoles, Roles, roleToName } from '../../game/role.js';
 import { DEFAULT_ROLE_TIME, DEFAULT_TALK_TIME } from '../../game/constants.js';
+import { CENTER_SIZE } from '../../game/state.js';
 
 export default class GameSetup {
 	/**
@@ -56,8 +57,8 @@ export default class GameSetup {
 
 		this.#dom.appendChild(Dom.p(game.isHost ? 'Select roles and set time limits' : 'Wait for game setup'));
 		this.#generateRolesDom();
-		this.#roleTime = Dom.p('Seconds per role: 15');
-		this.#talkTime = Dom.p('Minutes to discuss: 5');
+		this.#roleTime = Dom.p(`Seconds per role: ${DEFAULT_ROLE_TIME}`);
+		this.#talkTime = Dom.p(`Minutes to discuss: ${DEFAULT_TALK_TIME}`);
 		this.#dom.appendChild(this.#roleTime);
 		this.#dom.appendChild(this.#talkTime);
 
@@ -73,6 +74,7 @@ export default class GameSetup {
 			});
 		} else {
 			this.#generateTimeDom();
+			this.#dom.appendChild(Dom.button('START THE GAME :D', this.#startGame.bind(this)));
 		}
 	}
 
@@ -219,8 +221,8 @@ export default class GameSetup {
 			this.#socket.send('setupInfo', {
 				roleAdd: isMulti ? Array(multi.number).fill(rid) : [rid],
 				roleSub: [],
-				roleTime: NaN,
-				talkTime: NaN,
+				roleTime: this.#game.roleTime,
+				talkTime: this.#game.talkTime,
 			});
 		}
 
@@ -259,8 +261,8 @@ export default class GameSetup {
 			this.#socket.send('setupInfo', {
 				roleAdd: [],
 				roleSub: isMulti ? Array(multi.number).fill(rid) : [rid],
-				roleTime: NaN,
-				talkTime: NaN,
+				roleTime: this.#game.roleTime,
+				talkTime: this.#game.talkTime,
 			});
 		}
 
@@ -300,5 +302,15 @@ export default class GameSetup {
 		this.#talkTime.textContent = `Minutes to discuss: ${talkTime / 60}`;
 		this.#game.roleTime = roleTime;
 		this.#game.talkTime = talkTime;
+	}
+
+	#startGame() {
+		if (!this.#game.isHost) { throw new Error(); }
+		if (this.#game.numRoles - CENTER_SIZE !== this.#game.numPlayers) {
+			// eslint-disable-next-line no-alert
+			alert(`The number of roles must equal number of players plus ${CENTER_SIZE}`);
+			return;
+		}
+		this.#socket.emit('setupDone', '');
 	}
 }
