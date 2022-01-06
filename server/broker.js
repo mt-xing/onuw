@@ -1,5 +1,5 @@
 import * as io from '../node_modules/socket.io/dist/index.js';
-import { DoubleRoles, MAX_ROLES, Roles } from '../game/role.js';
+import { MAX_ROLES, Roles } from '../game/role.js';
 import { CENTER_SIZE } from '../game/state.js';
 
 export default class Broker {

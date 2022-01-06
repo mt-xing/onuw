@@ -1,3 +1,15 @@
 #game {
+	font-family: sans-serif;
 	width: 100%;
+}
+
+.classSelect {
+	display: inline-block;
+	padding: 5px;
+	border: 1px black solid;
+	font-size: 16px;
+}
+
+button.classSelect {
+	cursor: pointer;
 }

@@ -1,4 +1,4 @@
-import { DoubleRoles, Roles } from '../game/role.js';
+import { Roles } from '../game/role.js';
 
 export default class OnuwGame {
 	/** @type {number} */
@@ -10,7 +10,7 @@ export default class OnuwGame {
 	#players;
 
 	/**
-	 * @type {Set<Roles>}
+	 * @type {Map<Roles, number>}
 	 */
 	#roles;
 
@@ -22,14 +22,14 @@ export default class OnuwGame {
 	constructor() {
 		this.playerID = NaN;
 		this.#players = [];
-		this.#roles = new Set();
+		this.#roles = new Map();
 		this.#numRoles = 0;
 	}
 
 	reset() {
 		this.playerID = NaN;
 		this.#players = [];
-		this.#roles = new Set();
+		this.#roles = new Map();
 		this.#numRoles = 0;
 	}
 
@@ -47,19 +47,41 @@ export default class OnuwGame {
 
 	/**
 	 * @param {Roles} roleID
-	 * @returns {[boolean, number]} Was added; number of total roles now
 	 */
-	toggleRole(roleID) {
-		const roleQuantity = DoubleRoles.has(roleID) ? 2 : 1;
-		const isIn = this.#roles.has(roleID);
-		if (isIn) {
-			this.#numRoles -= roleQuantity;
-			this.#roles.delete(roleID);
+	addRole(roleID) {
+		const t = this.#roles.get(roleID);
+		this.#numRoles++;
+		if (t === undefined) {
+			this.#roles.set(roleID, 1);
 		} else {
-			this.#numRoles += roleQuantity;
-			this.#roles.add(roleID);
+			this.#roles.set(roleID, t + 1);
 		}
+	}
 
-		return [!isIn, this.#numRoles];
+	/**
+	 * @param {Roles} roleID
+	 */
+	removeRole(roleID) {
+		const t = this.#roles.get(roleID);
+		if (t === undefined) {
+			return;
+		} else {
+			this.#numRoles--;
+			if (t <= 1) {
+				this.#roles.delete(roleID);
+				return;
+			}
+			this.#roles.set(roleID, t - 1);
+		}
+	}
+
+	/**
+	 * @param {Roles} roleID
+	 * @returns {number}
+	 */
+	numRole(roleID) {
+		const d = this.#roles.get(roleID);
+		if (d === undefined) { return 0; }
+		return d;
 	}
 }

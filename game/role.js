@@ -201,10 +201,14 @@ export const Roles = Object.freeze({
 });
 
 /**
- * Roles that can have two players
- * @type {Set<Roles>}
+ * @type {Partial<Record<Roles,
+ * 	{type: 'up to', number: number} | {type: 'all', number: number}
+ * >>}
  */
-export const DoubleRoles = new Set([Roles.WEREWOLF, Roles.MASON]);
+export const MultiRoles = {
+	[Roles.WEREWOLF]: { type: 'up to', number: 2 },
+	[Roles.MASON]: { type: 'all', number: 2 },
+};
 
 /**
  * Lookup from role id to name of role
