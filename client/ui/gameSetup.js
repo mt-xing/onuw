@@ -247,6 +247,11 @@ export default class GameSetup {
 
 		const n = this.#game.numRole(rid);
 		this.#game.addRole(rid);
+		if (this.#game.isHost && isMulti) {
+			for (let i = 1; i < multi.number; i++) {
+				this.#game.addRole(rid);
+			}
+		}
 
 		const d = this.#unusedRoles.get(rid);
 		if (d === undefined) {
@@ -286,6 +291,11 @@ export default class GameSetup {
 		}
 
 		this.#game.removeRole(rid);
+		if (this.#game.isHost && isMulti) {
+			for (let i = 1; i < multi.number; i++) {
+				this.#game.removeRole(rid);
+			}
+		}
 		const n = this.#game.numRole(rid);
 
 		const d = this.#unusedRoles.get(rid);

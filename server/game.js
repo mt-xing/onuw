@@ -160,10 +160,6 @@ export default class OnuwGame {
 			wakeOrderIndex++;
 		}
 
-		// for (const pids of wakeOrder) {
-		// 	await Promise.all(pids.map(playerAct));
-		// }
-
 		/** @type {Record<number, string>} */
 		const boardInfo = {};
 		playerIDarray.forEach((pid) => {

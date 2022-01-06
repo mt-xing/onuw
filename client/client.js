@@ -7,6 +7,7 @@ const socket = new Socket('http://localhost:8080/onuw');
 
 const gameDom = document.getElementById('game');
 if (gameDom === null) {
+	// eslint-disable-next-line no-alert
 	alert('ERROR: No game dom');
 	throw new Error();
 }

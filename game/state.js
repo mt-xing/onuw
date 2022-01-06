@@ -86,7 +86,7 @@ export default class State {
 	}
 
 	/**
-	 * Returns an array of all waking roles in play in wake order.
+	 * Returns an array of all unique waking roles in play in wake order.
 	 */
 	get allWakingRoles() {
 		return this.#players
@@ -96,6 +96,7 @@ export default class State {
 			.sort((a, b) => Role.sortWakeOrder(
 				a.wakeOrder ?? [],
 				b.wakeOrder ?? [],
-			));
+			))
+			.filter((x, i, a) => i === 0 || x.role !== a[i - 1].role);
 	}
 }

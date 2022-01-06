@@ -13,7 +13,7 @@ export default class OnuwServer {
 	#namespace;
 
 	/**
-	 * @type {Map<io.Socket, string>}
+	 * @type {Map<number, string>} Socket ID to room ID
 	 */
 	#socketRoom;
 
@@ -67,7 +67,7 @@ export default class OnuwServer {
 				/** @type {{name: string}} */
 				const { name } = JSON.parse(roomInfo);
 				this.#setups.set(id, new Broker(name, socket));
-				this.#socketRoom.set(socket, id);
+				this.#socketRoom.set(socket.id, id);
 
 				socket.emit('createYes', JSON.stringify({ id }));
 
@@ -106,6 +106,7 @@ export default class OnuwServer {
 			socket.emit('joinYes', JSON.stringify({ playerID: addResult, players: game.players }));
 			this.#namespace.to(id).emit('joinNew', JSON.stringify({ playerID: addResult, name }));
 			socket.join(id);
+			this.#socketRoom.set(socket.id, id);
 			break;
 		}
 	}
@@ -114,7 +115,7 @@ export default class OnuwServer {
 	 * @param {io.Socket} socket
 	 */
 	#enterSetup(socket) {
-		const room = this.#socketRoom.get(socket);
+		const room = this.#socketRoom.get(socket.id);
 		const game = this.#setups.get(room ?? '');
 		if (game === undefined) {
 			return;
@@ -128,7 +129,7 @@ export default class OnuwServer {
 	 * @param {string} info
 	 */
 	#setupInfo(socket, info) {
-		const room = this.#socketRoom.get(socket);
+		const room = this.#socketRoom.get(socket.id);
 		const game = this.#setups.get(room ?? '');
 		if (game === undefined) {
 			return;
@@ -149,7 +150,7 @@ export default class OnuwServer {
 	 * @param {io.Socket} socket
 	 */
 	#completeSetup(socket) {
-		const room = this.#socketRoom.get(socket);
+		const room = this.#socketRoom.get(socket.id);
 		const game = this.#setups.get(room ?? '');
 		if (game === undefined || room === undefined) {
 			return;
@@ -197,7 +198,7 @@ export default class OnuwServer {
 	 * @param {string} info
 	 */
 	#selectionMade(socket, info) {
-		const room = this.#socketRoom.get(socket);
+		const room = this.#socketRoom.get(socket.id);
 		const game = this.#games.get(room ?? '');
 		if (game === undefined) {
 			return;
@@ -211,12 +212,12 @@ export default class OnuwServer {
 	 * @param {io.Socket} socket
 	 */
 	#voteReady(socket) {
-		const room = this.#socketRoom.get(socket);
+		const room = this.#socketRoom.get(socket.id);
 		const game = this.#games.get(room ?? '');
 		if (game === undefined) {
 			return;
 		}
-		game.comm.processPlayerVoteReady(game.comm.socketToPlayer.get(socket) ?? NaN);
+		game.comm.processPlayerVoteReady(game.comm.socketToPlayer.get(socket.id) ?? NaN);
 	}
 
 	/**
@@ -224,24 +225,24 @@ export default class OnuwServer {
 	 * @param {string} info
 	 */
 	#voteReceived(socket, info) {
-		const room = this.#socketRoom.get(socket);
+		const room = this.#socketRoom.get(socket.id);
 		const game = this.#games.get(room ?? '');
 		if (game === undefined) {
 			return;
 		}
 		/** @type {{id: number}} */
 		const { id } = JSON.parse(info);
-		game.comm.processPlayerVote(game.comm.socketToPlayer.get(socket) ?? NaN, id);
+		game.comm.processPlayerVote(game.comm.socketToPlayer.get(socket.id) ?? NaN, id);
 	}
 
 	/**
 	 * @param {io.Socket} socket
 	 */
 	#restartGame(socket) {
-		const room = this.#socketRoom.get(socket);
+		const room = this.#socketRoom.get(socket.id);
 		const game = this.#games.get(room ?? '');
 		if (game === undefined || room === undefined) { return; }
-		if (game.comm.socketToPlayer.get(socket) !== 0) { return; }
+		if (game.comm.socketToPlayer.get(socket.id) !== 0) { return; }
 		if (!game.over) { return; }
 		this.#namespace.to(room).emit('restart');
 		this.#games.delete(room);
@@ -259,7 +260,7 @@ export default class OnuwServer {
 	 * @param {io.Socket} socket
 	 */
 	#endGame(socket) {
-		const room = this.#socketRoom.get(socket);
+		const room = this.#socketRoom.get(socket.id);
 		if (room === undefined) { return; }
 		this.#namespace.to(room).emit('disconn');
 		const game = this.#games.get(room);
@@ -269,7 +270,7 @@ export default class OnuwServer {
 
 		/** @param {io.Socket} soc */
 		const deleteSocket = (soc) => {
-			this.#socketRoom.delete(soc);
+			this.#socketRoom.delete(soc.id);
 			soc.disconnect(true);
 		};
 

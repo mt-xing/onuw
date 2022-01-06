@@ -23,7 +23,7 @@ export default class Communicator {
 	playerToSocket;
 
 	/**
-	 * @type {Map<io.Socket, number>}
+	 * @type {Map<number, number>} Socket ID to player ID
 	 */
 	socketToPlayer;
 
@@ -58,7 +58,7 @@ export default class Communicator {
 		this.#pendingVote = null;
 		this.#broadcast = broadcast;
 		this.socketToPlayer = new Map();
-		playerToSocket.forEach((socket, id) => this.socketToPlayer.set(socket, id));
+		playerToSocket.forEach((socket, id) => this.socketToPlayer.set(socket.id, id));
 	}
 
 	/**
@@ -79,7 +79,7 @@ export default class Communicator {
 	 * @param {string} msg Message
 	 */
 	message(pid, msg) {
-		this.sendToPlayer(pid, 'msg', msg);
+		this.sendToPlayer(pid, 'msg', JSON.stringify({ msg }));
 	}
 
 	/**
@@ -181,7 +181,7 @@ export default class Communicator {
 	 * @param {Record<number, string>} boardInfo Mapping from player id to descriptors
 	 */
 	transitionToDay(boardInfo) {
-		this.#broadcast('day', JSON.stringify(boardInfo));
+		this.#broadcast('day', JSON.stringify({ boardInfo }));
 	}
 
 	/**

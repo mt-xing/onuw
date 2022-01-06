@@ -138,4 +138,12 @@ export default class OnuwGame {
 	set startingRole(role) {
 		this.#playerStartRole = role;
 	}
+
+	/**
+	 * @param {number} pid
+	 * @returns {string}
+	 */
+	getPlayerName(pid) {
+		return this.#players[pid];
+	}
 }

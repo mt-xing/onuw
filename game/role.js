@@ -1,5 +1,5 @@
 import State from './state.js';
-import { assertUnreachable, toTitleCase } from './utils.js';
+import { toTitleCase } from './utils.js';
 
 export default class Role {
 	/**
