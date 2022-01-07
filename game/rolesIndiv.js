@@ -88,7 +88,9 @@ export class MysticWolf extends Role {
 			}
 		}
 		const view = await pickPlayers(1, false);
-		giveInfo(`The card ${state.getName(view[0])} has is ${state.getPlayer(view[0]).currentRole.roleName}`);
+		if (view.length === 1) {
+			giveInfo(`The card ${state.getName(view[0])} has is ${state.getPlayer(view[0]).currentRole.roleName}`);
+		}
 	}
 }
 
@@ -244,7 +246,7 @@ export class Seer extends Role {
 export class ApprenticeSeer extends Role {
 	constructor() {
 		super(
-			Roles.SEER,
+			Roles.APPRENTICE_SEER,
 			'Transcendent, but only kinda',
 			'You may view one card from the center.',
 			[5, 2],
@@ -264,7 +266,7 @@ export class ApprenticeSeer extends Role {
 		const cards = await pickCenters(1);
 		if (pickCenters.length === 1) {
 			const role = state.getCenter(cards[0]);
-			giveInfo(`The card you selected in the center was ${role}`);
+			giveInfo(`The card you selected in the center was ${role.roleName}`);
 		}
 	}
 }
