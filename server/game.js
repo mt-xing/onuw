@@ -180,17 +180,21 @@ export default class OnuwGame {
 			let timeout = null;
 			let timeRemaining = this.thinkTime;
 			const updateInterval = 15 * 1000; // 15 sec
-			if (timeRemaining > updateInterval) {
-				timeout = setTimeout(() => {
-					timeRemaining -= updateInterval;
-					this.comm.timeUpdate(timeRemaining);
-				}, updateInterval);
-			} else {
-				timeout = setTimeout(() => {
-					readyUpGenerator.throw('Unneeded');
-					resolve(undefined);
-				}, this.thinkTime);
-			}
+			const doTime = () => {
+				if (timeRemaining > updateInterval) {
+					timeout = setTimeout(() => {
+						timeRemaining -= updateInterval;
+						this.comm.timeUpdate(timeRemaining);
+						doTime();
+					}, updateInterval);
+				} else {
+					timeout = setTimeout(() => {
+						readyUpGenerator.throw('Unneeded');
+						resolve(undefined);
+					}, this.thinkTime);
+				}
+			};
+			doTime();
 
 			(async () => {
 				/** @type {Set<number>} */
@@ -203,7 +207,9 @@ export default class OnuwGame {
 					readyPlayers.add(t);
 					this.comm.playerReadyToVote(t);
 				}
-				clearTimeout(timeout);
+				if (timeout !== null) {
+					clearTimeout(timeout);
+				}
 				resolve(undefined);
 			})();
 		});

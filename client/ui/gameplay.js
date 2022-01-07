@@ -271,5 +271,10 @@ export default class Gameplay {
 		} else {
 			this.#dom.appendChild(Dom.p('You lose. Better luck next time'));
 		}
+		if (this.#game.isHost) {
+			this.#dom.appendChild(Dom.button('Play again?', () => {
+				this.#socket.emit('restart', '');
+			}));
+		}
 	}
 }
