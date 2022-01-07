@@ -191,7 +191,7 @@ export default class OnuwGame {
 					timeout = setTimeout(() => {
 						readyUpGenerator.throw('Unneeded');
 						resolve(undefined);
-					}, this.thinkTime);
+					}, timeRemaining);
 				}
 			};
 			doTime();
