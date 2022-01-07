@@ -49,6 +49,17 @@ export default class OnuwGame {
 		this.#players = [];
 		this.#roles = new Map();
 		this.#numRoles = 0;
+		this.roleTime = DEFAULT_ROLE_TIME;
+		this.talkTime = DEFAULT_TALK_TIME * 60;
+		this.#playerStartRole = undefined;
+	}
+
+	restart() {
+		this.#roles = new Map();
+		this.#numRoles = 0;
+		this.roleTime = DEFAULT_ROLE_TIME;
+		this.talkTime = DEFAULT_TALK_TIME * 60;
+		this.#playerStartRole = undefined;
 	}
 
 	get isHost() {

@@ -42,23 +42,28 @@ export default class Connections {
 		gameDom.appendChild(Dom.button('Create', this.#create.bind(this)));
 		gameDom.appendChild(Dom.button('Join', this.#join.bind(this)));
 
+		socket.off('createYes');
 		socket.on('createYes', (msg) => {
 			const { id } = JSON.parse(msg);
 			this.createYes(id);
 		});
+		socket.off('createNo');
 		socket.on('createNo', (msg) => {
 			const { reason } = JSON.parse(msg);
 			this.createNo(reason);
 		});
 
+		socket.off('joinYes');
 		socket.on('joinYes', (msg) => {
 			const { playerID, players } = JSON.parse(msg);
 			this.joinYes(playerID, players);
 		});
+		socket.off('joinNo');
 		socket.on('joinNo', (msg) => {
 			const { reason } = JSON.parse(msg);
 			this.joinNo(reason);
 		});
+		socket.off('joinNew');
 		socket.on('joinNew', (msg) => {
 			const { playerID, name } = JSON.parse(msg);
 			this.joinNew(playerID, name);

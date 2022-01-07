@@ -64,6 +64,7 @@ export default class GameSetup {
 		this.#dom.textContent = null;
 		this.#socket = socket;
 		this.#game = game;
+		this.#game.restart();
 
 		this.#unusedRoles = new Map();
 		this.#usedRoles = new Map();
@@ -79,6 +80,7 @@ export default class GameSetup {
 		this.#dom.appendChild(this.#talkTime);
 
 		if (!game.isHost) {
+			this.#socket.off('setupInfo');
 			this.#socket.on('setupInfo', (msg) => {
 				/** @type {{roleAdd: Roles[], roleSub: Roles[], roleTime: number, talkTime: number}} */
 				const {
@@ -93,7 +95,9 @@ export default class GameSetup {
 			this.#dom.appendChild(Dom.button('START THE GAME :D', this.#startGame.bind(this)));
 		}
 
+		socket.off('setupFinal');
 		socket.on('setupFinal', this.#finalSetup.bind(this));
+		socket.off('setupRole');
 		socket.on('setupRole', this.#receiveRole.bind(this));
 	}
 

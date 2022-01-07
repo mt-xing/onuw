@@ -34,6 +34,7 @@ export default class Gameplay {
 		this.#game = game;
 
 		this.#giveRoleInfo();
+		['roleStart', 'msg', 'pickCenters', 'pickChoices', 'pickPlayers', 'timeout', 'wake', 'sleep'].forEach(this.#socket.off.bind(this.#socket));
 		this.#socket.on('roleStart', this.#roleStart.bind(this));
 		this.#socket.on('msg', this.#msg.bind(this));
 		this.#socket.on('pickCenters', this.#pickCenters.bind(this));
@@ -44,6 +45,7 @@ export default class Gameplay {
 		this.#socket.on('sleep', this.#sleep.bind(this));
 
 		// TODO vote status
+		['day', 'time', 'voteStart', 'result'].forEach(this.#socket.off.bind(this.#socket));
 		this.#socket.on('day', this.#endOfNight.bind(this));
 		this.#socket.on('time', this.#timeSync.bind(this));
 		this.#socket.on('voteStart', this.#voteStart.bind(this));

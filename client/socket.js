@@ -32,6 +32,14 @@ export default class Socket {
 	}
 
 	/**
+	 * Clear a callback
+	 * @param {string} type
+	 */
+	off(type) {
+		this.#socket.off(type);
+	}
+
+	/**
 	 * Send a message to the server
 	 * @param {string} type
 	 * @param {string} msg
