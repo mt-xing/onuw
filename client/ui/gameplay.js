@@ -44,11 +44,12 @@ export default class Gameplay {
 		this.#socket.on('wake', this.#wake.bind(this));
 		this.#socket.on('sleep', this.#sleep.bind(this));
 
-		// TODO vote status
-		['day', 'time', 'voteStart', 'result'].forEach(this.#socket.off.bind(this.#socket));
+		['day', 'time', 'voteReady', 'voteStart', 'voteReceived', 'result'].forEach(this.#socket.off.bind(this.#socket));
 		this.#socket.on('day', this.#endOfNight.bind(this));
 		this.#socket.on('time', this.#timeSync.bind(this));
+		this.#socket.on('voteReady', this.#voteReady.bind(this));
 		this.#socket.on('voteStart', this.#voteStart.bind(this));
+		this.#socket.on('voteReceived', this.#voteReceived.bind(this));
 		this.#socket.on('result', this.#showResults.bind(this));
 	}
 
@@ -223,6 +224,15 @@ export default class Gameplay {
 		this.#dom.appendChild(Dom.p(`Time left: ${secondsToTime(time)}`));
 	}
 
+	/**
+	 * @param {string} raw
+	 */
+	#voteReady(raw) {
+		/** @type {{id: number}} */
+		const { id } = JSON.parse(raw);
+		this.#dom.appendChild(Dom.p(`${this.#game.getPlayerName(id)} is ready to vote`));
+	}
+
 	#voteStart() {
 		this.#dom.appendChild(Dom.hr());
 		this.#dom.appendChild(Dom.p('Please vote for a player to kill:'));
@@ -233,6 +243,15 @@ export default class Gameplay {
 					this.#socket.send('vote', { id: playerID });
 				}));
 			});
+	}
+
+	/**
+	 * @param {string} raw
+	 */
+	#voteReceived(raw) {
+		/** @type {{playerID: number}} */
+		const { playerID } = JSON.parse(raw);
+		this.#dom.appendChild(Dom.p(`${this.#game.getPlayerName(playerID)} has voted`));
 	}
 
 	/**
