@@ -69,17 +69,10 @@ export default class NightStatus {
 			return;
 		}
 
-		// const max = this.#time * UPDATES_PER_SECOND;
-		// let left = 0;
-		// const updateTime = () => {
-		// 	if (left <= max) {
-		// 		left++;
-		// 		bar.value = left;
-		// 		setTimeout(updateTime, 1000 / UPDATES_PER_SECOND);
-		// 	}
-		// };
-		// updateTime();
-		bar.style.transition = `transform ${this.#time}s`;
+		bar.style.transition = `transform ${this.#time}s linear, background 1s ease-in-out`;
 		bar.style.transform = 'scaleY(1)';
+		setTimeout(() => {
+			bar.classList.add('done');
+		}, this.#time * 1000);
 	}
 }
