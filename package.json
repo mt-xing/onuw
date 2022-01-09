@@ -2,7 +2,7 @@
   "scripts": {
     "test": "node test.js",
     "client": "http-server . -p 3000",
-    "client-silent": "npm run client --silent",
+    "client-silent": "http-server . -s -p 3000",
     "server": "node server/index.js",
     "start": "npm-run-all --parallel client-silent server"
   },
