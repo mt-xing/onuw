@@ -6,6 +6,7 @@ import { constructRole } from '../../game/rolesIndiv.js';
 import { CENTER_SIZE } from '../../game/state.js';
 import { assertUnreachable, makeList, secondsToTime } from '../../game/utils.js';
 import Choice from './gameplay/choices.js';
+import NightStatus from './gameplay/nightStatus.js';
 
 export default class Gameplay {
 	/**
@@ -24,6 +25,11 @@ export default class Gameplay {
 	#dom;
 
 	/**
+	 * @type {NightStatus}
+	 */
+	#nightStatus;
+
+	/**
 	 * @type {Map<number, Choice>}
 	 */
 	#playerChoices;
@@ -39,6 +45,8 @@ export default class Gameplay {
 		this.#socket = socket;
 		this.#game = game;
 		this.#playerChoices = new Map();
+
+		this.#nightStatus = new NightStatus(this.#dom, game.allRoles, game.roleTime);
 
 		this.#giveRoleInfo();
 		['roleStart', 'msg', 'pickCenters', 'pickChoices', 'pickPlayers', 'timeout', 'wake', 'sleep'].forEach(this.#socket.off.bind(this.#socket));
@@ -74,8 +82,7 @@ export default class Gameplay {
 	#roleStart(raw) {
 		/** @type {{role: Roles}} */
 		const { role } = JSON.parse(raw);
-		this.#dom.appendChild(Dom.hr());
-		this.#dom.appendChild(Dom.p(`Current Turn: ${roleToName[role]}`));
+		this.#nightStatus.startRole(role);
 	}
 
 	/**
