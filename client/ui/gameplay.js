@@ -222,7 +222,7 @@ export default class Gameplay {
 	}
 
 	#voteStart() {
-		this.#dom.appendChild(Dom.hr());
+		this.#dom.textContent = null;
 		this.#dom.appendChild(Dom.p('Please vote for a player to kill:'));
 		Array.from(Array(this.#game.numPlayers).keys())
 			.forEach((playerID) => {
