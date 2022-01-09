@@ -14,3 +14,84 @@
 button.classSelect {
 	cursor: pointer;
 }
+
+section {
+	margin: 0 15px 20px 15px;
+	padding: 15px;
+	box-shadow: 2px 2px 15px 10px black;
+}
+
+.selection ul {
+	list-style: none;
+	margin: 10px; padding: 0;
+}
+
+.selection li {
+	margin: 7px 0; padding: 0;
+}
+
+.selection span {
+	display: inline-block;
+}
+
+.selection li>span {
+	padding: 5px;
+	box-shadow: 0 0 2px 2px #880000;
+	width: 100%;
+	cursor: not-allowed;
+}
+
+.selection li input {
+	display: none;
+}
+
+.selection li label {
+	width: 100%;
+}
+
+.selection li input+span {
+	padding: 5px;
+	box-shadow: 0 0 2px 2px black;
+	width: 100%;
+	cursor: pointer;
+}
+
+.selection li input:checked+span {
+	background: #6ce9ff;
+	box-shadow: 0 0 2px 2px #000088;
+	width: 100%;
+}
+
+.selection button {
+	padding: 10px;
+	background: white;
+	margin-top: 10px;
+	margin-left: 10px;
+	cursor: pointer;
+	box-shadow: 0 0 2px 2px black;
+}
+
+.selection.locked {
+	pointer-events: none;
+	position: relative;
+	cursor: not-allowed;
+}
+
+.selection .timeout, .selection .done {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	background: rgba(0,0,0,0.5);
+	color: white;
+	top: 0; left: 0;
+	margin: 0;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.selection .done {
+	background: rgba(0, 64, 0, 0.5);
+}

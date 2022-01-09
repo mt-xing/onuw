@@ -37,6 +37,38 @@ export default class Dom {
 	}
 
 	/**
+	 * Construct a paragraph DOM object
+	 * @param {string} text
+	 * @param {string} [className]
+	 * @returns {HTMLSpanElement}
+	 */
+	static span(text, className) {
+		const p = document.createElement('span');
+		p.textContent = text;
+		if (className !== undefined) {
+			p.className = className;
+		}
+		return p;
+	}
+
+	/**
+	 *
+	 * @param {string | HTMLElement} child
+	 * @returns {HTMLLIElement}
+	 */
+	static li(child) {
+		const li = document.createElement('li');
+
+		if (typeof child === 'string') {
+			li.appendChild(Dom.span(child));
+		} else {
+			li.appendChild(child);
+		}
+
+		return li;
+	}
+
+	/**
 	 *
 	 * @param {string} type
 	 * @param {string} [placeholder]

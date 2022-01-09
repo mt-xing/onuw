@@ -5,6 +5,7 @@ import Dom from '../dom.js';
 import { constructRole } from '../../game/rolesIndiv.js';
 import { CENTER_SIZE } from '../../game/state.js';
 import { assertUnreachable, makeList, secondsToTime } from '../../game/utils.js';
+import Choice from './gameplay/choices.js';
 
 export default class Gameplay {
 	/**
@@ -23,6 +24,11 @@ export default class Gameplay {
 	#dom;
 
 	/**
+	 * @type {Map<number, Choice>}
+	 */
+	#playerChoices;
+
+	/**
 	 * @param {Socket} socket
 	 * @param {OnuwGame} game
 	 * @param {HTMLElement} gameDom
@@ -32,6 +38,7 @@ export default class Gameplay {
 		this.#dom.textContent = null;
 		this.#socket = socket;
 		this.#game = game;
+		this.#playerChoices = new Map();
 
 		this.#giveRoleInfo();
 		['roleStart', 'msg', 'pickCenters', 'pickChoices', 'pickPlayers', 'timeout', 'wake', 'sleep'].forEach(this.#socket.off.bind(this.#socket));
@@ -112,7 +119,7 @@ export default class Gameplay {
 		/** @type {{nonce: number, num: number, banned: Record<number, string>}} */
 		const { nonce, num, banned } = JSON.parse(raw);
 
-		const heading = `Please select ${num} ${num === 1 ? 'player' : 'players'}.`;
+		const heading = `Please select ${num} ${num === 1 ? 'player' : 'players'}:`;
 		/** @type {[string, string | null][]} */
 		const choices = Array.from(Array(this.#game.numPlayers).keys())
 			.map((playerID) => [
@@ -129,51 +136,25 @@ export default class Gameplay {
 	 * @param {string} heading
 	 */
 	#promptForSomething(nonce, choices, num, heading) {
-		const wrap = document.createElement('div');
-		wrap.appendChild(Dom.p(heading));
-		// eslint-disable-next-line operator-linebreak
-		const choiceChecks = /** @type {(HTMLInputElement|null)[]} */
-			(choices.map((choice) => {
-				if (choice[1] !== null) {
-					wrap.appendChild(Dom.p(`${choice[0]} - ${choice[1]}`));
-					return null;
-				}
-				const chk = Dom.input('checkbox');
-				const label = document.createElement('label');
-				label.appendChild(chk);
-				label.appendChild(document.createTextNode(choice[0]));
-				wrap.appendChild(label);
-				return chk;
-			}));
-		wrap.appendChild(Dom.button('Lock-In Choice', (ev) => {
-			/** @type {number[]} */
-			// eslint-disable-next-line no-nested-ternary
-			const c = choiceChecks.map((chk) => (chk === null ? 0 : (chk.checked ? 1 : 0)));
-			const n = c.reduce((a, x) => a + x);
-			// eslint-disable-next-line no-alert
-			if (n !== num) { alert(`Error: Select ${num} choice(s)`); return; }
-
-			const ids = c
-				.map((x, id) => (x === 1 ? id : NaN))
-				.filter((x) => !Number.isNaN(x));
-
-			this.#socket.send('pick', {
-				nonce,
-				id: ids,
-			});
-			// @ts-ignore
-			// eslint-disable-next-line no-param-reassign
-			ev.currentTarget.disabled = true;
-		}));
-		this.#dom.appendChild(wrap);
+		const c = new Choice(this.#socket, this.#dom, nonce, choices, num, heading);
+		this.#playerChoices.set(nonce, c);
 	}
 
 	/**
 	 * @param {string} raw
 	 */
 	#timeout(raw) {
-		// TODO proper timeout
-		this.#dom.appendChild(Dom.p(`Timeout: ${raw}`));
+		/** @type {{nonce: number}} */
+		const { nonce } = JSON.parse(raw);
+
+		const c = this.#playerChoices.get(nonce);
+		if (c === undefined) {
+			// eslint-disable-next-line no-console
+			console.error(`Received invalid timeout with nonce ${nonce}`);
+			return;
+		}
+
+		c.timeout();
 	}
 
 	#wake() {
