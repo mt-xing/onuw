@@ -92,7 +92,7 @@ export default class Connections {
 			alert('Enter a valid game ID');
 			return;
 		}
-		this.#socket.send('join', { id: this.#idField.value, name: this.#nameField.value });
+		this.#socket.send('join', { id: this.#idField.value.toLowerCase(), name: this.#nameField.value });
 	}
 
 	#hostConfirm() {
