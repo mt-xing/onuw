@@ -182,8 +182,8 @@ export default class Gameplay {
 		/** @type {{boardInfo: Record<number, string>}} */
 		const { boardInfo } = JSON.parse(raw);
 		this.#dom.appendChild(Dom.hr());
-		this.#messageLog.msg('Good morning! Everybody, wake up.');
-		this.#dom.appendChild(Dom.p('Good morning.'));
+		this.#messageLog.msg('Everybody, wake up.');
+		this.#messageLog.msg('Good morning!');
 		this.#dom.appendChild(Dom.p('State of the board, if any:'));
 		if (Object.keys(boardInfo).length === 0) {
 			this.#dom.appendChild(Dom.p('Nothing relevant'));

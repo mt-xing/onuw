@@ -1,7 +1,21 @@
 import Dom from '../../dom.js';
 
 export default class MessageLog {
+	/** @type {HTMLElement} */
 	#wrap;
+
+	/**
+	 * Queue of elements to be spawned in.
+	 *
+	 * Head of queue is element 0.
+	 *
+	 * This queue is non-empty if and only if the `#spawnPending()` cycle is currently running.
+	 * If it is, do not call `#spawnPending()` again; it will automatically empty this queue out.
+	 * Otherwise, call `#spawnPending()` after `push`ing to this queue.
+	 *
+	 * @type {HTMLElement[]}
+	 */
+	#pending;
 
 	/**
      * @param {HTMLElement} dom
@@ -10,6 +24,7 @@ export default class MessageLog {
 		this.#wrap = document.createElement('main');
 		this.#wrap.classList.add('messageLog');
 		dom.appendChild(this.#wrap);
+		this.#pending = [];
 	}
 
 	/**
@@ -27,6 +42,17 @@ export default class MessageLog {
      * @param {HTMLElement} el
      */
 	msgRaw(el) {
+		const queueEmpty = this.#pending.length === 0;
+		this.#pending.push(el);
+		if (queueEmpty) {
+			this.#spawnPending();
+		}
+	}
+
+	#spawnPending() {
+		if (this.#pending.length === 0) { return; }
+		const el = this.#pending[0];
+
 		this.#wrap.appendChild(el);
 		const t = window.getComputedStyle(el).transform;
 		if (t !== 'matrix(0, 0, 0, 0, 0, 0)') {
@@ -36,5 +62,11 @@ export default class MessageLog {
 		// eslint-disable-next-line no-param-reassign
 		el.style.transform = 'scale(1)';
 		this.#wrap.scrollTop = this.#wrap.scrollHeight;
+
+		setTimeout(() => {
+			// I'm not expecting this queue to get long
+			this.#pending.shift();
+			this.#spawnPending();
+		}, 1000);
 	}
 }
