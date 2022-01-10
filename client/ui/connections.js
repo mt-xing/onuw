@@ -79,6 +79,10 @@ export default class Connections {
 			alert('Enter your name');
 			return;
 		}
+		if (this.#nameField.value.length > 50) {
+			alert('bruh why');
+			return;
+		}
 		this.#game.addPlayer(0, this.#nameField.value);
 		this.#socket.send('create', { name: this.#nameField.value });
 	}
@@ -86,6 +90,10 @@ export default class Connections {
 	#join() {
 		if (this.#nameField.value === '') {
 			alert('Enter your name');
+			return;
+		}
+		if (this.#nameField.value.length > 50) {
+			alert('bruh why');
 			return;
 		}
 		if (this.#idField.value === '') {

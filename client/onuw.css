@@ -21,8 +21,9 @@ button {
 .messageLog {
 	display: inline-block;
 	width: calc(100% - 200px);
-	height: 100%;
+	height: calc(100% - 15px);
 	overflow-y: auto;
+	scroll-behavior: smooth;
 
 	padding-top: 15px;
 

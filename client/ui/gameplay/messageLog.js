@@ -31,9 +31,10 @@ export default class MessageLog {
 		const t = window.getComputedStyle(el).transform;
 		if (t !== 'matrix(0, 0, 0, 0, 0, 0)') {
 			// eslint-disable-next-line no-console
-			console.error(`Weird; this section spawned with ${t}`);
+			console.error(`Weird; this section spawned with transform ${t}`);
 		}
 		// eslint-disable-next-line no-param-reassign
 		el.style.transform = 'scale(1)';
+		this.#wrap.scrollTop = this.#wrap.scrollHeight;
 	}
 }
