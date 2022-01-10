@@ -1,5 +1,6 @@
 import Dom from '../../dom.js';
 import Socket from '../../socket.js';
+import MessageLog from './messageLog.js';
 
 export default class Choice {
 	/** @type {HTMLElement} */
@@ -13,7 +14,7 @@ export default class Choice {
 
 	/**
 	 * @param {Socket} socket
-	 * @param {HTMLElement} dom
+	 * @param {MessageLog} dom
 	 * @param {number} nonce
 	 * @param {[string, string | null][]} choices Choice text and enabled
 	 * @param {number} num
@@ -22,7 +23,6 @@ export default class Choice {
 	constructor(socket, dom, nonce, choices, num, heading) {
 		this.#element = document.createElement('section');
 		this.#element.className = 'selection';
-		dom.appendChild(this.#element);
 
 		this.#element.appendChild(Dom.p(heading));
 
@@ -55,6 +55,8 @@ export default class Choice {
 		this.#confirmBtn = Dom.button('Confirm Choice', this.#handleConfirm.bind(this, socket, nonce, num));
 		this.#confirmBtn.disabled = true;
 		this.#element.appendChild(this.#confirmBtn);
+
+		dom.msgRaw(this.#element);
 	}
 
 	/**

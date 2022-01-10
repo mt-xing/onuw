@@ -52,6 +52,22 @@ export default class Dom {
 	}
 
 	/**
+	 * @param {string | HTMLElement} child
+	 * @returns {HTMLElement}
+	 */
+	static section(child) {
+		const sec = document.createElement('section');
+
+		if (typeof child === 'string') {
+			sec.appendChild(Dom.span(child));
+		} else {
+			sec.appendChild(child);
+		}
+
+		return sec;
+	}
+
+	/**
 	 *
 	 * @param {string | HTMLElement} child
 	 * @returns {HTMLLIElement}

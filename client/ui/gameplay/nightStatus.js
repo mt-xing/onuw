@@ -26,7 +26,7 @@ export default class NightStatus {
 	constructor(dom, roles, time) {
 		this.#time = time;
 
-		this.#wrap = document.createElement('div');
+		this.#wrap = document.createElement('aside');
 		this.#wrap.className = 'roleWrap';
 		dom.appendChild(this.#wrap);
 		this.#bars = new Map();

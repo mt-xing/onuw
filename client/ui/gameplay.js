@@ -7,6 +7,7 @@ import { CENTER_SIZE } from '../../game/state.js';
 import { assertUnreachable, makeList, secondsToTime } from '../../game/utils.js';
 import Choice from './gameplay/choices.js';
 import NightStatus from './gameplay/nightStatus.js';
+import MessageLog from './gameplay/messageLog.js';
 
 export default class Gameplay {
 	/**
@@ -24,10 +25,11 @@ export default class Gameplay {
 	  */
 	#dom;
 
-	/**
-	 * @type {NightStatus}
-	 */
+	/** @type {NightStatus} */
 	#nightStatus;
+
+	/** @type {MessageLog} */
+	#messageLog;
 
 	/**
 	 * @type {Map<number, Choice>}
@@ -46,6 +48,7 @@ export default class Gameplay {
 		this.#game = game;
 		this.#playerChoices = new Map();
 
+		this.#messageLog = new MessageLog(this.#dom);
 		this.#nightStatus = new NightStatus(this.#dom, game.allRoles, game.roleTime);
 
 		this.#giveRoleInfo();
@@ -73,7 +76,7 @@ export default class Gameplay {
 		this.#dom.appendChild(Dom.p(`Your starting role is ${role.roleName}`));
 		this.#dom.appendChild(Dom.p(role.description));
 		this.#dom.appendChild(Dom.p(role.instructions));
-		this.#dom.appendChild(Dom.p('Good night, all. And good luck.'));
+		this.#messageLog.msg('Good night, all. And good luck.');
 	}
 
 	/**
@@ -91,7 +94,7 @@ export default class Gameplay {
 	#msg(raw) {
 		/** @type {{msg: string}} */
 		const { msg } = JSON.parse(raw);
-		this.#dom.appendChild(Dom.p(msg));
+		this.#messageLog.msg(msg);
 	}
 
 	/**
@@ -143,7 +146,7 @@ export default class Gameplay {
 	 * @param {string} heading
 	 */
 	#promptForSomething(nonce, choices, num, heading) {
-		const c = new Choice(this.#socket, this.#dom, nonce, choices, num, heading);
+		const c = new Choice(this.#socket, this.#messageLog, nonce, choices, num, heading);
 		this.#playerChoices.set(nonce, c);
 	}
 
@@ -165,11 +168,11 @@ export default class Gameplay {
 	}
 
 	#wake() {
-		this.#dom.appendChild(Dom.p('Wake up.'));
+		this.#messageLog.msg('Wake up.');
 	}
 
 	#sleep() {
-		this.#dom.appendChild(Dom.p('Return to sleep. Good night.'));
+		this.#messageLog.msg('Return to sleep. Good night.');
 	}
 
 	/**
@@ -179,7 +182,7 @@ export default class Gameplay {
 		/** @type {{boardInfo: Record<number, string>}} */
 		const { boardInfo } = JSON.parse(raw);
 		this.#dom.appendChild(Dom.hr());
-		this.#dom.appendChild(Dom.p('Everybody, wake up.'));
+		this.#messageLog.msg('Good morning! Everybody, wake up.');
 		this.#dom.appendChild(Dom.p('Good morning.'));
 		this.#dom.appendChild(Dom.p('State of the board, if any:'));
 		if (Object.keys(boardInfo).length === 0) {

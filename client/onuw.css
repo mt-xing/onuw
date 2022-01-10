@@ -1,6 +1,9 @@
 #game {
 	font-family: sans-serif;
 	width: 100%;
+
+	height: calc(100vh - 200px);
+	border: 1px black solid;
 }
 
 .classSelect {
@@ -11,15 +14,31 @@
 	font-size: 16px;
 }
 
-button.classSelect {
+button {
 	cursor: pointer;
 }
 
-section {
+.messageLog {
+	display: inline-block;
+	width: calc(100% - 200px);
+	height: 100%;
+	overflow-y: auto;
+
+	padding-top: 15px;
+
+	vertical-align: top;
+}
+
+.messageLog section {
 	margin: 0 15px 20px 15px;
 	padding: 15px;
 	box-shadow: 2px 2px 15px 10px black;
+
+	transition: transform 0.5s cubic-bezier(0.075, 0.820, 0.165, 1.000);
+	transform: scale(0);
 }
+
+/* #region Selection Box */
 
 .selection ul {
 	list-style: none;
@@ -97,17 +116,18 @@ section {
 	background: rgba(0, 64, 0, 0.5);
 }
 
+/* #endregion */
+
 .roleWrap {
-	position: fixed;
 	width: 200px;
-	height: 100vh;
-	right: 0;
-	top: 0;
+	height: 100%;
 
 	z-index: 2;
 
-	display: flex;
+	display: inline-flex;
 	flex-direction: column;
+
+	vertical-align: top;
 }
 
 .roleWrap div {
