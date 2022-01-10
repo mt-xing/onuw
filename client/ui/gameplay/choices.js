@@ -97,11 +97,21 @@ export default class Choice {
 		this.#confirmBtn.disabled = true;
 
 		this.#element.classList.add('locked');
-		this.#element.appendChild(Dom.p('✔️ Your choice has been submitted', 'done'));
+		const msg = Dom.p('✔️ Your choice has been submitted', 'done');
+		this.#element.appendChild(msg);
+		if (!getComputedStyle(msg).transform) {
+			console.error('Box has no style');
+		}
+		msg.style.transform = 'translateY(0)';
 	}
 
 	timeout() {
 		this.#element.classList.add('locked');
-		this.#element.appendChild(Dom.p('❌ Sorry, you did not confirm your selection in time', 'timeout'));
+		const msg = Dom.p('❌ Sorry, you did not confirm your selection in time', 'timeout');
+		this.#element.appendChild(msg);
+		if (!getComputedStyle(msg).transform) {
+			console.error('Box has no style');
+		}
+		msg.style.transform = 'translateY(0)';
 	}
 }
