@@ -100,6 +100,7 @@ export default class Choice {
 		const msg = Dom.p('✔️ Your choice has been submitted', 'done');
 		this.#element.appendChild(msg);
 		if (!getComputedStyle(msg).transform) {
+			// eslint-disable-next-line no-console
 			console.error('Box has no style');
 		}
 		msg.style.transform = 'translateY(0)';
@@ -110,6 +111,7 @@ export default class Choice {
 		const msg = Dom.p('❌ Sorry, you did not confirm your selection in time', 'timeout');
 		this.#element.appendChild(msg);
 		if (!getComputedStyle(msg).transform) {
+			// eslint-disable-next-line no-console
 			console.error('Box has no style');
 		}
 		msg.style.transform = 'translateY(0)';
