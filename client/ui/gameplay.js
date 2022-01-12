@@ -8,6 +8,7 @@ import { assertUnreachable, makeList, secondsToTime } from '../../game/utils.js'
 import Choice from './gameplay/choices.js';
 import NightStatus from './gameplay/nightStatus.js';
 import MessageLog from './gameplay/messageLog.js';
+import BoardStatus from './gameplay/boardStatus.js';
 
 export default class Gameplay {
 	/**
@@ -24,6 +25,9 @@ export default class Gameplay {
 	  * @type {HTMLElement}
 	  */
 	#dom;
+
+	/** @type {BoardStatus} */
+	#boardStatus;
 
 	/** @type {NightStatus} */
 	#nightStatus;
@@ -42,13 +46,17 @@ export default class Gameplay {
 	 * @param {HTMLElement} gameDom
 	 */
 	constructor(socket, game, gameDom) {
-		this.#dom = gameDom;
-		this.#dom.textContent = null;
+		// eslint-disable-next-line no-param-reassign
+		gameDom.textContent = null;
+		this.#dom = document.createElement('div');
+		gameDom.appendChild(this.#dom);
+		this.#dom.classList.add('gameWrap');
 		this.#socket = socket;
 		this.#game = game;
 		this.#playerChoices = new Map();
 
 		this.#messageLog = new MessageLog(this.#dom);
+		this.#boardStatus = new BoardStatus(this.#dom, game.playerNames);
 		this.#nightStatus = new NightStatus(this.#dom, game.allRoles, game.roleTime);
 
 		this.#giveRoleInfo();
@@ -167,12 +175,19 @@ export default class Gameplay {
 		c.timeout();
 	}
 
-	#wake() {
+	/**
+	 * @param {string} raw
+	 */
+	#wake(raw) {
+		/** @type {{boardInfo: Record<number, string>}} */
+		const { boardInfo } = JSON.parse(raw);
 		this.#messageLog.msg('Wake up.');
+		this.#boardStatus.showBoard(boardInfo);
 	}
 
 	#sleep() {
 		this.#messageLog.msg('Return to sleep. Good night.');
+		this.#boardStatus.hideBoard();
 	}
 
 	/**
@@ -181,21 +196,10 @@ export default class Gameplay {
 	#endOfNight(raw) {
 		/** @type {{boardInfo: Record<number, string>}} */
 		const { boardInfo } = JSON.parse(raw);
+		this.#boardStatus.showBoard(boardInfo);
 		this.#dom.appendChild(Dom.hr());
 		this.#messageLog.msg('Everybody, wake up.');
 		this.#messageLog.msg('Good morning!');
-		this.#dom.appendChild(Dom.p('State of the board, if any:'));
-		if (Object.keys(boardInfo).length === 0) {
-			this.#dom.appendChild(Dom.p('Nothing relevant'));
-		} else {
-			Object.keys(boardInfo)
-				.map((s) => parseInt(s, 10))
-				.forEach((playerID) => {
-					this.#dom.appendChild(Dom.p(
-						`${this.#game.getPlayerName(playerID)}: ${boardInfo[playerID]}`,
-					));
-				});
-		}
 		this.#dom.appendChild(Dom.button('I\'m ready to vote', (ev) => {
 			this.#socket.emit('voteReady', '');
 			// @ts-ignore

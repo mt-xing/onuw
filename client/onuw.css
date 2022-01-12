@@ -18,10 +18,26 @@ button {
 	cursor: pointer;
 }
 
+/* #region Gameplay */
+
+.gameWrap {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+
+	display: grid;
+	grid-template-columns: 200px 1fr 500px 1fr 200px;
+	grid-template-rows: 200px 1fr;
+	grid-template-areas: 
+		"header header header header header"
+		"boardStatus . messageLog . nightStatus"
+	;
+}
+
+/* #region Message Log */
 .messageLog {
-	display: inline-block;
-	width: calc(100% - 200px);
-	height: calc(100% - 15px);
+	grid-area: messageLog;
 	overflow-y: auto;
 	scroll-behavior: smooth;
 
@@ -38,6 +54,8 @@ button {
 	transition: transform 0.5s cubic-bezier(0.075, 0.820, 0.165, 1.000);
 	transform: scale(0);
 }
+
+/* #endregion */
 
 /* #region Selection Box */
 
@@ -126,9 +144,9 @@ button {
 
 /* #endregion */
 
+/* #region Night Status */
 .roleWrap {
-	width: 200px;
-	height: 100%;
+	grid-area: nightStatus;
 
 	z-index: 2;
 
@@ -143,10 +161,15 @@ button {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	border: 1px black solid;
+	border-left: 1px black solid;
+	border-bottom: 1px black solid;
 	background: white;
 
 	position: relative;
+}
+
+.roleWrap div:last-child {
+	border-bottom: none;
 }
 
 .roleWrap div .progress {
@@ -167,3 +190,49 @@ button {
 .roleWrap .done.progress {
 	background: rgba(255, 0, 0, 0.2);
 }
+
+/* #endregion */
+
+/* #region Board Status */
+
+.boardWrap {
+	grid-area: boardStatus;
+
+	display: inline-flex;
+	flex-direction: column;
+}
+
+.boardWrap div {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background: black;
+	color: black;
+
+	transition: background 0.5s ease-in-out, color 0.5s ease-in-out;
+
+	position: relative;
+}
+
+.boardWrap p {
+	text-align: center;
+}
+
+.boardWrap h2 {
+	color: white;
+	transition: color 0.5s ease-in-out;
+	margin: 5px 0;
+}
+
+.boardWrap.visible div {
+	background: white;
+}
+
+.boardWrap.visible h2 {
+	color: black;
+}
+
+/* #endregion */
+
+/* #endregion */

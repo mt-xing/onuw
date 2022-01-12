@@ -158,6 +158,10 @@ export default class OnuwGame {
 		return this.#players[pid];
 	}
 
+	get playerNames() {
+		return this.#players.slice();
+	}
+
 	get allRoles() {
 		return new Set(this.#roles.keys());
 	}

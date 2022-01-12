@@ -76,7 +76,7 @@ export default class Communicator {
 	 */
 	wake(pid, boardState) {
 		if (!Number.isNaN(pid)) {
-			this.sendToPlayer(pid, 'wake', JSON.stringify(boardState));
+			this.sendToPlayer(pid, 'wake', JSON.stringify({ boardInfo: boardState }));
 		}
 	}
 
