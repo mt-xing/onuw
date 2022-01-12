@@ -111,7 +111,7 @@ export default class OnuwGame {
 			};
 
 			const player = this.state.getPlayer(pid);
-			this.comm.wake(pid);
+			this.comm.wake(pid, this.state.boardState);
 
 			await player.startingRole.act(
 				async (num, allowSelf) => {
@@ -160,18 +160,7 @@ export default class OnuwGame {
 			wakeOrderIndex++;
 		}
 
-		/** @type {Record<number, string>} */
-		const boardInfo = {};
-		playerIDarray.forEach((pid) => {
-			const role = this.state.getPlayer(pid).currentRole;
-			const playerMods = role.modifiers;
-			if (playerMods.has(Modifiers.SENTINEL)) {
-				boardInfo[pid] = 'This player\'s role was guarded by the sentinel';
-			} else if (playerMods.has(Modifiers.REVEALER)) {
-				boardInfo[pid] = `This player has been revealed to be a ${role.roleName}`;
-			}
-		});
-		this.comm.transitionToDay(boardInfo);
+		this.comm.transitionToDay(this.state.boardState);
 
 		await new Promise((resolve) => {
 			const readyUpGenerator = this.comm.waitForPlayersReadyToVote();

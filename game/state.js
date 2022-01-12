@@ -1,4 +1,4 @@
-import Role from './role.js';
+import Role, { Modifiers } from './role.js';
 import Player from './player.js';
 import { shuffle } from './utils.js';
 
@@ -98,5 +98,20 @@ export default class State {
 				b.wakeOrder ?? [],
 			))
 			.filter((x, i, a) => i === 0 || x.role !== a[i - 1].role);
+	}
+
+	get boardState() {
+		/** @type {Record<number, string>} */
+		const boardInfo = {};
+		for (let pid = 0; pid < this.numPlayers; pid++) {
+			const role = this.getPlayer(pid).currentRole;
+			const playerMods = role.modifiers;
+			if (playerMods.has(Modifiers.SENTINEL)) {
+				boardInfo[pid] = 'This player\'s role was guarded by the sentinel';
+			} else if (playerMods.has(Modifiers.REVEALER)) {
+				boardInfo[pid] = `This player has been revealed to be a ${role.roleName}`;
+			}
+		}
+		return boardInfo;
 	}
 }

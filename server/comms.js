@@ -72,10 +72,11 @@ export default class Communicator {
 	/**
 	 * Wake up a player
 	 * @param {number} pid Player ID
+	 * @param {Record<number, string>} boardState
 	 */
-	wake(pid) {
+	wake(pid, boardState) {
 		if (!Number.isNaN(pid)) {
-			this.sendToPlayer(pid, 'wake', '');
+			this.sendToPlayer(pid, 'wake', JSON.stringify(boardState));
 		}
 	}
 
