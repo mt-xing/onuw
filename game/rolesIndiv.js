@@ -28,6 +28,20 @@ function werewolfString(wolves) {
 	return `The werewolves are: ${makeList(wolves)}`;
 }
 
+/**
+ * Returns the player names of the dream wolf, if one exists in the game
+ * @param {State} state
+ * @returns {string | null}
+ */
+function getDreamWolf(state) {
+	for (let i = 0; i < state.numPlayers; i++) {
+		if (state.getPlayer(i).currentRole.role === Roles.DREAM_WOLF) {
+			return state.getName(i);
+		}
+	}
+	return null;
+}
+
 export class Werewolf extends Role {
 	constructor() {
 		super(
@@ -50,6 +64,10 @@ export class Werewolf extends Role {
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		const wolves = getAllWerewolves(state);
 		giveInfo(werewolfString(wolves));
+		const dream = getDreamWolf(state);
+		if (dream !== null) {
+			giveInfo(`However, ${dream} is a dream wolf`);
+		}
 		if (wolves.length === 1) {
 			const pick = await pickCenters(1);
 			if (pick.length === 1) {
@@ -81,6 +99,10 @@ export class MysticWolf extends Role {
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		const wolves = getAllWerewolves(state);
 		giveInfo(werewolfString(wolves));
+		const dream = getDreamWolf(state);
+		if (dream !== null) {
+			giveInfo(`However, ${dream} is a dream wolf and does not know the identity of the other werewolves.`);
+		}
 		if (wolves.length === 1) {
 			const pick = await pickCenters(1);
 			if (pick.length === 1) {
