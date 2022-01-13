@@ -9,6 +9,7 @@ import Choice from './gameplay/choices.js';
 import NightStatus from './gameplay/nightStatus.js';
 import MessageLog from './gameplay/messageLog.js';
 import BoardStatus from './gameplay/boardStatus.js';
+import Header from './gameplay/header.js';
 
 export default class Gameplay {
 	/**
@@ -35,6 +36,9 @@ export default class Gameplay {
 	/** @type {MessageLog} */
 	#messageLog;
 
+	/** @type {Header} */
+	#header;
+
 	/**
 	 * @type {Map<number, Choice>}
 	 */
@@ -58,8 +62,10 @@ export default class Gameplay {
 		this.#messageLog = new MessageLog(this.#dom);
 		this.#boardStatus = new BoardStatus(this.#dom, game.playerNames);
 		this.#nightStatus = new NightStatus(this.#dom, game.allRoles, game.roleTime);
+		this.#header = new Header(this.#dom, this.#game.startingRole);
 
-		this.#giveRoleInfo();
+		this.#messageLog.msg('Good night, all. And good luck.');
+
 		['roleStart', 'msg', 'pickCenters', 'pickChoices', 'pickPlayers', 'timeout', 'wake', 'sleep'].forEach(this.#socket.off.bind(this.#socket));
 		this.#socket.on('roleStart', this.#roleStart.bind(this));
 		this.#socket.on('msg', this.#msg.bind(this));
@@ -77,14 +83,6 @@ export default class Gameplay {
 		this.#socket.on('voteStart', this.#voteStart.bind(this));
 		this.#socket.on('voteReceived', this.#voteReceived.bind(this));
 		this.#socket.on('result', this.#showResults.bind(this));
-	}
-
-	#giveRoleInfo() {
-		const role = constructRole(this.#game.startingRole);
-		this.#dom.appendChild(Dom.p(`Your starting role is ${role.roleName}`));
-		this.#dom.appendChild(Dom.p(role.description));
-		this.#dom.appendChild(Dom.p(role.instructions));
-		this.#messageLog.msg('Good night, all. And good luck.');
 	}
 
 	/**
@@ -197,16 +195,16 @@ export default class Gameplay {
 		/** @type {{boardInfo: Record<number, string>}} */
 		const { boardInfo } = JSON.parse(raw);
 		this.#boardStatus.showBoard(boardInfo);
-		this.#dom.appendChild(Dom.hr());
 		this.#messageLog.msg('Everybody, wake up.');
 		this.#messageLog.msg('Good morning!');
-		this.#dom.appendChild(Dom.button('I\'m ready to vote', (ev) => {
+		this.#messageLog.msg(Dom.button('I\'m ready to vote', (ev) => {
 			this.#socket.emit('voteReady', '');
 			// @ts-ignore
 			// eslint-disable-next-line no-param-reassign
 			ev.currentTarget.disabled = true;
 		}));
-		this.#dom.appendChild(Dom.p(`Time left: ${secondsToTime(this.#game.talkTime)}`));
+
+		this.#header.startTimer(this.#game.talkTime);
 	}
 
 	/**
@@ -216,7 +214,7 @@ export default class Gameplay {
 		/** @type {{time: number}} */
 		const { time } = JSON.parse(raw);
 
-		this.#dom.appendChild(Dom.p(`Time left: ${secondsToTime(time)}`));
+		this.#header.timeSync(time);
 	}
 
 	/**

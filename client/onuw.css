@@ -57,6 +57,29 @@ button {
 
 /* #endregion */
 
+/* #region Role Indicator */
+
+.roleIndicator {
+	grid-area: header;
+	display: flex;
+	flex-direction: row;
+}
+
+.roleIndicator .roleName {
+	flex: 3;
+}
+
+.roleIndicator .roleDesc {
+	flex: 6;
+}
+
+.roleIndicator .timer {
+	display: block;
+	flex: 1;
+}
+
+/* #endregion */
+
 /* #region Selection Box */
 
 .selection {
