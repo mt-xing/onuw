@@ -10,6 +10,9 @@ export default class Header {
 	/** @type {HTMLElement} */
 	#timerWrap;
 
+	/** @type {HTMLElement} */
+	#timerHeading;
+
 	/** @type {HTMLElement | undefined} */
 	#timer;
 
@@ -31,6 +34,9 @@ export default class Header {
 		this.#timerWrap = document.createElement('div');
 		this.#timerWrap.classList.add('timer');
 		this.#wrap.appendChild(this.#timerWrap);
+		this.#timerHeading = document.createElement('h2');
+		this.#timerHeading.textContent = 'Night';
+		this.#timerWrap.appendChild(this.#timerHeading);
 
 		this.#timeLeft = NaN;
 	}
@@ -39,26 +45,25 @@ export default class Header {
      * @param {Roles} role
      */
 	#showRole(role) {
-		const roleName = document.createElement('div');
-		roleName.classList.add('roleName');
-
 		const r = constructRole(role);
-		roleName.appendChild(Dom.p('Your starting role:'));
 		const h2 = document.createElement('h2');
 		h2.textContent = r.roleName;
-		roleName.appendChild(h2);
+		h2.classList.add('roleName');
 
-		this.#wrap.appendChild(roleName);
-		this.#wrap.appendChild(Dom.p(r.instructions, 'roleDesc'));
+		const roleDesc = document.createElement('div');
+		roleDesc.classList.add('roleDesc');
+		roleDesc.appendChild(Dom.p(r.instructions));
+		roleDesc.appendChild(Dom.p('This is the role you started with and will act as at night. You might not end the night as the same role.'));
+
+		this.#wrap.appendChild(h2);
+		this.#wrap.appendChild(roleDesc);
 	}
 
 	/**
 	 * @param {number} time
 	 */
 	startTimer(time) {
-		const h2 = document.createElement('h2');
-		h2.textContent = 'Time Remaining';
-		this.#timerWrap.appendChild(h2);
+		this.#timerHeading.textContent = 'Day';
 
 		this.#timer = Dom.p(secondsToTime(time));
 		this.#timerWrap.appendChild(this.#timer);
