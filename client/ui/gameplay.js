@@ -9,7 +9,7 @@ import Choice from './gameplay/choices.js';
 import NightStatus from './gameplay/nightStatus.js';
 import MessageLog from './gameplay/messageLog.js';
 import BoardStatus from './gameplay/boardStatus.js';
-import Header from './gameplay/header.js';
+import Timer from './gameplay/timer.js';
 
 export default class Gameplay {
 	/**
@@ -36,8 +36,8 @@ export default class Gameplay {
 	/** @type {MessageLog} */
 	#messageLog;
 
-	/** @type {Header} */
-	#header;
+	/** @type {Timer | undefined} */
+	#talkTimer;
 
 	/**
 	 * @type {Map<number, Choice>}
@@ -62,9 +62,23 @@ export default class Gameplay {
 		this.#messageLog = new MessageLog(this.#dom);
 		this.#boardStatus = new BoardStatus(this.#dom, game.playerNames);
 		this.#nightStatus = new NightStatus(this.#dom, game.allRoles, game.roleTime);
-		this.#header = new Header(this.#dom, this.#game.startingRole);
 
-		this.#messageLog.msg('Good night, all. And good luck.');
+		{
+			const role = constructRole(this.#game.startingRole);
+			this.#messageLog.msg('This is the role you start with:');
+
+			const h2 = document.createElement('h2');
+			h2.textContent = role.roleName;
+			const div = document.createElement('div');
+			div.appendChild(h2);
+			div.appendChild(Dom.p(role.description));
+			this.#messageLog.msg(div);
+
+			this.#messageLog.msg(role.instructions);
+			this.#messageLog.msg('This is the role you will act as at night. You might not end the night as the same role.');
+
+			this.#messageLog.msg('Good night, all. And good luck.');
+		}
 
 		['roleStart', 'msg', 'pickCenters', 'pickChoices', 'pickPlayers', 'timeout', 'wake', 'sleep'].forEach(this.#socket.off.bind(this.#socket));
 		this.#socket.on('roleStart', this.#roleStart.bind(this));
@@ -197,14 +211,22 @@ export default class Gameplay {
 		this.#boardStatus.showBoard(boardInfo);
 		this.#messageLog.msg('Everybody, wake up.');
 		this.#messageLog.msg('Good morning!');
+
+		this.#talkTimer = new Timer(this.#game.talkTime, (timerEl) => {
+			const d = document.createElement('div');
+			const h2 = document.createElement('h2');
+			h2.textContent = 'Time Remaining';
+			d.appendChild(h2);
+			d.appendChild(timerEl);
+			this.#messageLog.msg(d);
+		});
+
 		this.#messageLog.msg(Dom.button('I\'m ready to vote', (ev) => {
 			this.#socket.emit('voteReady', '');
 			// @ts-ignore
 			// eslint-disable-next-line no-param-reassign
 			ev.currentTarget.disabled = true;
-		}));
-
-		this.#header.startTimer(this.#game.talkTime);
+		}, 'readyVoteBtn'));
 	}
 
 	/**
@@ -214,7 +236,12 @@ export default class Gameplay {
 		/** @type {{time: number}} */
 		const { time } = JSON.parse(raw);
 
-		this.#header.timeSync(time);
+		if (this.#talkTimer === undefined) {
+			// eslint-disable-next-line no-console
+			console.error('Received time sync but timer is undefined');
+		} else {
+			this.#talkTimer.timeSync(time);
+		}
 	}
 
 	/**

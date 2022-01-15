@@ -28,9 +28,8 @@ button {
 
 	display: grid;
 	grid-template-columns: 200px 1fr 500px 1fr 200px;
-	grid-template-rows: 200px 1fr;
+	grid-template-rows: 1fr;
 	grid-template-areas: 
-		"header header header header header"
 		"boardStatus . messageLog . nightStatus"
 	;
 }
@@ -53,56 +52,6 @@ button {
 
 	transition: transform 0.5s cubic-bezier(0.075, 0.820, 0.165, 1.000);
 	transform: scale(0);
-}
-
-/* #endregion */
-
-/* #region Role Indicator */
-
-.roleIndicator {
-	grid-area: header;
-	display: flex;
-	flex-direction: row;
-}
-
-.roleIndicator .roleName {
-	flex: 1;
-	text-align: right;
-	padding-right: 2vw;
-
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-}
-
-.roleIndicator .roleDesc {
-	flex: 2;
-	text-align: left;
-	padding-right: 10vw;
-
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-}
-
-@font-face {
-	font-family: dseg;
-	src: url(DSEG7Modern-Bold.ttf);
-}
-
-.roleIndicator .timer {
-	display: block;
-	width: 200px;
-	text-align: center;
-
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-}
-
-.roleIndicator .timer p:last-child {
-	font-family: dseg;
 }
 
 /* #endregion */
@@ -281,6 +230,26 @@ button {
 
 .boardWrap.visible h2 {
 	color: black;
+}
+
+/* #endregion */
+
+/* #region Daytime */
+
+@font-face {
+	font-family: dseg;
+	src: url(DSEG7Modern-Bold.ttf);
+}
+
+.timer {
+	font-family: dseg;
+	font-size: 25px;
+}
+
+.readyVoteBtn {
+	font-size: 20px;
+	width: 100%;
+	padding: 15px;
 }
 
 /* #endregion */

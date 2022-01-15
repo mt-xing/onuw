@@ -190,7 +190,7 @@ export default class OnuwServer {
 		// Kick off the game :D
 		setTimeout(() => {
 			newGame.play();
-		}, 1000);
+		}, 10 * 1000); // 5 sec for role info to display, 5 sec to read
 	}
 
 	/**
