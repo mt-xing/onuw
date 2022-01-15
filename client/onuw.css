@@ -255,3 +255,28 @@ button {
 /* #endregion */
 
 /* #endregion */
+
+@media(max-width: 920px) {
+	
+	.gameWrap {
+		display: grid;
+		grid-template-columns: 200px 1fr 200px;
+		grid-template-rows: 1fr;
+		grid-template-areas: 
+			"boardStatus messageLog nightStatus"
+		;
+	}
+
+}
+
+@media(max-width: 650px) {
+	.gameWrap {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-template-rows: 1fr 1fr;
+		grid-template-areas: 
+			"messageLog messageLog"
+			"boardStatus nightStatus"
+		;
+	}
+}
