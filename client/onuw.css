@@ -216,6 +216,7 @@ button {
 
 .boardWrap p {
 	text-align: center;
+	margin: 0;
 }
 
 .boardWrap h2 {
@@ -273,7 +274,7 @@ button {
 	.gameWrap {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		grid-template-rows: 1fr 1fr;
+		grid-template-rows: 3fr 2fr;
 		grid-template-areas: 
 			"messageLog messageLog"
 			"boardStatus nightStatus"
