@@ -43,6 +43,7 @@ button {
 	padding-top: 15px;
 
 	vertical-align: top;
+	box-shadow: inset black 0 0 10px 1px;
 }
 
 .messageLog section {
