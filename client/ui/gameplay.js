@@ -77,7 +77,10 @@ export default class Gameplay {
 			this.#messageLog.msg(role.instructions);
 			this.#messageLog.msg('This is the role you will act as at night. You might not end the night as the same role.');
 
-			this.#messageLog.msg('Good night, all. And good luck.');
+			setTimeout(
+				() => this.#messageLog.msg('Good night, all. And good luck.'),
+				8000,
+			);
 		}
 
 		['roleStart', 'msg', 'pickCenters', 'pickChoices', 'pickPlayers', 'timeout', 'wake', 'sleep'].forEach(this.#socket.off.bind(this.#socket));
