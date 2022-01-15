@@ -2,7 +2,7 @@
 	font-family: sans-serif;
 	width: 100%;
 
-	height: calc(100vh - 200px);
+	height: calc(100vh - 150px);
 	border: 1px black solid;
 }
 
@@ -200,6 +200,7 @@ button {
 
 	display: inline-flex;
 	flex-direction: column;
+	border-right: 1px black solid;
 }
 
 .boardWrap div {
@@ -275,10 +276,14 @@ button {
 	.gameWrap {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		grid-template-rows: 3fr 2fr;
+		grid-template-rows: 1fr 1fr;
 		grid-template-areas: 
 			"messageLog messageLog"
 			"boardStatus nightStatus"
 		;
+	}
+
+	.boardWrap {
+		border: none;
 	}
 }
