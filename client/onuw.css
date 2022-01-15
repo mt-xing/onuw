@@ -224,7 +224,12 @@ button {
 .boardWrap h2 {
 	color: white;
 	transition: color 0.5s ease-in-out;
-	margin: 5px 0;
+	margin: 8% 0;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	width: 100%;
+	overflow-x: hidden;
+	text-align: center;
 }
 
 .boardWrap.visible div {
@@ -263,7 +268,7 @@ button {
 	
 	.gameWrap {
 		display: grid;
-		grid-template-columns: 200px 1fr 200px;
+		grid-template-columns: 200px minmax(0, 1fr) 200px;
 		grid-template-rows: 1fr;
 		grid-template-areas: 
 			"boardStatus messageLog nightStatus"
@@ -275,8 +280,8 @@ button {
 @media(max-width: 650px) {
 	.gameWrap {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
-		grid-template-rows: 1fr 1fr;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
 		grid-template-areas: 
 			"messageLog messageLog"
 			"boardStatus nightStatus"
