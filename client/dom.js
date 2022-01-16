@@ -110,4 +110,19 @@ export default class Dom {
 	static hr() {
 		return document.createElement('hr');
 	}
+
+	/**
+	 * Construct an h2 DOM object
+	 * @param {string} text
+	 * @param {string} [className]
+	 * @returns {HTMLHeadingElement}
+	 */
+	static h2(text, className) {
+		const p = document.createElement('h2');
+		p.textContent = text;
+		if (className !== undefined) {
+			p.className = className;
+		}
+		return p;
+	}
 }

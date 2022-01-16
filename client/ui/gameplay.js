@@ -10,6 +10,7 @@ import NightStatus from './gameplay/nightStatus.js';
 import MessageLog from './gameplay/messageLog.js';
 import BoardStatus from './gameplay/boardStatus.js';
 import Timer from './gameplay/timer.js';
+import KillVote from './killVote.js';
 
 export default class Gameplay {
 	/**
@@ -21,6 +22,11 @@ export default class Gameplay {
 	  * @type {OnuwGame}
 	  */
 	#game;
+
+	/**
+	  * @type {HTMLElement}
+	  */
+	#outerDom;
 
 	/**
 	  * @type {HTMLElement}
@@ -39,6 +45,9 @@ export default class Gameplay {
 	/** @type {Timer | undefined} */
 	#talkTimer;
 
+	/** @type {KillVote | undefined} */
+	#killVote;
+
 	/**
 	 * @type {Map<number, Choice>}
 	 */
@@ -50,10 +59,10 @@ export default class Gameplay {
 	 * @param {HTMLElement} gameDom
 	 */
 	constructor(socket, game, gameDom) {
-		// eslint-disable-next-line no-param-reassign
-		gameDom.textContent = null;
+		this.#outerDom = gameDom;
+		this.#outerDom.textContent = null;
 		this.#dom = document.createElement('div');
-		gameDom.appendChild(this.#dom);
+		this.#outerDom.appendChild(this.#dom);
 		this.#dom.classList.add('gameWrap');
 		this.#socket = socket;
 		this.#game = game;
@@ -253,19 +262,20 @@ export default class Gameplay {
 	#voteReady(raw) {
 		/** @type {{id: number}} */
 		const { id } = JSON.parse(raw);
-		this.#dom.appendChild(Dom.p(`${this.#game.getPlayerName(id)} is ready to vote`));
+		this.#boardStatus.voteReady(id);
 	}
 
 	#voteStart() {
 		this.#dom.textContent = null;
-		this.#dom.appendChild(Dom.p('Please vote for a player to kill:'));
-		Array.from(Array(this.#game.numPlayers).keys())
-			.forEach((playerID) => {
-				if (playerID === this.#game.playerID) { return; }
-				this.#dom.appendChild(Dom.button(this.#game.getPlayerName(playerID), () => {
-					this.#socket.send('vote', { id: playerID });
-				}));
-			});
+		// this.#dom.appendChild(Dom.p('Please vote for a player to kill:'));
+		// Array.from(Array(this.#game.numPlayers).keys())
+		// 	.forEach((playerID) => {
+		// 		if (playerID === this.#game.playerID) { return; }
+		// 		this.#dom.appendChild(Dom.button(this.#game.getPlayerName(playerID), () => {
+		// 			this.#socket.send('vote', { id: playerID });
+		// 		}));
+		// 	});
+		this.#killVote = new KillVote(this.#outerDom, this.#socket, this.#game);
 	}
 
 	/**

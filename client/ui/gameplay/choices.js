@@ -97,7 +97,7 @@ export default class Choice {
 		this.#confirmBtn.disabled = true;
 
 		this.#element.classList.add('locked');
-		const msg = Dom.p('✔️ Your choice has been submitted', 'done');
+		const msg = Dom.p('✅ Your choice has been submitted', 'done');
 		this.#element.appendChild(msg);
 		if (!getComputedStyle(msg).transform) {
 			// eslint-disable-next-line no-console

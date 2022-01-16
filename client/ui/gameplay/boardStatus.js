@@ -71,4 +71,18 @@ export default class BoardStatus {
 	hideBoard() {
 		this.#wrap.classList.remove('visible');
 	}
+
+	/**
+	 * @param {number} pid
+	 */
+	voteReady(pid) {
+		if (pid >= this.#playerElements.length) {
+			// eslint-disable-next-line no-console
+			console.error(`Invalid pid ready up to vote: ${pid}`);
+			return;
+		}
+
+		const el = this.#playerElements[pid].parentElement;
+		el?.appendChild(Dom.p('✅', 'voteReady'));
+	}
 }
