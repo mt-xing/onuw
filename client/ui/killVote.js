@@ -47,7 +47,9 @@ export default class KillVote {
 				// Current Player
 				const li = document.createElement('li');
 				ul.appendChild(li);
-				li.appendChild(Dom.p(`${game.getPlayerName(i)} - You may not vote for yourself`));
+				const p = Dom.p(`${game.getPlayerName(i)} - `);
+				p.appendChild(Dom.span('You may not vote for yourself'));
+				li.appendChild(p);
 				const img = document.createElement('img');
 				img.src = getSpinnerUrl();
 				this.#selfSpinner.appendChild(img);
@@ -61,6 +63,11 @@ export default class KillVote {
 		}
 
 		gameDom.appendChild(this.#wrap);
+		if (!getComputedStyle(this.#wrap).transform) {
+			// eslint-disable-next-line no-console
+			console.error('No style?');
+		}
+		this.#wrap.style.transform = 'translateX(0)';
 	}
 
 	/**
@@ -127,8 +134,6 @@ class LineItem {
 		img.src = getSpinnerUrl();
 		this.#spinner.appendChild(img);
 		li.appendChild(this.#spinner);
-
-		console.log(getSpinnerUrl());
 
 		this.#done = Dom.p('', 'done');
 		li.appendChild(this.#done);

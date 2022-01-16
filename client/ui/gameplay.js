@@ -266,15 +266,9 @@ export default class Gameplay {
 	}
 
 	#voteStart() {
-		this.#dom.textContent = null;
-		// this.#dom.appendChild(Dom.p('Please vote for a player to kill:'));
-		// Array.from(Array(this.#game.numPlayers).keys())
-		// 	.forEach((playerID) => {
-		// 		if (playerID === this.#game.playerID) { return; }
-		// 		this.#dom.appendChild(Dom.button(this.#game.getPlayerName(playerID), () => {
-		// 			this.#socket.send('vote', { id: playerID });
-		// 		}));
-		// 	});
+		this.#dom.style.transform = 'scale(0)';
+		this.#dom.style.border = '1px black solid';
+		setTimeout(() => { this.#dom.parentElement?.removeChild(this.#dom); }, 500);
 		this.#killVote = new KillVote(this.#outerDom, this.#socket, this.#game);
 	}
 
@@ -284,7 +278,6 @@ export default class Gameplay {
 	#voteReceived(raw) {
 		/** @type {{playerID: number}} */
 		const { playerID } = JSON.parse(raw);
-		// this.#dom.appendChild(Dom.p(`${this.#game.getPlayerName(playerID)} has voted`));
 		this.#killVote?.vote(playerID);
 	}
 
