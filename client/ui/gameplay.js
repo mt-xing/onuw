@@ -284,7 +284,8 @@ export default class Gameplay {
 	#voteReceived(raw) {
 		/** @type {{playerID: number}} */
 		const { playerID } = JSON.parse(raw);
-		this.#dom.appendChild(Dom.p(`${this.#game.getPlayerName(playerID)} has voted`));
+		// this.#dom.appendChild(Dom.p(`${this.#game.getPlayerName(playerID)} has voted`));
+		this.#killVote?.vote(playerID);
 	}
 
 	/**

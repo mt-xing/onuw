@@ -9,6 +9,9 @@ export default class KillVote {
 	/** @type {LineItem[]} */
 	#lis;
 
+	/** @type {number} */
+	#pid;
+
 	/**
      * @param {HTMLElement} gameDom
      * @param {Socket} socket
@@ -21,6 +24,7 @@ export default class KillVote {
 
 		this.#lis = [];
 		const resetAll = () => this.#lis.forEach((x) => x.clear());
+		this.#pid = game.playerID;
 
 		const ul = document.createElement('ul');
 		this.#wrap.appendChild(ul);
@@ -39,12 +43,26 @@ export default class KillVote {
 
 		gameDom.appendChild(this.#wrap);
 	}
+
+	/**
+	 * @param {number} pid
+	 */
+	vote(pid) {
+		if (pid === this.#pid) {
+			// TODO
+			return;
+		}
+		const liIndexPid = pid > this.#pid ? pid - 1 : pid;
+		if (liIndexPid >= this.#lis.length) {
+			// eslint-disable-next-line no-console
+			console.error(`Invalid pid voted: ${pid}`);
+			return;
+		}
+		this.#lis[liIndexPid].voted();
+	}
 }
 
 class LineItem {
-	/** @type {HTMLLIElement} */
-	#dom;
-
 	/** @type {HTMLButtonElement} */
 	#mainBtn;
 
@@ -53,6 +71,9 @@ class LineItem {
 
 	/** @type {() => void} */
 	#resetAll;
+
+	/** @type {HTMLElement} */
+	#spinner;
 
 	/**
 	 * @param {HTMLElement} wrapDom
@@ -63,17 +84,23 @@ class LineItem {
 	constructor(wrapDom, name, vote, resetAll) {
 		this.#resetAll = resetAll;
 
-		this.#dom = document.createElement('li');
-		wrapDom.appendChild(this.#dom);
+		const li = document.createElement('li');
+		wrapDom.appendChild(li);
 
 		this.#mainBtn = Dom.button(name, this.#showConf.bind(this), 'primaryBtn');
-		this.#dom.appendChild(this.#mainBtn);
+		li.appendChild(this.#mainBtn);
 
 		this.#secondBtns = [
 			Dom.button('Confirm Vote', () => { resetAll(); vote(); }, 'hidden secondaryBtn'),
 			Dom.button('Cancel', this.clear.bind(this), 'hidden secondaryBtn'),
 		];
-		this.#secondBtns.forEach((b) => this.#dom.appendChild(b));
+		this.#secondBtns.forEach((b) => li.appendChild(b));
+
+		this.#spinner = Dom.p('', 'spinner');
+		const img = document.createElement('img');
+		img.src = 'load.gif';
+		this.#spinner.appendChild(img);
+		li.appendChild(this.#spinner);
 	}
 
 	#showConf() {
@@ -85,5 +112,9 @@ class LineItem {
 	clear() {
 		this.#mainBtn.classList.remove('hidden');
 		this.#secondBtns.forEach((b) => b.classList.add('hidden'));
+	}
+
+	voted() {
+		this.#spinner.textContent = '✅';
 	}
 }

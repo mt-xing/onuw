@@ -279,7 +279,8 @@ button {
 	padding: 20px;
 	width: calc(100% - 80px);
 	height: calc(100% - 80px);
-	
+
+	max-width: 700px;
 	box-shadow: black 0 0 10px 1px;
 
 	position: absolute;
@@ -308,8 +309,23 @@ button {
 	pointer-events: none;
 }
 
+.voteWrap li .spinner {
+	height: 100%;
+	width: 60px;
+	border-left: 1px black solid;
+	position: absolute;
+	right: 0; top: 0;
+	padding: 0;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	font-size: 30px;
+}
+
 .voteWrap li button {
-	transition: transform 0.5s ease-in-out, background 0.2s ease-in-out;
+	transition: transform 0.4s cubic-bezier(0.165, 0.840, 0.440, 1.000), background 0.2s ease-in-out;
 	transform: scaleX(1);
 
 	border: none;
@@ -330,7 +346,7 @@ button {
 
 .voteWrap .primaryBtn {
 	display: block;
-	width: 100%;
+	width: calc(100% - 60px);
 	transform-origin: left center;
 }
 
@@ -338,14 +354,14 @@ button {
 	position: absolute;
 	height: 100%;
 	top: 0;
-	width: 50%;
+	width: calc(50% - 30px);
 	left: 0;
 	transform-origin: 200% center;
 	box-shadow: inset 0 0 2px 2px #008800;
 }
 
-.voteWrap .secondaryBtn:last-child {
-	left: 50%;
+.voteWrap .secondaryBtn:nth-child(3) {
+	left: calc(50% - 30px);
 	transform-origin: right center;
 	box-shadow: inset 0 0 2px 2px #880000;
 }
