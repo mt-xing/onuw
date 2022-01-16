@@ -2,6 +2,15 @@ import Dom from '../dom.js';
 import OnuwGame from '../game.js';
 import Socket from '../socket.js';
 
+function getSpinnerUrl() {
+	const cPath = import.meta.url;
+	const split = cPath.split('/');
+	const fileName = split[split.length - 1];
+	const path = cPath.substring(0, cPath.length - fileName.length);
+
+	return `${path}load.gif`;
+}
+
 export default class KillVote {
 	/** @type {HTMLElement} */
 	#wrap;
@@ -40,7 +49,7 @@ export default class KillVote {
 				ul.appendChild(li);
 				li.appendChild(Dom.p(`${game.getPlayerName(i)} - You may not vote for yourself`));
 				const img = document.createElement('img');
-				img.src = 'load.gif';
+				img.src = getSpinnerUrl();
 				this.#selfSpinner.appendChild(img);
 				li.appendChild(this.#selfSpinner);
 			} else {
@@ -115,9 +124,11 @@ class LineItem {
 
 		this.#spinner = Dom.p('', 'spinner');
 		const img = document.createElement('img');
-		img.src = 'load.gif';
+		img.src = getSpinnerUrl();
 		this.#spinner.appendChild(img);
 		li.appendChild(this.#spinner);
+
+		console.log(getSpinnerUrl());
 
 		this.#done = Dom.p('', 'done');
 		li.appendChild(this.#done);
