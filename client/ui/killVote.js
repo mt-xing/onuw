@@ -12,6 +12,9 @@ export default class KillVote {
 	/** @type {number} */
 	#pid;
 
+	/** @type {HTMLElement} */
+	#selfSpinner;
+
 	/**
      * @param {HTMLElement} gameDom
      * @param {Socket} socket
@@ -24,19 +27,26 @@ export default class KillVote {
 
 		this.#lis = [];
 		const resetAll = () => this.#lis.forEach((x) => x.clear());
+		const lockAll = () => this.#lis.forEach((x) => x.lock());
 		this.#pid = game.playerID;
 
 		const ul = document.createElement('ul');
 		this.#wrap.appendChild(ul);
+		this.#selfSpinner = Dom.p('', 'spinner');
 		for (let i = 0; i < game.numPlayers; i++) {
 			if (i === game.playerID) {
 				// Current Player
 				const li = document.createElement('li');
 				ul.appendChild(li);
 				li.appendChild(Dom.p(`${game.getPlayerName(i)} - You may not vote for yourself`));
+				const img = document.createElement('img');
+				img.src = 'load.gif';
+				this.#selfSpinner.appendChild(img);
+				li.appendChild(this.#selfSpinner);
 			} else {
 				this.#lis.push(new LineItem(ul, game.getPlayerName(i), () => {
 					socket.send('vote', { id: i });
+					lockAll();
 				}, resetAll));
 			}
 		}
@@ -49,7 +59,7 @@ export default class KillVote {
 	 */
 	vote(pid) {
 		if (pid === this.#pid) {
-			// TODO
+			this.#selfSpinner.textContent = '✅';
 			return;
 		}
 		const liIndexPid = pid > this.#pid ? pid - 1 : pid;
@@ -63,6 +73,9 @@ export default class KillVote {
 }
 
 class LineItem {
+	/** @type {HTMLElement} */
+	#dom;
+
 	/** @type {HTMLButtonElement} */
 	#mainBtn;
 
@@ -75,6 +88,9 @@ class LineItem {
 	/** @type {HTMLElement} */
 	#spinner;
 
+	/** @type {HTMLElement} */
+	#done;
+
 	/**
 	 * @param {HTMLElement} wrapDom
 	 * @param {string} name
@@ -85,13 +101,14 @@ class LineItem {
 		this.#resetAll = resetAll;
 
 		const li = document.createElement('li');
+		this.#dom = li;
 		wrapDom.appendChild(li);
 
 		this.#mainBtn = Dom.button(name, this.#showConf.bind(this), 'primaryBtn');
 		li.appendChild(this.#mainBtn);
 
 		this.#secondBtns = [
-			Dom.button('Confirm Vote', () => { resetAll(); vote(); }, 'hidden secondaryBtn'),
+			Dom.button('Confirm Vote', () => { resetAll(); vote(); this.#confirm(); }, 'hidden secondaryBtn'),
 			Dom.button('Cancel', this.clear.bind(this), 'hidden secondaryBtn'),
 		];
 		this.#secondBtns.forEach((b) => li.appendChild(b));
@@ -101,6 +118,9 @@ class LineItem {
 		img.src = 'load.gif';
 		this.#spinner.appendChild(img);
 		li.appendChild(this.#spinner);
+
+		this.#done = Dom.p('', 'done');
+		li.appendChild(this.#done);
 	}
 
 	#showConf() {
@@ -116,5 +136,13 @@ class LineItem {
 
 	voted() {
 		this.#spinner.textContent = '✅';
+	}
+
+	#confirm() {
+		this.#done.classList.add('show');
+	}
+
+	lock() {
+		this.#dom.classList.add('locked');
 	}
 }

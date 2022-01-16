@@ -1,9 +1,13 @@
+body {
+	margin: 0; padding: 0;
+}
+
 #game {
 	font-family: 'Helvetica', 'Arial', sans-serif;
 	width: 100%;
-
-	height: calc(100vh - 150px);
-	border: 1px black solid;
+	height: 100vh;
+	border: none;
+	margin: 0; padding: 0;
 
 	position: relative;
 }
@@ -336,6 +340,11 @@ button {
 	user-select: none;
 }
 
+.voteWrap .locked {
+	pointer-events: none;
+	cursor: not-allowed;
+}
+
 .voteWrap li button:hover {
 	background: #eeeeee;
 }
@@ -369,6 +378,28 @@ button {
 .voteWrap button.hidden {
 	transform: scaleX(0);
 	pointer-events: none;
+}
+
+.voteWrap .done {
+	position: absolute;
+	height: 100%;
+	width: calc(100% - 60px);
+	left: 0; top: 0;
+	padding: 0; margin: 0;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	background: rgba(128, 0, 0, 0.5);
+
+	transform: scaleX(0);
+	transition: transform 1s cubic-bezier(0.165, 0.840, 0.440, 1.000);
+	transform-origin: right center;
+}
+
+.voteWrap .done.show {
+	transform: scaleX(1);
 }
 
 /* #endregion */
