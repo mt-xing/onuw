@@ -116,6 +116,21 @@ export default class Dom {
 	}
 
 	/**
+	 * Construct an h1 DOM object
+	 * @param {string} text
+	 * @param {string} [className]
+	 * @returns {HTMLHeadingElement}
+	 */
+	static h1(text, className) {
+		const p = document.createElement('h1');
+		p.textContent = text;
+		if (className !== undefined) {
+			p.className = className;
+		}
+		return p;
+	}
+
+	/**
 	 * Construct an h2 DOM object
 	 * @param {string} text
 	 * @param {string} [className]

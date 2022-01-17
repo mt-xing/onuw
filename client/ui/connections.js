@@ -19,9 +19,8 @@ export default class Connections {
 	 */
 	#dom;
 
-	#nameField;
-
-	#idField;
+	/** @type {HTMLElement | undefined} */
+	#currScreen;
 
 	/**
 	 * @param {Socket} socket
@@ -35,14 +34,14 @@ export default class Connections {
 
 		this.#spawnOpening(gameDom);
 
-		this.#nameField = Dom.input('text', 'Name');
-		gameDom.appendChild(this.#nameField);
+		// this.#nameField = Dom.input('text', 'Name');
+		// gameDom.appendChild(this.#nameField);
 
-		this.#idField = Dom.input('text', 'Game ID');
-		gameDom.appendChild(this.#idField);
+		// this.#idField = Dom.input('text', 'Game ID');
+		// gameDom.appendChild(this.#idField);
 
-		gameDom.appendChild(Dom.button('Create', this.#create.bind(this)));
-		gameDom.appendChild(Dom.button('Join', this.#join.bind(this)));
+		// gameDom.appendChild(Dom.button('Create', this.#create.bind(this)));
+		// gameDom.appendChild(Dom.button('Join', this.#join.bind(this)));
 
 		socket.off('createYes');
 		socket.on('createYes', (msg) => {
@@ -84,11 +83,11 @@ export default class Connections {
 		intro.appendChild(h1);
 
 		const div = document.createElement('div');
-		div.appendChild(Dom.button('Host Game', () => {}));
-		div.appendChild(Dom.button('Join Game', () => {}));
+		div.appendChild(Dom.button('Host Game', this.#create.bind(this)));
+		div.appendChild(Dom.button('Join Game', this.#join.bind(this)));
 		intro.appendChild(div);
 
-		intro.appendChild(Dom.p('Not an unlicensed potentially illegal rip-off of One Night Ultimate Werewolf. It\'s, uh... something else.'));
+		intro.appendChild(Dom.p('Not an unlicensed rip-off of One Night Ultimate Werewolf. It\'s, uh... something else.'));
 		const boardGame = Dom.p('But on a completely unrelated note you can support the creators of One Night Ultimate Werewolf by buying it ');
 		const boardGameLink = document.createElement('a');
 		boardGameLink.textContent = 'here';
@@ -115,39 +114,120 @@ export default class Connections {
 		intro.appendChild(footer);
 
 		wrapDom.appendChild(intro);
+		this.#currScreen = intro;
 	}
 
 	get game() {
 		return this.#game;
 	}
 
+	#clearCurr() {
+		if (this.#currScreen !== undefined) {
+			// TODO animate properly
+			const c = this.#currScreen;
+			this.#currScreen = undefined;
+
+			c.style.transition = 'transform 0.5s ease-in';
+			c.style.transform = 'scale(0)translateX(0)';
+			c.style.pointerEvents = 'none';
+			setTimeout(() => {
+				c.parentElement?.removeChild(c);
+			}, 500);
+		}
+	}
+
+	/**
+	 * @param {HTMLElement} el
+	 */
+	#addCurr(el) {
+		if (this.#currScreen !== undefined) {
+			throw new Error('Current screen has not been cleared');
+		}
+		this.#currScreen = el;
+		this.#dom.appendChild(el);
+		if (!getComputedStyle(el).transform) {
+			// eslint-disable-next-line no-console
+			console.info('No transform on element');
+		}
+		this.#currScreen.style.transform = 'scale(1)translateX(0)';
+	}
+
 	#create() {
-		if (this.#nameField.value === '') {
-			alert('Enter your name');
-			return;
-		}
-		if (this.#nameField.value.length > 50) {
-			alert('bruh why');
-			return;
-		}
-		this.#game.addPlayer(0, this.#nameField.value);
-		this.#socket.send('create', { name: this.#nameField.value });
+		this.#clearCurr();
+		const m = document.createElement('main');
+		m.classList.add('connection');
+		this.#addCurr(m);
+
+		m.appendChild(Dom.h1('Host Game'));
+		m.appendChild(Dom.p('Hi there! What\'s your name?'));
+		const nameField = Dom.input('text', 'Name');
+		nameField.setAttribute('maxlength', '35');
+		nameField.addEventListener('change', () => {
+			btn.disabled = nameField.value === '';
+		});
+		nameField.addEventListener('keydown', () => {
+			btn.disabled = nameField.value === '';
+		});
+		nameField.addEventListener('keyup', () => {
+			btn.disabled = nameField.value === '';
+		});
+		m.appendChild(nameField);
+
+		const btn = Dom.button('Continue', () => {
+			this.#game.addPlayer(0, nameField.value);
+			this.#socket.send('create', { name: nameField.value });
+			btn.disabled = true;
+		});
+		btn.disabled = true;
+		m.appendChild(btn);
 	}
 
 	#join() {
-		if (this.#nameField.value === '') {
-			alert('Enter your name');
-			return;
-		}
-		if (this.#nameField.value.length > 50) {
-			alert('bruh why');
-			return;
-		}
-		if (this.#idField.value === '') {
-			alert('Enter a valid game ID');
-			return;
-		}
-		this.#socket.send('join', { id: this.#idField.value.toLowerCase(), name: this.#nameField.value });
+		// if (this.#nameField.value === '') {
+		// 	alert('Enter your name');
+		// 	return;
+		// }
+		// if (this.#nameField.value.length > 50) {
+		// 	alert('bruh why');
+		// 	return;
+		// }
+		// if (this.#idField.value === '') {
+		// 	alert('Enter a valid game ID');
+		// 	return;
+		// }
+		// this.#socket.send('join', { id: this.#idField.value.toLowerCase(),
+		// name: this.#nameField.value });
+
+		this.#clearCurr();
+		const m = document.createElement('main');
+		m.classList.add('connection');
+		this.#addCurr(m);
+
+		m.appendChild(Dom.h1('Join Game'));
+		m.appendChild(Dom.p('Welcome! We\'ll need your name and game ID.'));
+
+		const nameField = Dom.input('text', 'Name');
+		const gameField = Dom.input('text', 'Game ID');
+		nameField.setAttribute('maxlength', '35');
+		gameField.setAttribute('maxlength', '5');
+		gameField.setAttribute('minlength', '5');
+		const updateBtn = () => { btn.disabled = nameField.value === '' || gameField.value.length < 5; };
+		[nameField, gameField].forEach((input) => {
+			input.addEventListener('change', updateBtn);
+			input.addEventListener('keydown', updateBtn);
+			input.addEventListener('keyup', updateBtn);
+		});
+		m.appendChild(nameField);
+		m.appendChild(gameField);
+
+		m.appendChild(Dom.p('Not sure what this is? Ask the person hosting the game.'));
+
+		const btn = Dom.button('Join', () => {
+			this.#socket.send('join', { id: gameField.value.toLowerCase(), name: nameField.value });
+			btn.disabled = true;
+		});
+		btn.disabled = true;
+		m.appendChild(btn);
 	}
 
 	#hostConfirm() {

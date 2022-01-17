@@ -6,16 +6,52 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 	</head>
 	<body>
-		<div id="game">
-			<main class="intro">
-				<h1>onuw</h1>
+		<div id="game" style="overflow-y:auto;">
+			<main class="connection">
+				<h1>Host Game</h1>
+				<p>Hi there! What's your name?</p>
+				<input type="text" placeholder="Name" maxlength="35" />
+				<button>Continue</button>
+			</main>
+			<main class="connection" style="margin-top: 100vh;">
+				<h1>Join Game</h1>
+				<p>Welcome! We'll need your name and game ID.</p>
+				<input type="text" placeholder="Name" maxlength="35" />
+				<input type="text" placeholder="Game ID" minlength="5" maxlength="5" />
+				<p>Not sure what this is? Ask the person hosting the game.</p>
+				<button>Join</button>
+				<p class="errorCode">Sorry, that game code doesn't exist.</p>
+			</main>
+			<main class="connection" style="margin-top: 200vh;">
 				<div>
-					<button>Host Game</button><button>Join Game</button>
+					<section>
+						<p>Here's your game ID:</p>
+						<code>abc12</code>
+						<p>Give this to the other players.</p>
+					</section>
+					<section>
+						<h2>Players</h2>
+						<table>
+							<tr><td>Abby</td></tr>
+							<tr><td>Bobby</td></tr>
+							<tr><td>Cindy</td></tr>
+							<tr><td>Daniel put in a really long name for some reason and it may not fit in the box</td></tr>
+						</table>
+						<p>Can accommodate 9 more players</p>
+					</section>
 				</div>
-				<p>Not an unlicensed potentially illegal rip-off of One Night Ultimate Werewolf. It's, uh... something else.</p>
-				<p>But on a completely unrelated note you can support the creators of One Night Ultimate Werewolf by buying it <a href="https://beziergames.com/collections/all-games/products/one-night-ultimate-werewolf" target="_blank">here</a>.</p>
-				<p>This game is open source! Check it out on <a href="https://github.com/mt-xing/onuw" target="_blank">GitHub</a>.</p>
-				<footer><a href="https://michaelxing.com" data-text="Xing">Xing</a></footer>
+				<button disabled>Start</button>
+			</main>
+			<main class="connection" style="margin-top: 300vh;">
+				<h2>Players</h2>
+				<table>
+					<tr><td>Abby</td></tr>
+					<tr><td>Bobby</td></tr>
+					<tr><td>Cindy</td></tr>
+					<tr><td>Daniel put in a really long name for some reason and it may not fit in the box</td></tr>
+				</table>
+				<p>Successfully joined <code>abc12</code></p>
+				<p>Waiting for the host to start your game.</p>
 			</main>
 		</div>
 	</body>

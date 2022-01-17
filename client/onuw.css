@@ -62,7 +62,7 @@ button {
 	margin-top: 10px;
 }
 
-.intro button {
+.intro button, .connection button {
 	background: white;
 	padding: 20px 40px;
 	margin: 10px;
@@ -72,14 +72,14 @@ button {
 	border: none;
 	box-shadow: black 0 0 10px 5px;
 
-	transition: box-shadow 0.2s ease-in-out;
+	transition: box-shadow 0.2s ease-in-out, color 0.5s ease-in-out, background 0.5s ease-in-out;
 }
 
-.intro button:hover, .intro button:focus {
+.intro button:hover, .intro button:focus, .connection button:hover, .connection button:focus {
 	box-shadow: #000088 0 0 10px 5px;
 }
 
-.intro button:active {
+.intro button:active, .connection button:active {
 	transition: box-shadow 0.1s ease-in-out;
 	box-shadow: white 0 0 10px 0;
 }
@@ -140,6 +140,117 @@ button {
 
 .intro footer a:active {
 	transform: translate(1px, 1px);
+}
+
+/* #endregion */
+
+/* #region Connection */
+
+.connection {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+
+	position: absolute;
+	top: 0; left: 0; right: 0;
+
+	transition: transform 1s cubic-bezier(0.165, 0.840, 0.440, 1.000);
+	transform: scale(1)translateX(-100vw);
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.connection h1 {
+	font-size: 50px;
+	margin: 0;
+}
+
+.connection p, .connection input, .connection button, .connection code {
+	margin: 20px 0 0 0;
+}
+
+.connection button, .connection input {
+	font-size: initial;
+	padding: 15px 30px;
+}
+
+.connection button:disabled {
+	background: black;
+	color: white;
+	cursor: not-allowed;
+	box-shadow: black 0 0 10px 0px;
+}
+
+.connection input {
+	border: none;
+}
+
+.connection .errorCode {
+	color: #ff8888;
+}
+
+.connection code {
+	background: white;
+	color: black;
+	padding: 20px 30px;
+	font-size: 20px;
+	font-family: 'Consolas', 'Courier New', monospace;
+	border-radius: 30px;
+	letter-spacing: 2px;
+	display: inline-block;
+}
+
+.connection div {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 30px;
+}
+
+.connection section {
+	text-align: center;
+	width: 400px;
+	overflow: hidden;
+}
+
+.connection section:first-child {
+	margin-right: 70px;
+}
+
+.connection h2 {
+	font-weight: normal;
+}
+
+.connection table {
+	width: 100%;
+	table-layout: fixed;
+}
+
+.connection tr td {
+	padding: 10px 0;
+	border-bottom: 1px white solid;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	width: 100%;
+	overflow-x: hidden;
+}
+
+.connection tr:last-child td {
+	border: none;
+}
+
+.connection > table {
+	width: 400px;
+	text-align: center;
+}
+
+.connection p code {
+	padding: 10px;
 }
 
 /* #endregion */
