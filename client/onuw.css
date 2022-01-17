@@ -1,13 +1,19 @@
+@import 'https://fonts.googleapis.com/css?family=Raleway|Open+Sans';
+@import url("https://use.typekit.net/uly3jmt.css");
 body {
 	margin: 0; padding: 0;
+
+	color: white;
+	background: #212121;
+	font-family: 'Open Sans', sans-serif;
 }
 
 #game {
-	font-family: 'Helvetica', 'Arial', sans-serif;
 	width: 100%;
 	height: 100vh;
 	border: none;
 	margin: 0; padding: 0;
+	overflow: hidden;
 
 	position: relative;
 }
@@ -62,6 +68,9 @@ button {
 
 	transition: transform 0.5s cubic-bezier(0.075, 0.820, 0.165, 1.000);
 	transform: scale(0);
+
+	color: black;
+	background: white;
 }
 
 /* #endregion */
@@ -173,6 +182,7 @@ button {
 	border-left: 1px black solid;
 	border-bottom: 1px black solid;
 	background: white;
+	color: black;
 
 	position: relative;
 }
@@ -290,6 +300,7 @@ button {
 	max-width: 700px;
 	box-shadow: black 0 0 10px 1px;
 	background: white;
+	color: black;
 
 	position: absolute;
 	top: 0; left: 0; right: 0;
@@ -412,6 +423,126 @@ button {
 
 .voteWrap .done.show {
 	transform: scaleX(1);
+}
+
+/* #endregion */
+
+/* #region Results */
+
+.results {
+	margin: 0;
+	width: 100%;
+	height: 100%;
+	overflow-y: auto;
+	scroll-behavior: smooth;
+
+	position: absolute;
+	top: 0; left: 0; right: 0;
+
+	transform: translateX(-100vw);
+	transition: transform 1s cubic-bezier(0.165, 0.840, 0.440, 1.000);
+}
+
+.results section {
+	box-shadow: black 0 0 10px 1px;
+	background: white;
+	color: black;
+	padding: 20px;
+	margin: 30px auto;
+	max-width: 700px;
+	
+	transition: transform 1s cubic-bezier(0.075, 0.820, 0.165, 1.000);
+	transform: scale(0);
+}
+
+.results section:first-child {
+	transform: scale(1);
+}
+
+.results .hidden {
+	transform: scale(0);
+	transition: transform 0.5s cubic-bezier(0.075, 0.820, 0.165, 1.000);
+}
+
+.results .shown {
+	transform: scale(1) !important;
+}
+
+.results h1 {
+	font-size: 50px;
+	margin: 0;
+}
+
+.results h2 {
+	margin: 0;
+	font-weight: normal;
+}
+
+.results .finalRole p {
+	font-size: 300%;
+	margin: 10px 0 0 0;
+}
+
+.results table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+.results td {
+	border-bottom: 1px black solid;
+	padding: 10px 0;
+}
+
+.results td:first-child {
+	text-align: center;
+	font-size: 200%;
+	width: 60px;
+	padding-right: 20px;
+}
+
+.results td > p {
+	margin: 0;
+}
+
+.results td > p:last-child {
+	font-size: 75%;
+
+	transition: max-height 0.5s cubic-bezier(0.895, 0.030, 0.685, 0.220);
+	max-height: 0;
+	overflow-y: hidden;
+}
+
+.results tr:last-child td {
+	border: none;
+}
+
+.results .winTeams p {
+	font-size: 300%;
+	margin: 10px 0 0 0;
+}
+
+.results .verdict h2 {
+	font-size: 100px;
+	font-weight: bold;
+	margin: 0;
+}
+
+.results button {
+	width: 100%;
+	font-size: 200%;
+	padding: 20px 0;
+	border: 1px black solid;
+	background: white;
+
+	transition: background 0.2s ease-in-out;
+}
+
+.results button:hover {
+	background: #eeeeee;
+}
+
+.results button:active {
+	background: #aaaaaa;
 }
 
 /* #endregion */

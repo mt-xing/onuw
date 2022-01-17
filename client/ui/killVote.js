@@ -86,6 +86,12 @@ export default class KillVote {
 		}
 		this.#lis[liIndexPid].voted();
 	}
+
+	animateOut() {
+		this.#wrap.style.transform = 'scale(0)';
+		this.#wrap.style.border = '1px black solid';
+		setTimeout(() => { this.#wrap.parentElement?.removeChild(this.#wrap); }, 500);
+	}
 }
 
 class LineItem {

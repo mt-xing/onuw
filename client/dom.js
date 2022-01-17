@@ -53,15 +53,19 @@ export default class Dom {
 
 	/**
 	 * @param {string | HTMLElement} child
+	 * @param {string} [className]
 	 * @returns {HTMLElement}
 	 */
-	static section(child) {
+	static section(child, className) {
 		const sec = document.createElement('section');
 
 		if (typeof child === 'string') {
 			sec.appendChild(Dom.span(child));
 		} else {
 			sec.appendChild(child);
+		}
+		if (className !== undefined) {
+			sec.className = className;
 		}
 
 		return sec;
