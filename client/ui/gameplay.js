@@ -296,43 +296,5 @@ export default class Gameplay {
 		showResults(this.#outerDom, votes, playerRoles, winTeam, this.#game, () => {
 			this.#socket.emit('restart', '');
 		});
-
-		// this.#dom.appendChild(Dom.hr());
-		// this.#dom.appendChild(Dom.p('And the votes are in:'));
-		// votes.forEach((voteTarget, pID) => {
-		// 	this.#dom.appendChild(Dom.p(`${this.#game.getPlayerName(pID)} voted to kill ${this.#game.getPlayerName(voteTarget)}`));
-		// });
-		// this.#dom.appendChild(Dom.p('The role everyone ended up with:'));
-		// playerRoles.forEach((role, pID) => {
-		// 	this.#dom.appendChild(Dom.p(`${this.#game.getPlayerName(pID)} was ${roleToName[role]}`));
-		// });
-		// this.#dom.appendChild(Dom.p('Winning team(s):'));
-		// if (winTeam.length === 0) {
-		// 	this.#dom.appendChild(Dom.p('Nobody. Everyone lost. Y\'all suck.'));
-		// } else {
-		// 	this.#dom.appendChild(Dom.p(makeList(winTeam.map((t) => {
-		// 		switch (t) {
-		// 		case Teams.WEREWOLF:
-		// 			return 'Werewolves';
-		// 		case Teams.VILLAGER:
-		// 			return 'Villagers';
-		// 		case Teams.TANNER:
-		// 			return 'Tanner';
-		// 		default:
-		// 			return assertUnreachable(t);
-		// 		}
-		// 	}))));
-		// }
-		// const yourRole = constructRole(playerRoles[this.#game.playerID]);
-		// if (winTeam.some((w) => yourRole.winTeam === w)) {
-		// 	this.#dom.appendChild(Dom.p('YOU WON!'));
-		// } else {
-		// 	this.#dom.appendChild(Dom.p('You lose. Better luck next time'));
-		// }
-		// if (this.#game.isHost) {
-		// 	this.#dom.appendChild(Dom.button('Play again?', () => {
-		// 		this.#socket.emit('restart', '');
-		// 	}));
-		// }
 	}
 }
