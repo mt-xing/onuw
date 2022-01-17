@@ -30,6 +30,120 @@ button {
 	cursor: pointer;
 }
 
+/* #region Intro */
+
+.intro {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+
+	position: absolute;
+	top: 0; left: 0; right: 0;
+
+	transition: transform 1s cubic-bezier(0.165, 0.840, 0.440, 1.000);
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.intro h1 {
+	font-family: 'Raleway', sans-serif;
+	font-size: 150px;
+	margin: 0;
+
+	text-shadow: 0 0 20px black;
+}
+
+.intro div {
+	margin-bottom: 50px;
+	margin-top: 10px;
+}
+
+.intro button {
+	background: white;
+	padding: 20px 40px;
+	margin: 10px;
+
+	font-size: 20px;
+
+	border: none;
+	box-shadow: black 0 0 10px 5px;
+
+	transition: box-shadow 0.2s ease-in-out;
+}
+
+.intro button:hover, .intro button:focus {
+	box-shadow: #000088 0 0 10px 5px;
+}
+
+.intro button:active {
+	transition: box-shadow 0.1s ease-in-out;
+	box-shadow: white 0 0 10px 0;
+}
+
+.intro p {
+	margin: 10px 0 0 0;
+	padding: 0 20px;
+	text-align: center;
+}
+
+.intro a, .intro a:active {
+	color: white;
+	text-decoration: underline;
+}
+
+.intro a:hover {
+	text-decoration: none;
+}
+
+.intro a:active {
+	text-decoration: underline;
+}
+
+.intro footer {
+	position: absolute;
+	bottom: 20px;
+}
+
+.intro footer a {
+	color: blue;
+    display: inline-block;
+    font-family: 'cooper-black-std', serif;
+    position: relative;
+    -webkit-text-stroke: 1px black;
+    -webkit-text-fill-color: blue;
+    text-decoration: none;
+
+	font-size: 75px;
+
+	transform: translate(0, 0);
+	transition: transform 0.1s ease-in-out;
+}
+
+.intro footer a::after {
+	content: attr(data-text);
+    position: absolute;
+    -webkit-text-stroke: 5px white;
+    left: 0;
+    z-index: -2;
+    font-size: 1em;
+
+	text-shadow: 0 0 20px black;
+}
+
+.intro footer a:hover {
+	transform: translate(-1px, -1px);
+}
+
+.intro footer a:active {
+	transform: translate(1px, 1px);
+}
+
+/* #endregion */
+
 /* #region Gameplay */
 
 .gameWrap {

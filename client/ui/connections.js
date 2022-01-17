@@ -33,6 +33,8 @@ export default class Connections {
 		this.#socket = socket;
 		this.#game = new OnuwGame();
 
+		this.#spawnOpening(gameDom);
+
 		this.#nameField = Dom.input('text', 'Name');
 		gameDom.appendChild(this.#nameField);
 
@@ -68,6 +70,51 @@ export default class Connections {
 			const { playerID, name } = JSON.parse(msg);
 			this.joinNew(playerID, name);
 		});
+	}
+
+	/**
+	 * @param {HTMLElement} wrapDom
+	 */
+	#spawnOpening(wrapDom) {
+		const intro = document.createElement('main');
+		intro.classList.add('intro');
+
+		const h1 = document.createElement('h1');
+		h1.textContent = 'onuw';
+		intro.appendChild(h1);
+
+		const div = document.createElement('div');
+		div.appendChild(Dom.button('Host Game', () => {}));
+		div.appendChild(Dom.button('Join Game', () => {}));
+		intro.appendChild(div);
+
+		intro.appendChild(Dom.p('Not an unlicensed potentially illegal rip-off of One Night Ultimate Werewolf. It\'s, uh... something else.'));
+		const boardGame = Dom.p('But on a completely unrelated note you can support the creators of One Night Ultimate Werewolf by buying it ');
+		const boardGameLink = document.createElement('a');
+		boardGameLink.textContent = 'here';
+		boardGameLink.href = 'https://beziergames.com/collections/all-games/products/one-night-ultimate-werewolf';
+		boardGameLink.target = '_blank';
+		boardGame.appendChild(boardGameLink);
+		boardGame.appendChild(document.createTextNode('.'));
+		intro.appendChild(boardGame);
+		const git = Dom.p('This game is open source! Check it out on ');
+		const gitLink = document.createElement('a');
+		gitLink.textContent = 'GitHub';
+		gitLink.href = 'https://github.com/mt-xing/onuw';
+		gitLink.target = '_blank';
+		git.appendChild(gitLink);
+		git.appendChild(document.createTextNode('.'));
+		intro.appendChild(git);
+
+		const footer = document.createElement('footer');
+		const xLink = document.createElement('a');
+		footer.appendChild(xLink);
+		xLink.href = 'https://michaelxing.com';
+		xLink.textContent = 'Xing';
+		xLink.setAttribute('data-text', 'Xing');
+		intro.appendChild(footer);
+
+		wrapDom.appendChild(intro);
 	}
 
 	get game() {
