@@ -58,13 +58,11 @@ export default function showResults(outerDom, votes, playerRoles, winTeam, game,
 	const finalRoleWrap = Dom.section(Dom.h2('Your Final Role'), 'finalRole');
 	const finalRole = Dom.p(yourRole.roleName, 'hidden');
 	finalRoleWrap.appendChild(finalRole);
-	dom.appendChild(finalRoleWrap);
 
 	// Vote Count
 	const voteWrap = Dom.section(Dom.h2('Vote Count'));
 	const table = document.createElement('table');
 	voteWrap.appendChild(table);
-	dom.appendChild(voteWrap);
 	const voteTotals = Array(votes.length).fill(0);
 	votes.forEach((v) => voteTotals[v]++);
 	const playerIDs = votes.map((_, i) => i);
@@ -110,16 +108,23 @@ export default function showResults(outerDom, votes, playerRoles, winTeam, game,
 			}
 		});
 	winningTeams.forEach((wt) => winningTeamsWrap.appendChild(wt));
-	dom.appendChild(winningTeamsWrap);
 
 	// Verdict
 	const verdict = Dom.section(Dom.h2(
 		winTeam.some((w) => yourRole.winTeam === w) ? 'You Win 👍' : 'You Lose 👎',
 	), 'verdict');
-	dom.appendChild(verdict);
 
-	/** @param {HTMLElement} e */
-	const st = (e) => { dom.scrollTop = e.offsetTop - 20; };
+	/**
+	 * @param {HTMLElement} section
+	 * @param {number} delay
+	 */
+	const showSection = (section, delay) => setTimeout(() => {
+		dom.appendChild(section);
+		forceDom(section);
+		// eslint-disable-next-line no-param-reassign
+		section.style.transform = 'scale(1)';
+		dom.scrollTop = section.offsetTop - 20;
+	}, delay);
 	// Animations:
 	// 1) Dom
 	// 2) Final role wrap
@@ -133,12 +138,10 @@ export default function showResults(outerDom, votes, playerRoles, winTeam, game,
 	// 10) Verdict
 	forceDom(dom);
 	dom.style.transform = 'translateX(0)';
-	forceDom(finalRoleWrap);
-	setTimeout(() => { finalRoleWrap.style.transform = 'scale(1)'; st(finalRoleWrap); }, 1000);
+	showSection(finalRoleWrap, 1000);
 	forceDom(finalRole);
 	setTimeout(() => { finalRole.classList.add('shown'); }, 2000);
-	forceDom(voteWrap);
-	setTimeout(() => { voteWrap.style.transform = 'scale(1)'; st(voteWrap); }, 3000);
+	showSection(voteWrap, 3000);
 	setTimeout(() => {
 		// eslint-disable-next-line camelcase
 		voteCounts0_votedForBy1_finalRoles2.forEach(([vc, _, _a], pid) => {
@@ -156,19 +159,15 @@ export default function showResults(outerDom, votes, playerRoles, winTeam, game,
 		// eslint-disable-next-line camelcase
 		voteCounts0_votedForBy1_finalRoles2.forEach(([_, _a, fr]) => { forceDom(fr); fr.classList.add('shown'); });
 	}, 6000);
-	forceDom(winningTeamsWrap);
-	setTimeout(() => { winningTeamsWrap.style.transform = 'scale(1)'; st(winningTeamsWrap); }, 7000);
+	showSection(winningTeamsWrap, 7000);
 	setTimeout(() => {
 		winningTeams.forEach((wt) => { forceDom(wt); wt.classList.add('shown'); });
 	}, 8000);
-	forceDom(verdict);
-	setTimeout(() => { verdict.style.transform = 'scale(1)'; st(verdict); }, 9000);
+	showSection(verdict, 9000);
 
 	if (game.playerID === 0 && restart !== undefined) {
 		// Add restart button
 		const w = Dom.section(Dom.button('Play Again?', restart));
-		dom.appendChild(w);
-		forceDom(w);
-		setTimeout(() => { w.style.transform = 'scale(1)'; st(w); }, 10000);
+		showSection(w, 10000);
 	}
 }
