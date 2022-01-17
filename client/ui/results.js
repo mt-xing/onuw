@@ -92,7 +92,7 @@ export default function showResults(outerDom, votes, playerRoles, winTeam, game,
 	});
 
 	// Win Teams
-	const winningTeamsWrap = Dom.section(Dom.h2('Winning Team(s)'), 'winTeams');
+	const winningTeamsWrap = Dom.section(Dom.h2(winTeam.length === 1 ? 'Winning Team' : 'Winning Teams'), 'winTeams');
 	const winningTeams = winTeam.length === 0
 		? [Dom.p('No one. Y\'all suck.', 'hidden')]
 		: winTeam.map((t) => {

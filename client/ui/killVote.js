@@ -67,7 +67,7 @@ export default class KillVote {
 			// eslint-disable-next-line no-console
 			console.error('No style?');
 		}
-		this.#wrap.style.transform = 'translateX(0)';
+		this.#wrap.style.transform = 'translateX(0)scale(1)';
 	}
 
 	/**
@@ -88,9 +88,10 @@ export default class KillVote {
 	}
 
 	animateOut() {
-		this.#wrap.style.transform = 'scale(0)';
+		this.#wrap.style.transition = 'transform 1s ease-in';
+		this.#wrap.style.transform = 'translateX(0)scale(0)';
 		this.#wrap.style.border = '1px black solid';
-		setTimeout(() => { this.#wrap.parentElement?.removeChild(this.#wrap); }, 500);
+		setTimeout(() => { this.#wrap.parentElement?.removeChild(this.#wrap); }, 1000);
 	}
 }
 
