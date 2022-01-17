@@ -88,10 +88,10 @@ export default class KillVote {
 	}
 
 	animateOut() {
-		this.#wrap.style.transition = 'transform 1s ease-in';
+		this.#wrap.style.transition = 'transform 0.5s ease-in';
 		this.#wrap.style.transform = 'translateX(0)scale(0)';
 		this.#wrap.style.border = '1px black solid';
-		setTimeout(() => { this.#wrap.parentElement?.removeChild(this.#wrap); }, 1000);
+		setTimeout(() => { this.#wrap.parentElement?.removeChild(this.#wrap); }, 500);
 	}
 }
 
