@@ -197,7 +197,7 @@ export default class Connections {
 		nameField.setAttribute('maxlength', '35');
 		gameField.setAttribute('maxlength', '5');
 		gameField.setAttribute('minlength', '5');
-		const updateBtn = () => { btn.disabled = nameField.value === '' || gameField.value.length < 5; };
+		const updateBtn = () => { btn.disabled = nameField.value === '' || gameField.value.length < 5; error.textContent = null; };
 		[nameField, gameField].forEach((input) => {
 			input.addEventListener('change', updateBtn);
 			input.addEventListener('keydown', updateBtn);
@@ -215,6 +215,13 @@ export default class Connections {
 		});
 		btn.disabled = true;
 		m.appendChild(btn);
+
+		const error = Dom.p('', 'errorCode');
+		m.appendChild(error);
+		/** @param {string} reason */
+		this.joinNo = (reason) => {
+			error.textContent = reason;
+		};
 	}
 
 	#hostConfirm() {
@@ -349,7 +356,8 @@ export default class Connections {
 	 * @param {string} reason
 	 */
 	joinNo(reason) {
-		this.#dom.appendChild(Dom.p(reason));
+		// eslint-disable-next-line no-console
+		console.error(`Invalid join error before ready. ${reason}`);
 	}
 
 	/**
@@ -357,8 +365,6 @@ export default class Connections {
 	 * @param {string} name
 	 */
 	joinNew(playerID, name) {
-		// this.#dom.appendChild(Dom.p(`${name} joined as player ${playerID}`));
-		// this.#game.addPlayer(playerID, name);
 		// eslint-disable-next-line no-console
 		console.error(`Invalid join new before ready. Player ${playerID} with name ${name}`);
 	}
