@@ -2,6 +2,7 @@ import { makeList } from '../../game/utils.js';
 import Dom from '../dom.js';
 import Socket from '../socket.js';
 import OnuwGame from '../game.js';
+import { MAX_ROLES } from '../../game/role.js';
 
 export default class Connections {
 	/**
@@ -183,21 +184,6 @@ export default class Connections {
 	}
 
 	#join() {
-		// if (this.#nameField.value === '') {
-		// 	alert('Enter your name');
-		// 	return;
-		// }
-		// if (this.#nameField.value.length > 50) {
-		// 	alert('bruh why');
-		// 	return;
-		// }
-		// if (this.#idField.value === '') {
-		// 	alert('Enter a valid game ID');
-		// 	return;
-		// }
-		// this.#socket.send('join', { id: this.#idField.value.toLowerCase(),
-		// name: this.#nameField.value });
-
 		this.#clearCurr();
 		const m = document.createElement('main');
 		m.classList.add('connection');
@@ -225,6 +211,7 @@ export default class Connections {
 		const btn = Dom.button('Join', () => {
 			this.#socket.send('join', { id: gameField.value.toLowerCase(), name: nameField.value });
 			btn.disabled = true;
+			this.#game.code = gameField.value.toLowerCase();
 		});
 		btn.disabled = true;
 		m.appendChild(btn);
@@ -238,17 +225,77 @@ export default class Connections {
 	 * @param {string} id
 	 */
 	createYes(id) {
-		this.#dom.textContent = null;
-		this.#dom.appendChild(Dom.p(`New game id: ${id}`));
-		this.#dom.appendChild(Dom.button('Start Game', this.#hostConfirm.bind(this)));
 		this.#game.playerID = 0;
+		this.#game.code = id;
+		this.#clearCurr();
+		const m = document.createElement('main');
+		m.classList.add('connection');
+		this.#addCurr(m);
+
+		const div = document.createElement('div');
+		m.appendChild(div);
+		const s1 = Dom.section(Dom.p('Here\'s your game ID:'));
+		div.appendChild(s1);
+		const code = document.createElement('code');
+		code.textContent = id;
+		s1.appendChild(code);
+		s1.appendChild(Dom.p('Give this to the other players.'));
+		const s2 = Dom.section(Dom.h2('Players'));
+		div.appendChild(s2);
+		const table = document.createElement('table');
+		s2.appendChild(table);
+
+		const playersLeft = Dom.p('Needs 2 more players');
+		s2.appendChild(playersLeft);
+
+		/** @param {string} name */
+		const addToTable = (name) => {
+			const tr = document.createElement('tr');
+			table.appendChild(tr);
+			const td = document.createElement('td');
+			tr.appendChild(td);
+			td.textContent = name;
+		};
+		addToTable(this.#game.getPlayerName(0));
+
+		/**
+		 * @param {number} playerID
+		 * @param {string} name
+		 */
+		this.joinNew = (playerID, name) => {
+			this.#game.addPlayer(playerID, name);
+			addToTable(name);
+
+			const np = this.#game.numPlayers;
+			if (this.#game.numPlayers < 3) {
+				playersLeft.textContent = np === 2 ? 'Needs 1 more player' : `Needs ${3 - np} more players`;
+				btn.disabled = true;
+			} else {
+				btn.disabled = false;
+				playersLeft.textContent = np === (MAX_ROLES - 1)
+					? 'Can accommodate 1 more player'
+					: `Can accomodate ${MAX_ROLES - np} more players`;
+			}
+		};
+
+		const btn = Dom.button('Start', () => {
+			this.#hostConfirm();
+		});
+		btn.disabled = true;
+		m.appendChild(btn);
 	}
 
 	/**
 	 * @param {string} reason
 	 */
 	createNo(reason) {
-		this.#dom.appendChild(Dom.p(reason));
+		this.#clearCurr();
+		const m = document.createElement('main');
+		m.classList.add('connection');
+		this.#addCurr(m);
+
+		m.appendChild(Dom.h1('Error :('));
+		m.appendChild(Dom.p(reason));
 		this.#game.reset();
 	}
 
@@ -257,14 +304,45 @@ export default class Connections {
 	 * @param {string[]} players
 	 */
 	joinYes(playerID, players) {
-		this.#dom.textContent = null;
-		this.#dom.appendChild(Dom.p(
-			`You are player ${playerID}, with these other players: ${makeList(players.map((name, i) => `${name} as player ${i}`))}`,
-		));
 		players.forEach((name, i) => {
 			this.#game.addPlayer(i, name);
 		});
 		this.#game.playerID = playerID;
+
+		this.#clearCurr();
+		const m = document.createElement('main');
+		m.classList.add('connection');
+		this.#addCurr(m);
+
+		m.appendChild(Dom.h2('Players'));
+		const table = document.createElement('table');
+		m.appendChild(table);
+
+		/** @param {string} name */
+		const addToTable = (name) => {
+			const tr = document.createElement('tr');
+			table.appendChild(tr);
+			const td = document.createElement('td');
+			tr.appendChild(td);
+			td.textContent = name;
+		};
+		players.forEach(addToTable);
+
+		/**
+		 * @param {number} pid
+		 * @param {string} name
+		 */
+		this.joinNew = (pid, name) => {
+			this.#game.addPlayer(pid, name);
+			addToTable(name);
+		};
+
+		const codeWrap = Dom.p('Successfully joined ');
+		const code = document.createElement('code');
+		code.textContent = this.#game.code ?? '';
+		codeWrap.appendChild(code);
+		m.appendChild(codeWrap);
+		m.appendChild(Dom.p('Waiting for the host to start your game.'));
 	}
 
 	/**
@@ -279,7 +357,9 @@ export default class Connections {
 	 * @param {string} name
 	 */
 	joinNew(playerID, name) {
-		this.#dom.appendChild(Dom.p(`${name} joined as player ${playerID}`));
-		this.#game.addPlayer(playerID, name);
+		// this.#dom.appendChild(Dom.p(`${name} joined as player ${playerID}`));
+		// this.#game.addPlayer(playerID, name);
+		// eslint-disable-next-line no-console
+		console.error(`Invalid join new before ready. Player ${playerID} with name ${name}`);
 	}
 }

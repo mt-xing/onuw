@@ -35,6 +35,9 @@ export default class OnuwGame {
 	 */
 	talkTime;
 
+	/** @type {string | undefined} */
+	code;
+
 	constructor() {
 		this.playerID = NaN;
 		this.#players = [];
@@ -52,6 +55,7 @@ export default class OnuwGame {
 		this.roleTime = DEFAULT_ROLE_TIME;
 		this.talkTime = DEFAULT_TALK_TIME * 60;
 		this.#playerStartRole = undefined;
+		this.code = undefined;
 	}
 
 	restart() {
