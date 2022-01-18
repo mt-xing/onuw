@@ -124,7 +124,6 @@ export default class Connections {
 
 	#clearCurr() {
 		if (this.#currScreen !== undefined) {
-			// TODO animate properly
 			const c = this.#currScreen;
 			this.#currScreen = undefined;
 

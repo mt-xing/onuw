@@ -173,6 +173,10 @@ button {
 	margin: 20px 0 0 0;
 }
 
+.connection p {
+	text-align: center;
+}
+
 .connection button, .connection input {
 	font-size: initial;
 	padding: 15px 30px;
