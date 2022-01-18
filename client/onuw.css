@@ -140,6 +140,7 @@ button {
 
 .intro footer a:active {
 	transform: translate(1px, 1px);
+	text-decoration: none;
 }
 
 /* #endregion */
