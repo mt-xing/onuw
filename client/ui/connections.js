@@ -88,24 +88,6 @@ export default class Connections {
 		div.appendChild(Dom.button('Join Game', this.#join.bind(this)));
 		intro.appendChild(div);
 
-		intro.appendChild(Dom.p('Not an unlicensed rip-off of One Night Ultimate Werewolf. It\'s, uh... something else.'));
-		const boardGame = Dom.p('But on a completely unrelated note you can support the creators of One Night Ultimate Werewolf by buying it ');
-		const boardGameLink = document.createElement('a');
-		boardGameLink.textContent = 'here';
-		boardGameLink.href = 'https://beziergames.com/collections/all-games/products/one-night-ultimate-werewolf';
-		boardGameLink.target = '_blank';
-		boardGame.appendChild(boardGameLink);
-		boardGame.appendChild(document.createTextNode('.'));
-		intro.appendChild(boardGame);
-		const git = Dom.p('This game is open source! Check it out on ');
-		const gitLink = document.createElement('a');
-		gitLink.textContent = 'GitHub';
-		gitLink.href = 'https://github.com/mt-xing/onuw';
-		gitLink.target = '_blank';
-		git.appendChild(gitLink);
-		git.appendChild(document.createTextNode('.'));
-		intro.appendChild(git);
-
 		const footer = document.createElement('footer');
 		const xLink = document.createElement('a');
 		footer.appendChild(xLink);
