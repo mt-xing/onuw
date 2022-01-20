@@ -144,6 +144,17 @@ export default class Connections {
 		m.appendChild(Dom.p('Hi there! What\'s your name?'));
 		const nameField = Dom.input('text', 'Name');
 		nameField.setAttribute('maxlength', '35');
+		m.appendChild(nameField);
+
+		let submitting = false;
+		const submit = () => {
+			if (submitting) { return; }
+			if (nameField.value === '') { return; }
+			submitting = true;
+			btn.disabled = true;
+			this.#game.addPlayer(0, nameField.value);
+			this.#socket.send('create', { name: nameField.value });
+		};
 		nameField.addEventListener('change', () => {
 			btn.disabled = nameField.value === '';
 		});
@@ -153,13 +164,9 @@ export default class Connections {
 		nameField.addEventListener('keyup', () => {
 			btn.disabled = nameField.value === '';
 		});
-		m.appendChild(nameField);
+		nameField.addEventListener('keydown', (e) => { if (e.code === 'Enter') { submit(); } });
 
-		const btn = Dom.button('Continue', () => {
-			this.#game.addPlayer(0, nameField.value);
-			this.#socket.send('create', { name: nameField.value });
-			btn.disabled = true;
-		});
+		const btn = Dom.button('Continue', submit);
 		btn.disabled = true;
 		m.appendChild(btn);
 	}
@@ -178,22 +185,29 @@ export default class Connections {
 		nameField.setAttribute('maxlength', '35');
 		gameField.setAttribute('maxlength', '5');
 		gameField.setAttribute('minlength', '5');
+
+		let submitting = false;
+		const submit = () => {
+			if (submitting) { return; }
+			if (nameField.value === '' || gameField.value.length < 5) { return; }
+			submitting = true;
+			btn.disabled = true;
+			this.#socket.send('join', { id: gameField.value.toLowerCase(), name: nameField.value });
+			this.#game.code = gameField.value.toLowerCase();
+		};
 		const updateBtn = () => { btn.disabled = nameField.value === '' || gameField.value.length < 5; error.textContent = null; };
 		[nameField, gameField].forEach((input) => {
 			input.addEventListener('change', updateBtn);
 			input.addEventListener('keydown', updateBtn);
-			input.addEventListener('keyup', updateBtn);
+			input.addEventListener('keyup', (e) => { if (e.code !== 'Enter') { updateBtn(); } });
+			input.addEventListener('keydown', (e) => { if (e.code === 'Enter') { submit(); } });
 		});
 		m.appendChild(nameField);
 		m.appendChild(gameField);
 
 		m.appendChild(Dom.p('Not sure what this is? Ask the person hosting the game.'));
 
-		const btn = Dom.button('Join', () => {
-			this.#socket.send('join', { id: gameField.value.toLowerCase(), name: nameField.value });
-			btn.disabled = true;
-			this.#game.code = gameField.value.toLowerCase();
-		});
+		const btn = Dom.button('Join', submit);
 		btn.disabled = true;
 		m.appendChild(btn);
 
@@ -202,6 +216,7 @@ export default class Connections {
 		/** @param {string} reason */
 		this.joinNo = (reason) => {
 			error.textContent = reason;
+			submitting = false;
 		};
 	}
 
