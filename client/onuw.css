@@ -788,6 +788,15 @@ button {
 		;
 	}
 
+	.connection div {
+		flex-direction: column;
+		margin-bottom: 30px;
+	}
+
+	.connection section:first-child {
+		margin-right: 0;
+	}
+
 }
 
 @media(max-width: 650px) {
