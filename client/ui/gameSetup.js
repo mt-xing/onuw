@@ -44,25 +44,27 @@ export default class GameSetup {
 	 *
 	 * @param {Socket} socket
 	 * @param {OnuwGame} game
-	 * @param {HTMLElement} gameDom
 	 * @param {(game: OnuwGame) => void} completeCallback
 	 */
-	constructor(socket, game, gameDom, completeCallback) {
+	constructor(socket, game, completeCallback) {
 		if (this.constructor === GameSetup) {
 			throw new Error('GameSetup is an abstract class');
 		}
 		// eslint-disable-next-line no-param-reassign
-		gameDom.textContent = null;
 		this.#game = game;
 		this.#game.restart();
 
 		this.#waiting = 2;
-		this.#allDone = completeCallback;
+		this.#allDone = (g) => { this.done(); completeCallback(g); };
 
 		socket.off('setupFinal');
 		socket.on('setupFinal', this.#finalSetup.bind(this));
 		socket.off('setupRole');
 		socket.on('setupRole', this.#receiveRole.bind(this));
+	}
+
+	done() {
+		throw new Error('UNIMPLEMENTED');
 	}
 
 	/**
@@ -120,7 +122,7 @@ class HostSetup extends GameSetup {
 	 * @param {(game: OnuwGame) => void} completeCallback
 	 */
 	constructor(socket, game, gameDom, completeCallback) {
-		super(socket, game, gameDom, completeCallback);
+		super(socket, game, completeCallback);
 
 		this.#socket = socket;
 		this.#game = game;
@@ -128,6 +130,11 @@ class HostSetup extends GameSetup {
 		const header = document.createElement('header');
 		header.classList.add('setupHeader');
 		gameDom.appendChild(header);
+		if (!getComputedStyle(header).transform) {
+			// eslint-disable-next-line no-console
+			console.info('No transform on element');
+		}
+		header.style.transform = 'translateY(0)';
 
 		const rolesLeftWrap = document.createElement('p');
 		this.#counterText1 = Dom.span('Select ');
@@ -162,6 +169,23 @@ class HostSetup extends GameSetup {
 		const main = document.createElement('main');
 		main.classList.add('setup');
 		gameDom.appendChild(main);
+		if (!getComputedStyle(main).transform) {
+			// eslint-disable-next-line no-console
+			console.info('No transform on element');
+		}
+		main.style.transform = 'translateX(0)scale(1)';
+
+		this.done = () => {
+			header.style.transition = 'transform 0.5s ease-in';
+			main.style.transition = 'transform 0.5s ease-in';
+			header.style.transform = 'translateY(-100%)';
+			main.style.transform = 'translateX(0)scale(0)';
+
+			setTimeout(() => {
+				header.parentElement?.removeChild(header);
+				main.parentElement?.removeChild(main);
+			}, 1000);
+		};
 
 		const h2Wrap = document.createElement('div');
 		h2Wrap.classList.add('header');
@@ -314,12 +338,17 @@ class ClientSetup extends GameSetup {
 	 * @param {(game: OnuwGame) => void} completeCallback
 	 */
 	constructor(socket, game, gameDom, completeCallback) {
-		super(socket, game, gameDom, completeCallback);
+		super(socket, game, completeCallback);
 		this.#game = game;
 
 		const header = document.createElement('header');
 		header.classList.add('setupHeader');
 		gameDom.appendChild(header);
+		if (!getComputedStyle(header).transform) {
+			// eslint-disable-next-line no-console
+			console.info('No transform on element');
+		}
+		header.style.transform = 'translateY(0)';
 
 		const rolesLeftWrap = Dom.p('Waiting for host');
 		const inputsWrap = Dom.p('Seconds per role: ');
@@ -334,6 +363,23 @@ class ClientSetup extends GameSetup {
 		const main = document.createElement('main');
 		main.classList.add('setup');
 		gameDom.appendChild(main);
+		if (!getComputedStyle(main).transform) {
+			// eslint-disable-next-line no-console
+			console.info('No transform on element');
+		}
+		main.style.transform = 'translateX(0)scale(1)';
+
+		this.done = () => {
+			header.style.transition = 'transform 0.5s ease-in';
+			main.style.transition = 'transform 0.5s ease-in';
+			header.style.transform = 'translateY(-100%)';
+			main.style.transform = 'translateX(0)scale(0)';
+
+			setTimeout(() => {
+				header.parentElement?.removeChild(header);
+				main.parentElement?.removeChild(main);
+			}, 1000);
+		};
 
 		const h2Wrap = document.createElement('div');
 		h2Wrap.classList.add('header');

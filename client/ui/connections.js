@@ -35,15 +35,6 @@ export default class Connections {
 
 		this.#spawnOpening(gameDom);
 
-		// this.#nameField = Dom.input('text', 'Name');
-		// gameDom.appendChild(this.#nameField);
-
-		// this.#idField = Dom.input('text', 'Game ID');
-		// gameDom.appendChild(this.#idField);
-
-		// gameDom.appendChild(Dom.button('Create', this.#create.bind(this)));
-		// gameDom.appendChild(Dom.button('Join', this.#join.bind(this)));
-
 		socket.off('createYes');
 		socket.on('createYes', (msg) => {
 			const { id } = JSON.parse(msg);
@@ -363,5 +354,9 @@ export default class Connections {
 	joinNew(playerID, name) {
 		// eslint-disable-next-line no-console
 		console.error(`Invalid join new before ready. Player ${playerID} with name ${name}`);
+	}
+
+	end() {
+		this.#clearCurr();
 	}
 }

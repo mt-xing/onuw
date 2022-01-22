@@ -60,14 +60,22 @@ export default class Gameplay {
 	 * @param {HTMLElement} gameDom
 	 */
 	constructor(socket, game, gameDom) {
+		Gameplay.#instance = this;
+
 		this.#outerDom = gameDom;
-		this.#outerDom.textContent = null;
 		this.#dom = document.createElement('div');
 		this.#outerDom.appendChild(this.#dom);
 		this.#dom.classList.add('gameWrap');
 		this.#socket = socket;
 		this.#game = game;
 		this.#playerChoices = new Map();
+
+		if (!getComputedStyle(this.#dom).transform) {
+			// eslint-disable-next-line no-console
+			console.info('No transform on game dom');
+		}
+		this.#dom.style.transform = 'scale(1)';
+		this.#dom.style.opacity = '1';
 
 		this.#messageLog = new MessageLog(this.#dom);
 		this.#boardStatus = new BoardStatus(this.#dom, game.playerNames);
@@ -267,6 +275,7 @@ export default class Gameplay {
 	}
 
 	#voteStart() {
+		this.#dom.style.transition = 'transform 0.5s ease-in';
 		this.#dom.style.transform = 'scale(0)';
 		this.#dom.style.border = '1px black solid';
 		setTimeout(() => { this.#dom.parentElement?.removeChild(this.#dom); }, 500);
@@ -296,5 +305,29 @@ export default class Gameplay {
 		showResults(this.#outerDom, votes, playerRoles, winTeam, this.#game, () => {
 			this.#socket.emit('restart', '');
 		});
+	}
+
+	/** @type {Gameplay | undefined} */
+	static #instance;
+
+	/**
+	 * Remove the game element from the board, if present
+	 */
+	static remove() {
+		if (this.#instance !== undefined) {
+			for (const el of this.#instance.#outerDom.getElementsByTagName('main')) {
+				el.style.transition = 'transform 0.5s ease-in';
+				el.style.transform = 'translateX(0)scale(0)';
+			}
+
+			setTimeout(() => {
+				const i = this.#instance;
+				if (i === undefined) { return; }
+				for (const el of i.#outerDom.getElementsByTagName('main')) {
+					el.parentElement?.removeChild(el);
+				}
+				this.#instance = undefined;
+			}, 500);
+		}
 	}
 }

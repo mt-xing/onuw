@@ -137,7 +137,7 @@ export default function showResults(outerDom, votes, playerRoles, winTeam, game,
 	// 9) Winning teams
 	// 10) Verdict
 	forceDom(dom);
-	dom.style.transform = 'translateX(0)';
+	dom.style.transform = 'translateX(0)scale(1)';
 	showSection(finalRoleWrap, 1000);
 	forceDom(finalRole);
 	setTimeout(() => { finalRole.classList.add('shown'); }, 2000);
