@@ -281,7 +281,7 @@ class HostSetup extends GameSetup {
 			/** @type {HTMLInputElement} */(ev.currentTarget).value,
 			10,
 		);
-		if (this.#game.roleTime < 1) {
+		if (Number.isNaN(this.#game.roleTime) || this.#game.roleTime < 1) {
 			this.#game.roleTime = 1;
 			// eslint-disable-next-line no-param-reassign
 			/** @type {HTMLInputElement} */(ev.currentTarget).value = '1';
@@ -297,7 +297,7 @@ class HostSetup extends GameSetup {
 			/** @type {HTMLInputElement} */(ev.currentTarget).value,
 			10,
 		) * 60;
-		if (this.#game.talkTime < 1) {
+		if (Number.isNaN(this.#game.talkTime) || this.#game.talkTime < 1) {
 			this.#game.talkTime = 60;
 			// eslint-disable-next-line no-param-reassign
 			/** @type {HTMLInputElement} */(ev.currentTarget).value = '1';
