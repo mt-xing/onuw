@@ -47,7 +47,7 @@ export default class OnuwGame {
 		this.over = false;
 	}
 
-	async play() {
+	async #night() {
 		const roles = this.state.allWakingRoles;
 
 		/** @param {number} pid */
@@ -159,10 +159,10 @@ export default class OnuwGame {
 			await Promise.all(wakeOrder[wakeOrderIndex].map(playerAct));
 			wakeOrderIndex++;
 		}
+	}
 
-		this.comm.transitionToDay(this.state.boardState);
-
-		await new Promise((resolve) => {
+	async #day() {
+		return new Promise((resolve) => {
 			const readyUpGenerator = this.comm.waitForPlayersReadyToVote();
 
 			/** @type {NodeJS.Timeout | null} */
@@ -202,7 +202,10 @@ export default class OnuwGame {
 				resolve(undefined);
 			})();
 		});
+	}
 
+	async #vote() {
+		const playerIDarray = Array.from(Array(this.state.numPlayers).keys());
 		/**
 		 * @type {Map<number, number>}
 		 */
@@ -224,5 +227,14 @@ export default class OnuwGame {
 		this.comm.sendResults(voteArray, roleArray, winningTeams);
 
 		this.over = true;
+	}
+
+	async play() {
+		await this.#night();
+
+		this.comm.transitionToDay(this.state.boardState);
+
+		await this.#day();
+		await this.#vote();
 	}
 }
