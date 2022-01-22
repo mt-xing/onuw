@@ -18,7 +18,7 @@ export default class GameSetup {
 		if (game.isHost) {
 			return new HostSetup(socket, game, gameDom, completeCallback);
 		} else {
-			throw new Error('TODO');
+			return new ClientSetup(socket, game, gameDom, completeCallback);
 		}
 	}
 
@@ -101,6 +101,18 @@ class HostSetup extends GameSetup {
 	/** @type {OnuwGame} */
 	#game;
 
+	/** @type {HTMLButtonElement} */
+	#startBtn;
+
+	/** @type {HTMLElement} */
+	#counter;
+
+	/** @type {HTMLElement} */
+	#counterText1;
+
+	/** @type {HTMLElement} */
+	#counterText2;
+
 	/**
 	 * @param {Socket} socket
 	 * @param {OnuwGame} game
@@ -112,19 +124,24 @@ class HostSetup extends GameSetup {
 
 		this.#socket = socket;
 		this.#game = game;
-		this.#generateDom().forEach(gameDom.appendChild.bind(gameDom));
-	}
 
-	#generateDom() {
 		const header = document.createElement('header');
 		header.classList.add('setupHeader');
+		gameDom.appendChild(header);
 
-		const rolesLeftWrap = Dom.p('Select ');
-		const rolesLeft = document.createElement('strong');
-		rolesLeft.textContent = '?';
-		rolesLeftWrap.appendChild(rolesLeft);
-		rolesLeftWrap.appendChild(document.createTextNode(' more roles'));
-		rolesLeftWrap.appendChild(Dom.button('Begin Game', () => {}));
+		const rolesLeftWrap = document.createElement('p');
+		this.#counterText1 = Dom.span('Select ');
+		rolesLeftWrap.appendChild(this.#counterText1);
+		this.#counter = document.createElement('strong');
+		this.#counter.textContent = `${this.#game.numPlayers + CENTER_SIZE}`;
+		rolesLeftWrap.appendChild(this.#counter);
+		this.#counterText2 = Dom.span(' more roles');
+		rolesLeftWrap.appendChild(this.#counterText2);
+		this.#startBtn = Dom.button('Begin Game', () => {
+			this.#socket.emit('setupDone', '');
+		});
+		rolesLeftWrap.appendChild(this.#startBtn);
+
 		const inputsWrap = Dom.p('Seconds per role: ');
 		const role = Dom.input('number', undefined, `${DEFAULT_ROLE_TIME}`);
 		role.min = '1';
@@ -144,6 +161,8 @@ class HostSetup extends GameSetup {
 
 		const main = document.createElement('main');
 		main.classList.add('setup');
+		gameDom.appendChild(main);
+
 		const h2Wrap = document.createElement('div');
 		h2Wrap.classList.add('header');
 		h2Wrap.appendChild(Dom.h2('Unused Roles'));
@@ -174,8 +193,6 @@ class HostSetup extends GameSetup {
 				break;
 			}
 		}
-
-		return [header, main];
 	}
 
 	/**
@@ -185,19 +202,38 @@ class HostSetup extends GameSetup {
 	 */
 	#getButton(roleID, num) {
 		let active = false;
-		const b = Dom.button(roleToName[roleID], () => {
+		const textFooter = num !== 1 ? ` x${num}` : '';
+		const b = Dom.button(roleToName[roleID] + textFooter, () => {
 			if (!active) {
 				b.classList.add('active');
-				this.#game.addRole(roleID);
+				for (let i = 0; i < num; i++) {
+					this.#game.addRole(roleID);
+				}
 				this.#sendModdedRoles(Array(num).fill(roleID), []);
 			} else {
 				b.classList.remove('active');
-				this.#game.removeRole(roleID);
+				for (let i = 0; i < num; i++) {
+					this.#game.removeRole(roleID);
+				}
 				this.#sendModdedRoles([], Array(num).fill(roleID));
 			}
 			active = !active;
+			this.#computeRoles();
 		});
 		return b;
+	}
+
+	#computeRoles() {
+		const needed = this.#game.numPlayers + CENTER_SIZE;
+		if (needed === this.#game.numRoles) {
+			this.#startBtn.classList.add('active');
+			return;
+		}
+		this.#startBtn.classList.remove('active');
+		const delta = Math.abs(needed - this.#game.numRoles);
+		this.#counterText1.textContent = needed > this.#game.numRoles ? 'Select ' : 'Remove ';
+		this.#counter.textContent = `${delta}`;
+		this.#counterText2.textContent = delta === 1 ? ' more role' : 'more roles';
 	}
 
 	/**
@@ -252,5 +288,94 @@ class HostSetup extends GameSetup {
 			roleTime: this.#game.roleTime,
 			talkTime: this.#game.talkTime,
 		});
+	}
+}
+
+class ClientSetup extends GameSetup {
+	/** @type {Socket} */
+	#socket;
+
+	/** @type {OnuwGame} */
+	#game;
+
+	/** @type {HTMLElement} */
+	#roleTime;
+
+	/** @type {HTMLElement} */
+	#talkTime;
+
+	/**
+	 * @param {Socket} socket
+	 * @param {OnuwGame} game
+	 * @param {HTMLElement} gameDom
+	 * @param {(game: OnuwGame) => void} completeCallback
+	 */
+	constructor(socket, game, gameDom, completeCallback) {
+		super(socket, game, gameDom, completeCallback);
+
+		this.#socket = socket;
+		this.#game = game;
+
+		const header = document.createElement('header');
+		header.classList.add('setupHeader');
+		gameDom.appendChild(header);
+
+		const rolesLeftWrap = Dom.p('Waiting for host');
+		const inputsWrap = Dom.p('Seconds per role: ');
+		this.#roleTime = Dom.span(`${DEFAULT_ROLE_TIME}`);
+		inputsWrap.appendChild(this.#roleTime);
+		inputsWrap.appendChild(document.createTextNode('Minutes to discuss: '));
+		this.#talkTime = Dom.span(`${DEFAULT_TALK_TIME}`);
+		inputsWrap.appendChild(this.#talkTime);
+		header.appendChild(rolesLeftWrap);
+		header.appendChild(inputsWrap);
+
+		const main = document.createElement('main');
+		main.classList.add('setup');
+		gameDom.appendChild(main);
+
+		const h2Wrap = document.createElement('div');
+		h2Wrap.classList.add('header');
+		h2Wrap.appendChild(Dom.h2('Unused Roles'));
+		h2Wrap.appendChild(Dom.h2('Used Roles'));
+		main.appendChild(h2Wrap);
+
+		/**
+		 * @param {Roles} roleID
+		 * @param {number} number
+		 * @returns {HTMLElement}
+		 */
+		const getDiv = (roleID, number) => {
+			// <div class="role">Test Role</div>
+			const d = document.createElement('div');
+			d.classList.add('role');
+			d.textContent = (number !== 1 ? `${roleToName[roleID]} x${number}` : roleToName[roleID]);
+			return d;
+		};
+
+		for (const r in Roles) {
+			if (!Object.prototype.hasOwnProperty.call(Roles, r)) {
+				continue;
+			}
+
+			/** @type {Roles} */
+			// @ts-ignore
+			const roleID = Roles[/* @type {keyof typeof Roles} */(r)];
+			const specialRules = MultiRoles[roleID];
+
+			switch (specialRules?.type) {
+			case 'all':
+				main.appendChild(getDiv(roleID, specialRules.number));
+				break;
+			case 'up to':
+				for (let i = 0; i < specialRules.number; i++) {
+					main.appendChild(getDiv(roleID, 1));
+				}
+				break;
+			default:
+				main.appendChild(getDiv(roleID, 1));
+				break;
+			}
+		}
 	}
 }

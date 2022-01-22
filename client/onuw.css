@@ -297,6 +297,11 @@ button {
 	transition: transform 0.3s ease-in-out;
 }
 
+.setupHeader button.active {
+	transform:scale(1);
+	pointer-events: initial;
+}
+
 .setupHeader p:last-child {
 	line-height: 40px;
 
@@ -307,16 +312,19 @@ button {
 	text-align: right;
 }
 
-.setupHeader input {
+.setupHeader input, .setupHeader p:last-child span {
 	background: none;
 	color: white;
 	border: none;
-	border-bottom: 1px white solid;
 	margin-left: 10px;
 	font-size: 20px;
 	width: 50px;
 
 	text-align: left;
+}
+
+.setupHeader input {
+	border-bottom: 1px white solid;
 }
 
 .setup {

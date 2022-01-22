@@ -78,7 +78,7 @@ export default function showResults(outerDom, votes, playerRoles, winTeam, game,
 		const nameBox = document.createElement('td');
 		nameBox.appendChild(Dom.p(game.getPlayerName(pid)));
 		const voted = playerIDs.filter((p) => votes[p] === pid).map((p) => game.getPlayerName(p));
-		const vfb = Dom.p(`Voted for by: ${voted.length === 0 ? 'Nobody' : makeList(voted)}`);
+		const vfb = Dom.p(`Voted by: ${voted.length === 0 ? 'Nobody' : makeList(voted)}`);
 		nameBox.appendChild(vfb);
 		tr.appendChild(nameBox);
 
