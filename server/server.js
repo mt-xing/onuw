@@ -189,7 +189,14 @@ export default class OnuwServer {
 
 		// Kick off the game :D
 		setTimeout(() => {
-			newGame.play();
+			try {
+				newGame.play();
+			} catch (e) {
+				// eslint-disable-next-line no-console
+				console.error('Game terminated abnormally');
+				// eslint-disable-next-line no-console
+				console.error(e);
+			}
 		}, 10 * 1000); // 5 sec for role info to display, 5 sec to read
 	}
 
