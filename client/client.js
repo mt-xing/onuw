@@ -13,7 +13,7 @@ if (gameDom === null) {
 }
 const c = new Connections(socket, gameDom);
 socket.on('setupStart', () => {
-	const s = new GameSetup(socket, c.game, gameDom, (game) => {
+	const s = GameSetup.construct(socket, c.game, gameDom, (game) => {
 		const g = new Gameplay(socket, game, gameDom);
 	});
 });

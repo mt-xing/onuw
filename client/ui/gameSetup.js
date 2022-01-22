@@ -4,42 +4,28 @@ import OnuwGame from '../game.js';
 import { MultiRoles, Roles, roleToName } from '../../game/role.js';
 import { DEFAULT_ROLE_TIME, DEFAULT_TALK_TIME } from '../../game/constants.js';
 import { CENTER_SIZE } from '../../game/state.js';
+import { assertUnreachable } from '../../game/utils.js';
 
 export default class GameSetup {
 	/**
-	 * @type {Socket}
+	 * @param {Socket} socket
+	 * @param {OnuwGame} game
+	 * @param {HTMLElement} gameDom
+	 * @param {(game: OnuwGame) => void} completeCallback
+	 * @returns {GameSetup}
 	 */
-	#socket;
+	static construct(socket, game, gameDom, completeCallback) {
+		if (game.isHost) {
+			return new HostSetup(socket, game, gameDom, completeCallback);
+		} else {
+			throw new Error('TODO');
+		}
+	}
 
 	/**
 	  * @type {OnuwGame}
 	  */
 	#game;
-
-	/**
-	  * @type {HTMLElement}
-	  */
-	#dom;
-
-	/**
-	 * @type {Map<Roles, HTMLElement[]>}
-	 */
-	#unusedRoles;
-
-	/**
-	 * @type {Map<Roles, HTMLElement[]>}
-	 */
-	#usedRoles;
-
-	/**
-	 * @type {HTMLElement}
-	 */
-	#roleTime;
-
-	/**
-	 * @type {HTMLElement}
-	 */
-	#talkTime;
 
 	/**
 	 * Number of things waiting on before we can start
@@ -54,297 +40,29 @@ export default class GameSetup {
 	#allDone;
 
 	/**
+	 * ABSTRACT CLASS
+	 *
 	 * @param {Socket} socket
 	 * @param {OnuwGame} game
 	 * @param {HTMLElement} gameDom
 	 * @param {(game: OnuwGame) => void} completeCallback
 	 */
 	constructor(socket, game, gameDom, completeCallback) {
-		this.#dom = gameDom;
-		this.#dom.textContent = null;
-		this.#socket = socket;
+		if (this.constructor === GameSetup) {
+			throw new Error('GameSetup is an abstract class');
+		}
+		// eslint-disable-next-line no-param-reassign
+		gameDom.textContent = null;
 		this.#game = game;
 		this.#game.restart();
 
-		this.#unusedRoles = new Map();
-		this.#usedRoles = new Map();
-
 		this.#waiting = 2;
 		this.#allDone = completeCallback;
-
-		this.#dom.appendChild(Dom.p(game.isHost ? 'Select roles and set time limits' : 'Wait for game setup'));
-		this.#generateRolesDom();
-		this.#roleTime = Dom.p(`Seconds per role: ${DEFAULT_ROLE_TIME}`);
-		this.#talkTime = Dom.p(`Minutes to discuss: ${DEFAULT_TALK_TIME}`);
-		this.#dom.appendChild(this.#roleTime);
-		this.#dom.appendChild(this.#talkTime);
-
-		if (!game.isHost) {
-			this.#socket.off('setupInfo');
-			this.#socket.on('setupInfo', (msg) => {
-				/** @type {{roleAdd: Roles[], roleSub: Roles[], roleTime: number, talkTime: number}} */
-				const {
-					roleAdd, roleSub, roleTime, talkTime,
-				} = JSON.parse(msg);
-				roleAdd.forEach(this.addRole.bind(this));
-				roleSub.forEach(this.removeRole.bind(this));
-				this.#changeTimes(roleTime, talkTime);
-			});
-		} else {
-			this.#generateTimeDom();
-			this.#dom.appendChild(Dom.button('START THE GAME :D', this.#startGame.bind(this)));
-		}
 
 		socket.off('setupFinal');
 		socket.on('setupFinal', this.#finalSetup.bind(this));
 		socket.off('setupRole');
 		socket.on('setupRole', this.#receiveRole.bind(this));
-	}
-
-	#generateRolesDom() {
-		const unused = document.createElement('div');
-		unused.appendChild(Dom.p('Unused Roles:'));
-		const used = document.createElement('div');
-		used.appendChild(Dom.p('Selected Roles:'));
-		this.#dom.appendChild(unused);
-		this.#dom.appendChild(used);
-
-		/** @type {keyof typeof Roles} */
-		let role;
-		for (role in Roles) {
-			if (!Object.prototype.hasOwnProperty.call(Roles, role)) {
-				continue;
-			}
-			const roleID = Roles[role];
-
-			const specialRules = MultiRoles[roleID];
-
-			/**
-			 * @param {string} text
-			 * @param {(ev: MouseEvent) => void} fn
-			 * @returns {HTMLElement}
-			 */
-			const getBtn = (text, fn) => {
-				if (this.#game.isHost) {
-					const b = Dom.button(text, fn, 'classSelect');
-					return b;
-				}
-				return Dom.p(text, 'classSelect');
-			};
-
-			if (specialRules === undefined || specialRules.type === 'up to') {
-				/** @type {HTMLElement[]} */
-				const uu = [];
-				/** @type {HTMLElement[]} */
-				const u = [];
-				for (let i = 0; i < (specialRules === undefined ? 1 : specialRules.number); i++) {
-					const b = getBtn(roleToName[roleID], this.addRole.bind(this, roleID));
-					unused.appendChild(b);
-					uu.push(b);
-					const b2 = getBtn(roleToName[roleID], this.removeRole.bind(this, roleID));
-					used.appendChild(b2);
-					b2.style.display = 'none';
-					u.push(b2);
-				}
-				this.#unusedRoles.set(roleID, uu);
-				this.#usedRoles.set(roleID, u);
-			} else if (specialRules.type === 'all') {
-				const t = `${roleToName[roleID]} x${specialRules.number}`;
-				const b = getBtn(t, this.addRole.bind(this, roleID));
-				unused.appendChild(b);
-				this.#unusedRoles.set(roleID, [b]);
-				const b2 = getBtn(t, this.removeRole.bind(this, roleID));
-				used.appendChild(b2);
-				b2.style.display = 'none';
-				this.#usedRoles.set(roleID, [b2]);
-			}
-		}
-	}
-
-	#generateTimeDom() {
-		if (!this.#game.isHost) {
-			throw new Error();
-		}
-		this.#roleTime.textContent = 'Seconds per role: ';
-		const role = Dom.input('number', undefined, `${DEFAULT_ROLE_TIME}`);
-		role.min = '1';
-		role.step = '1';
-		role.max = '60';
-		this.#roleTime.appendChild(role);
-		role.addEventListener(
-			'change',
-			/**
-			 * @param {Event} ev
-			 */
-			(ev) => {
-				this.#game.roleTime = parseInt(
-					/** @type {HTMLInputElement} */(ev.currentTarget).value,
-					10,
-				);
-				if (this.#game.roleTime < 1) {
-					this.#game.roleTime = 1;
-					// eslint-disable-next-line no-param-reassign
-					/** @type {HTMLInputElement} */(ev.currentTarget).value = '1';
-				}
-				this.#socket.send('setupInfo', {
-					roleAdd: [],
-					roleSub: [],
-					roleTime: this.#game.roleTime,
-					talkTime: this.#game.talkTime,
-				});
-			},
-		);
-
-		this.#talkTime.textContent = 'Minutes to discuss: ';
-		const talk = Dom.input('number', undefined, `${DEFAULT_TALK_TIME}`);
-		talk.min = '1';
-		talk.step = '1';
-		talk.max = '20';
-		this.#talkTime.appendChild(talk);
-		talk.addEventListener(
-			'change',
-			/**
-			 * @param {Event} ev
-			 */
-			(ev) => {
-				this.#game.talkTime = parseInt(
-					/** @type {HTMLInputElement} */(ev.currentTarget).value,
-					10,
-				) * 60;
-				if (this.#game.talkTime < 1) {
-					this.#game.talkTime = 60;
-					// eslint-disable-next-line no-param-reassign
-					/** @type {HTMLInputElement} */(ev.currentTarget).value = '1';
-				}
-				this.#socket.send('setupInfo', {
-					roleAdd: [],
-					roleSub: [],
-					roleTime: this.#game.roleTime,
-					talkTime: this.#game.talkTime,
-				});
-			},
-		);
-	}
-
-	/**
-	 * Add a role to play
-	 *
-	 * Will update DOM and game state
-	 *
-	 * Note that for multi-roles with 'all' (the Mason),
-	 * this function will not update the DOM after the first mason has
-	 * already been changed (as there should only be one mason button).
-	 * For multi-roles, calling this once as host is enough to broadcast all role changes.
-	 * @param {Roles} rid
-	 */
-	addRole(rid) {
-		const multi = MultiRoles[rid];
-		const isMulti = multi !== undefined && multi.type === 'all';
-		if (this.#game.isHost) {
-			this.#socket.send('setupInfo', {
-				roleAdd: isMulti ? Array(multi.number).fill(rid) : [rid],
-				roleSub: [],
-				roleTime: this.#game.roleTime,
-				talkTime: this.#game.talkTime,
-			});
-		}
-
-		const n = this.#game.numRole(rid);
-		this.#game.addRole(rid);
-		if (this.#game.isHost && isMulti) {
-			for (let i = 1; i < multi.number; i++) {
-				this.#game.addRole(rid);
-			}
-		}
-
-		const d = this.#unusedRoles.get(rid);
-		if (d === undefined) {
-			// eslint-disable-next-line no-console
-			console.error(`ERROR Could not add role ${rid}`);
-			return;
-		}
-		if (isMulti) {
-			if (n >= d.length) {
-				return;
-			}
-		}
-		d[n].style.display = 'none';
-
-		const u = this.#usedRoles.get(rid);
-		if (u === undefined) {
-			// eslint-disable-next-line no-console
-			console.error(`ERROR Could not add role ${rid}`);
-			return;
-		}
-		u[n].style.display = '';
-	}
-
-	/**
-	 * @param {Roles} rid
-	 */
-	removeRole(rid) {
-		const multi = MultiRoles[rid];
-		const isMulti = multi !== undefined && multi.type === 'all';
-		if (this.#game.isHost) {
-			this.#socket.send('setupInfo', {
-				roleAdd: [],
-				roleSub: isMulti ? Array(multi.number).fill(rid) : [rid],
-				roleTime: this.#game.roleTime,
-				talkTime: this.#game.talkTime,
-			});
-		}
-
-		this.#game.removeRole(rid);
-		if (this.#game.isHost && isMulti) {
-			for (let i = 1; i < multi.number; i++) {
-				this.#game.removeRole(rid);
-			}
-		}
-		const n = this.#game.numRole(rid);
-
-		const d = this.#unusedRoles.get(rid);
-		if (d === undefined) {
-			// eslint-disable-next-line no-console
-			console.error(`ERROR Could not add role ${rid}`);
-			return;
-		}
-
-		if (isMulti && n >= d.length) {
-			return;
-		}
-
-		d[n].style.display = '';
-
-		const u = this.#usedRoles.get(rid);
-		if (u === undefined) {
-			// eslint-disable-next-line no-console
-			console.error(`ERROR Could not add role ${rid}`);
-			return;
-		}
-		u[n].style.display = 'none';
-	}
-
-	/**
-	 * Only to be called as non-host
-	 * @param {number} roleTime Seconds
-	 * @param {number} talkTime Seconds
-	 */
-	#changeTimes(roleTime, talkTime) {
-		if (this.#game.isHost) { throw new Error(); }
-		this.#roleTime.textContent = `Seconds per role: ${roleTime}`;
-		this.#talkTime.textContent = `Minutes to discuss: ${talkTime / 60}`;
-		this.#game.roleTime = roleTime;
-		this.#game.talkTime = talkTime;
-	}
-
-	#startGame() {
-		if (!this.#game.isHost) { throw new Error(); }
-		if (this.#game.numRoles - CENTER_SIZE !== this.#game.numPlayers) {
-			// eslint-disable-next-line no-alert
-			alert(`The number of roles must equal number of players plus ${CENTER_SIZE}`);
-			return;
-		}
-		this.#socket.emit('setupDone', '');
 	}
 
 	/**
@@ -373,5 +91,166 @@ export default class GameSetup {
 		if (this.#waiting === 0) {
 			this.#allDone(this.#game);
 		}
+	}
+}
+
+class HostSetup extends GameSetup {
+	/** @type {Socket} */
+	#socket;
+
+	/** @type {OnuwGame} */
+	#game;
+
+	/**
+	 * @param {Socket} socket
+	 * @param {OnuwGame} game
+	 * @param {HTMLElement} gameDom
+	 * @param {(game: OnuwGame) => void} completeCallback
+	 */
+	constructor(socket, game, gameDom, completeCallback) {
+		super(socket, game, gameDom, completeCallback);
+
+		this.#socket = socket;
+		this.#game = game;
+		this.#generateDom().forEach(gameDom.appendChild.bind(gameDom));
+	}
+
+	#generateDom() {
+		const header = document.createElement('header');
+		header.classList.add('setupHeader');
+
+		const rolesLeftWrap = Dom.p('Select ');
+		const rolesLeft = document.createElement('strong');
+		rolesLeft.textContent = '?';
+		rolesLeftWrap.appendChild(rolesLeft);
+		rolesLeftWrap.appendChild(document.createTextNode(' more roles'));
+		rolesLeftWrap.appendChild(Dom.button('Begin Game', () => {}));
+		const inputsWrap = Dom.p('Seconds per role: ');
+		const role = Dom.input('number', undefined, `${DEFAULT_ROLE_TIME}`);
+		role.min = '1';
+		role.step = '1';
+		role.max = '60';
+		role.addEventListener('change', this.#changeRoleTime.bind(this));
+		inputsWrap.appendChild(role);
+		inputsWrap.appendChild(document.createTextNode('Minutes to discuss: '));
+		const talk = Dom.input('number', undefined, `${DEFAULT_TALK_TIME}`);
+		talk.min = '1';
+		talk.step = '1';
+		talk.max = '30';
+		talk.addEventListener('change', this.#changeTalkTime.bind(this));
+		inputsWrap.appendChild(talk);
+		header.appendChild(rolesLeftWrap);
+		header.appendChild(inputsWrap);
+
+		const main = document.createElement('main');
+		main.classList.add('setup');
+		const h2Wrap = document.createElement('div');
+		h2Wrap.classList.add('header');
+		h2Wrap.appendChild(Dom.h2('Unused Roles'));
+		h2Wrap.appendChild(Dom.h2('Used Roles'));
+		main.appendChild(h2Wrap);
+
+		for (const r in Roles) {
+			if (!Object.prototype.hasOwnProperty.call(Roles, r)) {
+				continue;
+			}
+
+			/** @type {Roles} */
+			// @ts-ignore
+			const roleID = Roles[/* @type {keyof typeof Roles} */(r)];
+			const specialRules = MultiRoles[roleID];
+
+			switch (specialRules?.type) {
+			case 'all':
+				main.appendChild(this.#getButton(roleID, specialRules.number));
+				break;
+			case 'up to':
+				for (let i = 0; i < specialRules.number; i++) {
+					main.appendChild(this.#getButton(roleID, 1));
+				}
+				break;
+			default:
+				main.appendChild(this.#getButton(roleID, 1));
+				break;
+			}
+		}
+
+		return [header, main];
+	}
+
+	/**
+	 * @param {Roles} roleID
+	 * @param {number} num
+	 * @returns {HTMLButtonElement}
+	 */
+	#getButton(roleID, num) {
+		let active = false;
+		const b = Dom.button(roleToName[roleID], () => {
+			if (!active) {
+				b.classList.add('active');
+				this.#game.addRole(roleID);
+				this.#sendModdedRoles(Array(num).fill(roleID), []);
+			} else {
+				b.classList.remove('active');
+				this.#game.removeRole(roleID);
+				this.#sendModdedRoles([], Array(num).fill(roleID));
+			}
+			active = !active;
+		});
+		return b;
+	}
+
+	/**
+	 * @param {Roles[]} add
+	 * @param {Roles[]} sub
+	 */
+	#sendModdedRoles(add, sub) {
+		this.#socket.send('setupInfo', {
+			roleAdd: add,
+			roleSub: sub,
+			roleTime: this.#game.roleTime,
+			talkTime: this.#game.talkTime,
+		});
+	}
+
+	/**
+	 * @param {Event} ev
+	 */
+	#changeRoleTime(ev) {
+		this.#game.roleTime = parseInt(
+			/** @type {HTMLInputElement} */(ev.currentTarget).value,
+			10,
+		);
+		if (this.#game.roleTime < 1) {
+			this.#game.roleTime = 1;
+			// eslint-disable-next-line no-param-reassign
+			/** @type {HTMLInputElement} */(ev.currentTarget).value = '1';
+		}
+		this.#sendTimes();
+	}
+
+	/**
+	 * @param {Event} ev
+	 */
+	#changeTalkTime(ev) {
+		this.#game.talkTime = parseInt(
+			/** @type {HTMLInputElement} */(ev.currentTarget).value,
+			10,
+		) * 60;
+		if (this.#game.talkTime < 1) {
+			this.#game.talkTime = 60;
+			// eslint-disable-next-line no-param-reassign
+			/** @type {HTMLInputElement} */(ev.currentTarget).value = '1';
+		}
+		this.#sendTimes();
+	}
+
+	#sendTimes() {
+		this.#socket.send('setupInfo', {
+			roleAdd: [],
+			roleSub: [],
+			roleTime: this.#game.roleTime,
+			talkTime: this.#game.talkTime,
+		});
 	}
 }
