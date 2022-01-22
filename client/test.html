@@ -11,52 +11,27 @@
 		</style>
 	</head>
 	<body>
-		<div id="game" style="overflow-y:auto;">
-			<main class="connection">
-				<h1>Host Game</h1>
-				<p>Hi there! What's your name?</p>
-				<input type="text" placeholder="Name" maxlength="35" />
-				<button>Continue</button>
-			</main>
-			<main class="connection" style="margin-top: 100vh;">
-				<h1>Join Game</h1>
-				<p>Welcome! We'll need your name and game ID.</p>
-				<input type="text" placeholder="Name" maxlength="35" />
-				<input type="text" placeholder="Game ID" minlength="5" maxlength="5" />
-				<p>Not sure what this is? Ask the person hosting the game.</p>
-				<button>Join</button>
-				<p class="errorCode">Sorry, that game code doesn't exist.</p>
-			</main>
-			<main class="connection" style="margin-top: 200vh;">
-				<div>
-					<section>
-						<p>Here's your game ID:</p>
-						<code>abc12</code>
-						<p>Give this to the other players.</p>
-					</section>
-					<section>
-						<h2>Players</h2>
-						<table>
-							<tr><td>Abby</td></tr>
-							<tr><td>Bobby</td></tr>
-							<tr><td>Cindy</td></tr>
-							<tr><td>Daniel put in a really long name for some reason and it may not fit in the box</td></tr>
-						</table>
-						<p>Can accommodate 9 more players</p>
-					</section>
+		<div id="game">
+			<header class="setupHeader">
+				<p>Select <strong>15</strong> more roles<button>Begin Game</button></p>
+				<p>
+					Seconds per role: <input type="number" min="1" max="60" step="1" value="15" />
+					Minutes to discuss: <input type="number" min="1" max="30" step="1" value="5" />
+				</p>
+			</header>
+			<main class="setup">
+				<div class="header">
+					<h2>Unused Roles</h2>
+					<h2>Used Roles</h2>
 				</div>
-				<button disabled>Start</button>
-			</main>
-			<main class="connection" style="margin-top: 300vh;">
-				<h2>Players</h2>
-				<table>
-					<tr><td>Abby</td></tr>
-					<tr><td>Bobby</td></tr>
-					<tr><td>Cindy</td></tr>
-					<tr><td>Daniel put in a really long name for some reason and it may not fit in the box</td></tr>
-				</table>
-				<p>Successfully joined <code>abc12</code></p>
-				<p>Waiting for the host to start your game.</p>
+				<button>Werewolf</button>
+				<button>Werewolf</button>
+				<button class="active">Mystic Wolf</button>
+				<button>Dream Wolf</button>
+				<button>Sentinel</button>
+				<button>Seer</button>
+				<button>Apprentice Seer</button>
+				<div class="role">Test Role</div>
 			</main>
 		</div>
 	</body>
