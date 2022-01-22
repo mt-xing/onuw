@@ -46,7 +46,7 @@ export class Werewolf extends Role {
 	constructor() {
 		super(
 			Roles.WEREWOLF,
-			'You\'re evil',
+			'The bad guy',
 			'You will see who else started as a werewolf. Work together to fool the villagers.',
 			[2, 0],
 		);
@@ -81,7 +81,7 @@ export class MysticWolf extends Role {
 	constructor() {
 		super(
 			Roles.MYSTIC_WOLF,
-			'You\'re evil and transcendent',
+			'The transcendent bad guy',
 			'You will see the other werewolves. You may also look at another player\'s card to help you fool the villagers.',
 			[2, 1],
 		);
@@ -120,7 +120,7 @@ export class DreamWolf extends Role {
 	constructor() {
 		super(
 			Roles.DREAM_WOLF,
-			'You\'re evil but sleepy',
+			'The sleepy bad guy',
 			'You did not wake up in time for the werewolf roll call. You do not know the other werewolves (but they know you).',
 			null,
 		);
@@ -331,7 +331,7 @@ export class Witch extends Role {
 	constructor() {
 		super(
 			Roles.WITCH,
-			'Does some role magic or something, idk',
+			'Does some magic or something, idk',
 			'You may view one role from the center. If you do, you must swap it with any player of your choice.',
 			[6, 2],
 		);
