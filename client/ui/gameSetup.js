@@ -292,9 +292,6 @@ class HostSetup extends GameSetup {
 }
 
 class ClientSetup extends GameSetup {
-	/** @type {Socket} */
-	#socket;
-
 	/** @type {OnuwGame} */
 	#game;
 
@@ -304,6 +301,12 @@ class ClientSetup extends GameSetup {
 	/** @type {HTMLElement} */
 	#talkTime;
 
+	/** @type {Map<Roles, HTMLElement[]>} */
+	#unused;
+
+	/** @type {Map<Roles, HTMLElement[]>} */
+	#used;
+
 	/**
 	 * @param {Socket} socket
 	 * @param {OnuwGame} game
@@ -312,8 +315,6 @@ class ClientSetup extends GameSetup {
 	 */
 	constructor(socket, game, gameDom, completeCallback) {
 		super(socket, game, gameDom, completeCallback);
-
-		this.#socket = socket;
 		this.#game = game;
 
 		const header = document.createElement('header');
@@ -340,13 +341,15 @@ class ClientSetup extends GameSetup {
 		h2Wrap.appendChild(Dom.h2('Used Roles'));
 		main.appendChild(h2Wrap);
 
+		this.#unused = new Map();
+		this.#used = new Map();
+
 		/**
 		 * @param {Roles} roleID
 		 * @param {number} number
 		 * @returns {HTMLElement}
 		 */
 		const getDiv = (roleID, number) => {
-			// <div class="role">Test Role</div>
 			const d = document.createElement('div');
 			d.classList.add('role');
 			d.textContent = (number !== 1 ? `${roleToName[roleID]} x${number}` : roleToName[roleID]);
@@ -363,19 +366,69 @@ class ClientSetup extends GameSetup {
 			const roleID = Roles[/* @type {keyof typeof Roles} */(r)];
 			const specialRules = MultiRoles[roleID];
 
+			this.#unused.set(roleID, []);
+			this.#used.set(roleID, []);
+
 			switch (specialRules?.type) {
-			case 'all':
-				main.appendChild(getDiv(roleID, specialRules.number));
-				break;
-			case 'up to':
-				for (let i = 0; i < specialRules.number; i++) {
-					main.appendChild(getDiv(roleID, 1));
-				}
-				break;
-			default:
-				main.appendChild(getDiv(roleID, 1));
+			case 'all': {
+				const d = getDiv(roleID, specialRules.number);
+				this.#unused.get(roleID)?.push(d);
+				main.appendChild(d);
 				break;
 			}
+			case 'up to':
+				for (let i = 0; i < specialRules.number; i++) {
+					const d = getDiv(roleID, 1);
+					this.#unused.get(roleID)?.push(d);
+					main.appendChild(d);
+				}
+				break;
+			default: {
+				const d = getDiv(roleID, 1);
+				this.#unused.get(roleID)?.push(d);
+				main.appendChild(d);
+				break;
+			}
+			}
 		}
+
+		socket.on('setupInfo', this.#processInfo.bind(this));
+	}
+
+	/**
+	 * @param {string} raw
+	 */
+	#processInfo(raw) {
+		/**
+		 * @type {{roleAdd: Roles[], roleSub: Roles[], roleTime: number, talkTime: number}}
+		 */
+		const {
+			roleAdd, roleSub, roleTime, talkTime,
+		} = JSON.parse(raw);
+
+		this.#game.talkTime = talkTime;
+		this.#game.roleTime = roleTime;
+		this.#roleTime.textContent = `${roleTime}`;
+		this.#talkTime.textContent = `${talkTime / 60}`;
+
+		roleAdd.forEach(this.#game.addRole.bind(this.#game));
+		roleSub.forEach(this.#game.removeRole.bind(this.#game));
+
+		roleAdd.forEach((r) => {
+			const all = this.#unused.get(r);
+			if (all === undefined) { throw new Error(`Invalid role ${r}`); }
+			const dom = all.pop();
+			if (dom === undefined) { return; }
+			this.#used.get(r)?.push(dom);
+			dom.classList.add('active');
+		});
+		roleSub.forEach((r) => {
+			const all = this.#used.get(r);
+			if (all === undefined) { throw new Error(`Invalid role ${r}`); }
+			const dom = all.pop();
+			if (dom === undefined) { return; }
+			this.#unused.get(r)?.push(dom);
+			dom.classList.remove('active');
+		});
 	}
 }
