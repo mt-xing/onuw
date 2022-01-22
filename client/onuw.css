@@ -54,7 +54,7 @@ button {
 	margin-top: 10px;
 }
 
-.intro button, .connection button {
+.intro button, .connection button, .disconnect button {
 	background: white;
 	padding: 20px 40px;
 	margin: 10px;
@@ -67,11 +67,11 @@ button {
 	transition: box-shadow 0.2s ease-in-out, color 0.5s ease-in-out, background 0.5s ease-in-out;
 }
 
-.intro button:hover, .intro button:focus, .connection button:hover, .connection button:focus {
+.intro button:hover, .intro button:focus, .connection button:hover, .connection button:focus, .disconnect button:hover, .disconnect button:focus {
 	box-shadow: #000088 0 0 10px 5px;
 }
 
-.intro button:active, .connection button:active {
+.intro button:active, .connection button:active, .disconnect button:active {
 	transition: box-shadow 0.1s ease-in-out;
 	box-shadow: white 0 0 10px 0;
 }
@@ -906,6 +906,26 @@ button {
 }
 
 /* #endregion */
+
+.disconnect {
+	position: absolute;
+	left: 0; top: 0;
+	width: 100%; height: 100%;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+
+	background: rgba(0, 0, 0, 0.8);
+	color: white;
+
+	transition: transform 1s cubic-bezier(0.165, 0.840, 0.440, 1.000);
+	transform: translateX(-100vw);
+
+	font-size: 125%;
+}
 
 @media(max-width: 920px) {
 	

@@ -1,5 +1,6 @@
 import Socket from './socket.js';
 import Connections from './ui/connections.js';
+import disconnect from './ui/disconnect.js';
 import Gameplay from './ui/gameplay.js';
 import GameSetup from './ui/gameSetup.js';
 
@@ -18,4 +19,10 @@ socket.on('setupStart', () => {
 	GameSetup.construct(socket, c.game, gameDom, (game) => {
 		const g = new Gameplay(socket, game, gameDom);
 	});
+});
+socket.on('disconn', () => {
+	disconnect(gameDom);
+});
+socket.on('disconnect', () => {
+	disconnect(gameDom);
 });
