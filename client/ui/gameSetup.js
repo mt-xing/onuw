@@ -151,7 +151,7 @@ class HostSetup extends GameSetup {
 
 		const inputsWrap = Dom.p('Seconds per role: ');
 		const role = Dom.input('number', undefined, `${DEFAULT_ROLE_TIME}`);
-		role.min = '1';
+		role.min = '5';
 		role.step = '1';
 		role.max = '60';
 		role.addEventListener('change', this.#changeRoleTime.bind(this));
