@@ -86,18 +86,15 @@ export default class State {
 	}
 
 	/**
-	 * Returns an array of all unique waking roles in play in wake order.
+	 * Returns an array of all waking roles.
+	 *
+	 * May include duplicates
 	 */
 	get allWakingRoles() {
 		return this.#players
 			.map((p) => p.currentRole)
 			.concat(this.#centerRoles)
-			.filter((x) => x.wakeOrder !== null)
-			.sort((a, b) => Role.sortWakeOrder(
-				a.wakeOrder ?? [],
-				b.wakeOrder ?? [],
-			))
-			.filter((x, i, a) => i === 0 || x.role !== a[i - 1].role);
+			.filter((x) => x.wakeOrder !== null);
 	}
 
 	get boardState() {
@@ -107,9 +104,9 @@ export default class State {
 			const role = this.getPlayer(pid).currentRole;
 			const playerMods = role.modifiers;
 			if (playerMods.has(Modifiers.SENTINEL)) {
-				boardInfo[pid] = 'This player\'s role was guarded by the sentinel';
+				boardInfo[pid] = 'Guarded by the sentinel';
 			} else if (playerMods.has(Modifiers.REVEALER)) {
-				boardInfo[pid] = `This player has been revealed to be a ${role.roleName}`;
+				boardInfo[pid] = `Revealed to be a ${role.roleName}`;
 			}
 		}
 		return boardInfo;

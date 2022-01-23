@@ -580,6 +580,8 @@ button {
 	display: inline-flex;
 	flex-direction: column;
 	border-right: 1px black solid;
+
+	overflow-y: auto;
 }
 
 .boardWrap div {
@@ -593,6 +595,7 @@ button {
 	transition: background 0.5s ease-in-out, color 0.5s ease-in-out;
 
 	position: relative;
+	min-height: 100px;
 }
 
 .boardWrap p {
