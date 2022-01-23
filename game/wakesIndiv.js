@@ -20,15 +20,6 @@ function getAllWerewolves(state) {
 	return wolves;
 }
 
-/**
- * Convert a list of werewolf names to a string describing all the werewolves.
- * @param {string[]} wolves
- * @returns {string}
- */
-function werewolfString(wolves) {
-	return `The werewolves are: ${makeList(wolves)}`;
-}
-
 export class WerewolfWake extends WakeOrder {
 	constructor() {
 		super([2, 0], 'Werewolves');
@@ -59,15 +50,16 @@ export class WerewolfWake extends WakeOrder {
 	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		const wolves = getAllWerewolves(state);
-		giveInfo(werewolfString(wolves));
+		giveInfo(`The werewolves are: ${makeList(wolves)}`);
 		const dream = WerewolfWake.#getDreamWolf(state);
 		if (dream !== null) {
 			giveInfo(`However, ${dream} is a dream wolf`);
 		}
 		if (wolves.length === 1) {
+			giveInfo('Since you are the only werewolf, you may view a role from the center');
 			const pick = await pickCenters(1);
 			if (pick.length === 1) {
-				giveInfo(`The center card you picked was ${state.getCenter(pick[0]).roleName}`);
+				giveInfo(`The center role you picked was ${state.getCenter(pick[0]).roleName}`);
 			}
 		}
 	}
@@ -88,9 +80,10 @@ export class MysticWolfWake extends WakeOrder {
 	 * @param {number} id Current player ID
 	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
+		giveInfo('You may view one other player\'s role');
 		const view = await pickPlayers(1, false);
 		if (view.length === 1) {
-			giveInfo(`The card ${state.getName(view[0])} has is ${state.getPlayer(view[0]).currentRole.roleName}`);
+			giveInfo(`The role ${state.getName(view[0])} has is ${state.getPlayer(view[0]).currentRole.roleName}`);
 		}
 	}
 }
@@ -112,7 +105,7 @@ export class MinionWake extends WakeOrder {
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		const ww = getAllWerewolves(state);
 		if (ww.length > 0) {
-			giveInfo(werewolfString(getAllWerewolves(state)));
+			giveInfo(`The werewolves are: ${makeList(ww)}`);
 		} else {
 			giveInfo('There are no werewolves.');
 			giveInfo('If there are still no werewolves by the end of the night, then you must convince the villagers to kill a villager besides yourself to win.');
@@ -137,6 +130,7 @@ export class SentinelWake extends WakeOrder {
 	 * @param {number} id Current player ID
 	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
+		giveInfo('You may pick one other player to protect');
 		const protect = await pickPlayers(1, false);
 		if (protect.length === 1) {
 			const i = protect[0];
@@ -189,20 +183,20 @@ export class SeerWake extends WakeOrder {
 	 * @param {number} id Current player ID
 	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
-		const choice = await pickChoice(['View two center cards', 'View one other player\'s card']);
+		const choice = await pickChoice(['View two center roles', 'View one other player\'s role']);
 		if (choice === 0) {
 			// View two center
 			const cards = await pickCenters(2);
 			if (cards.length !== 0) {
 				const roles = cards.map((c) => state.getCenter(c).roleName);
-				giveInfo(`The cards you selected in the center were ${makeList(roles)}`);
+				giveInfo(`The roles you selected in the center were ${makeList(roles)}`);
 			}
 		} else if (choice === 1) {
 			// View one other player
 			const card = await pickPlayers(1, false);
 			if (card.length === 1) {
 				const pid = card[0];
-				giveInfo(`The card that ${state.getName(pid)} has is ${state.getPlayer(pid).currentRole.roleName}`);
+				giveInfo(`The role that ${state.getName(pid)} has is ${state.getPlayer(pid).currentRole.roleName}`);
 			}
 		}
 	}
@@ -223,10 +217,11 @@ export class ApprenticeSeerWake extends WakeOrder {
 	 * @param {number} id Current player ID
 	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
+		giveInfo('You may view one role from the center');
 		const cards = await pickCenters(1);
 		if (pickCenters.length === 1) {
 			const role = state.getCenter(cards[0]);
-			giveInfo(`The card you selected in the center was ${role.roleName}`);
+			giveInfo(`The role you selected in the center was ${role.roleName}`);
 		}
 	}
 }
@@ -251,6 +246,7 @@ export class RobberWake extends WakeOrder {
 			return;
 		}
 
+		giveInfo('You may choose to steal another player\'s role');
 		const cards = await pickPlayers(1, false);
 		if (cards.length === 1) {
 			const swapID = cards[0];
@@ -275,6 +271,7 @@ export class WitchWake extends WakeOrder {
 	 * @param {number} id Current player ID
 	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
+		giveInfo('You may choose to view a center role. If you do, you must swap it with another player.');
 		const cards = await pickCenters(1);
 		if (cards.length === 1) {
 			const centerCard = cards[0];
@@ -287,7 +284,7 @@ export class WitchWake extends WakeOrder {
 				}
 				return a;
 			})();
-			giveInfo(`The center card was ${state.getCenter(centerCard).roleName}. You must swap it with a player. If you do not select in time, it will be swapped with the following randomly selected player: ${state.getName(fallbackPlayer)}`);
+			giveInfo(`The center role was ${state.getCenter(centerCard).roleName}. You must swap it with a player. If you do not select in time, it will be swapped with the following randomly selected player: ${state.getName(fallbackPlayer)}`);
 			const selectedPlayer = await pickPlayers(1, true);
 			const actualPlayer = selectedPlayer.length === 1 ? selectedPlayer[0] : fallbackPlayer;
 			state.swapCenter(actualPlayer, centerCard);
@@ -310,6 +307,7 @@ export class TroublemakerWake extends WakeOrder {
 	 * @param {number} id Current player ID
 	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
+		giveInfo('You may swap the roles of two other players');
 		const cards = await pickPlayers(2, false);
 		if (cards.length === 2) {
 			state.swap(cards[0], cards[1]);
@@ -337,6 +335,7 @@ export class DrunkWake extends WakeOrder {
 			return;
 		}
 
+		giveInfo('You must select a center role to swap with your own. If you do not select in time, one will be selected for you.');
 		const cards = await pickCenters(1);
 		const card = cards.length === 1 ? cards[0] : Math.floor(Math.random() * CENTER_SIZE);
 		state.swapCenter(id, card);
@@ -381,6 +380,7 @@ export class RevealerWake extends WakeOrder {
 	 * @param {number} id Current player ID
 	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
+		giveInfo('You may select one player\'s role to reveal.');
 		const cards = await pickPlayers(1, false);
 		if (cards.length === 1) {
 			const pid = cards[0];

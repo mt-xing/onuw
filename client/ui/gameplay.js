@@ -149,7 +149,7 @@ export default class Gameplay {
 	#pickCenters(raw) {
 		/** @type {{nonce: number, num: number}} */
 		const { nonce, num } = JSON.parse(raw);
-		const heading = `Please select ${num} ${num === 1 ? 'card' : 'cards'} from the center:`;
+		const heading = `Please select ${num} ${num === 1 ? 'role' : 'roles'} from the center:`;
 		/** @type {[string, string | null][]} */
 		const choices = Array.from(Array(CENTER_SIZE).keys())
 			.map((center) => [`${center}`, null]);
