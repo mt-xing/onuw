@@ -33,6 +33,7 @@ export default class NightStatus {
 		this.#bars = new Map();
 
 		this.#constructBars(roles);
+		this.wake();
 	}
 
 	/**
@@ -81,5 +82,13 @@ export default class NightStatus {
 		setTimeout(() => {
 			bar.classList.add('done');
 		}, this.#time * 1000);
+	}
+
+	wake() {
+		this.#wrap.classList.add('awake');
+	}
+
+	sleep() {
+		this.#wrap.classList.remove('awake');
 	}
 }

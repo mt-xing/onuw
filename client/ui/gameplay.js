@@ -96,7 +96,12 @@ export default class Gameplay {
 			this.#messageLog.msg('This is the role you will act as at night. You might not end the night as the same role.');
 
 			setTimeout(
-				() => this.#messageLog.msg('Good night, all. And good luck.'),
+				() => {
+					this.#messageLog.msg('Good night, all. And good luck.');
+					this.#messageLog.sleep();
+					this.#boardStatus.hideBoard();
+					this.#nightStatus.sleep();
+				},
 				8000,
 			);
 		}
@@ -216,11 +221,15 @@ export default class Gameplay {
 		const { boardInfo } = JSON.parse(raw);
 		this.#messageLog.msg('Wake up.');
 		this.#boardStatus.showBoard(boardInfo);
+		this.#messageLog.wake();
+		this.#nightStatus.wake();
 	}
 
 	#sleep() {
 		this.#messageLog.msg('Return to sleep. Good night.');
 		this.#boardStatus.hideBoard();
+		this.#messageLog.sleep();
+		this.#nightStatus.sleep();
 	}
 
 	/**
@@ -230,6 +239,8 @@ export default class Gameplay {
 		/** @type {{boardInfo: Record<number, string>}} */
 		const { boardInfo } = JSON.parse(raw);
 		this.#boardStatus.showBoard(boardInfo);
+		this.#messageLog.wake();
+		this.#nightStatus.wake();
 		this.#messageLog.msg('Everybody, wake up.');
 		this.#messageLog.msg('Good morning!');
 

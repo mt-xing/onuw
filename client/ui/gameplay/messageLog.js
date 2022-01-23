@@ -25,6 +25,8 @@ export default class MessageLog {
 		this.#wrap.classList.add('messageLog');
 		dom.appendChild(this.#wrap);
 		this.#pending = [];
+
+		setTimeout(this.wake.bind(this), 1000);
 	}
 
 	/**
@@ -68,5 +70,13 @@ export default class MessageLog {
 			this.#pending.shift();
 			this.#spawnPending();
 		}, 1000);
+	}
+
+	wake() {
+		this.#wrap.style.background = 'white';
+	}
+
+	sleep() {
+		this.#wrap.style.background = '';
 	}
 }

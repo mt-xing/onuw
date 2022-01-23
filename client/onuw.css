@@ -419,6 +419,9 @@ button {
 
 	vertical-align: top;
 	box-shadow: inset black 0 0 10px 1px;
+
+	background: rgba(0, 0, 0, 0);
+	transition: background 0.5s ease-in-out;
 }
 
 .messageLog section {
@@ -530,6 +533,7 @@ button {
 
 	display: inline-flex;
 	flex-direction: column;
+	box-shadow: black -1px 0 15px 5px;
 
 	vertical-align: top;
 }
@@ -539,12 +543,17 @@ button {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	border-left: 1px black solid;
 	border-bottom: 1px black solid;
-	background: white;
-	color: black;
+	background: #212121;
+	color: white;
+	transition: background 0.5s ease-in-out, color 0.5s ease-in-out;
 
 	position: relative;
+}
+
+.roleWrap.awake div {
+	background: white;
+	color: black;
 }
 
 .roleWrap div:last-child {
@@ -579,7 +588,7 @@ button {
 
 	display: inline-flex;
 	flex-direction: column;
-	border-right: 1px black solid;
+	box-shadow: black 1px 0 15px 5px;
 
 	overflow-y: auto;
 }
@@ -589,8 +598,8 @@ button {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	background: black;
-	color: black;
+	background: #212121;
+	color: #212121;
 
 	transition: background 0.5s ease-in-out, color 0.5s ease-in-out;
 
@@ -616,6 +625,7 @@ button {
 
 .boardWrap.visible div {
 	background: white;
+	color:black;
 }
 
 .boardWrap.visible h2 {
@@ -1005,5 +1015,13 @@ button {
 
 	.boardWrap {
 		border: none;
+		box-shadow: none;
+		border-top: 1px black solid;
+	}
+
+	.roleWrap {
+		box-shadow: none;
+		border-top: 1px black solid;
+		border-left: 1px black solid;
 	}
 }

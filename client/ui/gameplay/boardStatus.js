@@ -27,6 +27,7 @@ export default class BoardStatus {
 		this.#playerElements = [];
 
 		this.#constructBoard(playerNames);
+		this.showBoard({});
 	}
 
 	/**
