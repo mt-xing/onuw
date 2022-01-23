@@ -1,5 +1,6 @@
 import Role, { Roles } from '../../../game/role.js';
 import { constructRole } from '../../../game/rolesIndiv.js';
+import WakeOrder from '../../../game/wake.js';
 import Dom from '../../dom.js';
 
 export default class NightStatus {
@@ -9,7 +10,7 @@ export default class NightStatus {
 	#wrap;
 
 	/**
-	 * @type {Map<Roles, HTMLElement>}
+	 * @type {Map<string, HTMLElement>}
 	 */
 	#bars;
 
@@ -38,28 +39,34 @@ export default class NightStatus {
 	 * @param {Set<Roles>} roles
 	 */
 	#constructBars(roles) {
-		Array.from(roles)
-			.map((x) => constructRole(x))
-			.filter((x) => x.wakeOrder !== null)
-			.sort((a, b) => Role.sortWakeOrder(
-				a.wakeOrder ?? [],
-				b.wakeOrder ?? [],
-			))
+		[...new Set(
+			Array.from(roles)
+				.map((x) => constructRole(x))
+				.map((x) => x.wakeOrder).filter(
+					/**
+					 * @param {(typeof WakeOrder)[]|null} x
+					 * @returns {x is (typeof WakeOrder)[]}
+					 */
+					(x) => x !== null,
+				)
+				.flat(),
+		)]
+			.map((X) => new X())
+			.sort((a, b) => WakeOrder.sortWakeOrder(a.wakeOrder, b.wakeOrder))
 			.forEach((r) => {
 				const div = document.createElement('div');
-				div.appendChild(Dom.span(r.roleName));
+				div.appendChild(Dom.span(r.displayName));
 				const bar = document.createElement('div');
 				bar.className = 'progress';
-				// bar.max = this.#time * UPDATES_PER_SECOND;
 				div.appendChild(bar);
 				this.#wrap.appendChild(div);
 
-				this.#bars.set(r.role, bar);
+				this.#bars.set(r.constructor.name, bar);
 			});
 	}
 
 	/**
-	 * @param {Roles} role
+	 * @param {string} role
 	 */
 	startRole(role) {
 		const bar = this.#bars.get(role);

@@ -2,6 +2,7 @@ import Communicator from './comms.js';
 import Role, { Modifiers } from '../game/role.js';
 import State from '../game/state.js';
 import computeWinner from '../game/winLogic.js';
+import WakeOrder from '../game/wake.js';
 
 export default class OnuwGame {
 	/**
@@ -49,33 +50,37 @@ export default class OnuwGame {
 
 	async #night() {
 		const roles = this.state.allWakingRoles;
+		/** @type {Map<typeof WakeOrder, number[]>} */
+		const wakeMap = new Map();
+		const wakes = [...new Set(
+			roles
+				.map((x) => x.wakeOrder).filter(
+					/**
+					 * @param {(typeof WakeOrder)[]|null} x
+					 * @returns {x is (typeof WakeOrder)[]}
+					 */
+					(x) => x !== null,
+				)
+				.flat(),
+		)]
+			.map((X) => {
+				wakeMap.set(X, []);
+				return new X();
+			})
+			.sort((a, b) => WakeOrder.sortWakeOrder(a.wakeOrder, b.wakeOrder));
 
-		/** @param {number} pid */
-		const pRole = (pid) => this.state.getPlayer(pid).startingRole;
 		const playerIDarray = Array.from(Array(this.state.numPlayers).keys());
-		const wakeOrder = playerIDarray
-			.filter((p) => pRole(p).wakeOrder !== null)
-			.sort((a, b) => Role.sortWakeOrder(
-				pRole(a).wakeOrder ?? [],
-				pRole(b).wakeOrder ?? [],
-			))
-			.reduce((a, x) => {
-				if (a.length === 0) {
-					return [[x]];
-				}
-				const lastWake = a[a.length - 1];
-				if (pRole(lastWake[0]).role === pRole(x).role) {
-					lastWake.push(x);
-					return a;
-				}
-				a.push([x]);
-				return a;
-			}, /** @type {number[][]} */([]));
+		playerIDarray.forEach((pid) => {
+			this.state.getPlayer(pid).startingRole.wakeOrder?.forEach(
+				(wake) => wakeMap.get(wake)?.push(pid),
+			);
+		});
 
 		/**
+		 * @param {WakeOrder} wake
 		 * @param {number} pid
 		 */
-		const playerAct = async (pid) => {
+		const playerAct = async (wake, pid) => {
 			let timeLeft = this.roleTime;
 			let lastTime = new Date();
 
@@ -110,10 +115,9 @@ export default class OnuwGame {
 				return banned;
 			};
 
-			const player = this.state.getPlayer(pid);
 			this.comm.wake(pid, this.state.boardState);
 
-			await player.startingRole.act(
+			await wake.act(
 				async (num, allowSelf) => {
 					const r = await this.comm.pickPlayers(pid, timeLeft, num, getBanned(allowSelf));
 					updateTimeLeft();
@@ -144,20 +148,17 @@ export default class OnuwGame {
 			this.comm.sleep(pid);
 		};
 
-		let wakeOrderIndex = 0;
-		for (const role of roles) {
-			this.comm.roleStart(role.role);
-			if (
-				wakeOrderIndex >= wakeOrder.length
-				|| !role.equals(pRole(wakeOrder[wakeOrderIndex][0]))
-			) {
+		for (const wake of wakes) {
+			// @ts-ignore
+			const players = wakeMap.get(wake.constructor);
+			this.comm.roleStart(wake.constructor.name);
+			if (players === undefined || players.length === 0) {
 				await new Promise((resolve) => {
 					setTimeout(resolve, this.roleTime);
 				});
 				continue;
 			}
-			await Promise.all(wakeOrder[wakeOrderIndex].map(playerAct));
-			wakeOrderIndex++;
+			await Promise.all(players.map(playerAct.bind(this, wake)));
 		}
 	}
 
