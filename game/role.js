@@ -1,5 +1,6 @@
 import State from './state.js';
 import { toTitleCase } from './utils.js';
+import WakeOrder from './wake.js';
 
 export default class Role {
 	/**
@@ -23,10 +24,8 @@ export default class Role {
 	/**
 	 * Wake order.
 	 *
-	 * Lower goes first, starting from front, lexicographic order.
-	 *
 	 * If this is `null`, this role does not wake.
-	 * @type {number[]|null}
+	 * @type {(typeof WakeOrder)[]|null}
 	 */
 	wakeOrder;
 
@@ -42,7 +41,7 @@ export default class Role {
 	 * @param {Roles} role
 	 * @param {string} description
 	 * @param {string} instructions
-	 * @param {number[]|null} wakeOrder
+	 * @param {(typeof WakeOrder)[]|null} wakeOrder
 	 */
 	constructor(role, description, instructions, wakeOrder) {
 		if (this.constructor === Role) {
@@ -54,23 +53,6 @@ export default class Role {
 		this.wakeOrder = wakeOrder;
 		this.modifiers = new Set();
 	}
-
-	// #region Abstract methods
-
-	/**
-	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
-	 * Number of players and whether self selection is allowed to ids
-	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
-	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
-	 * @param {(msg: string) => void} giveInfo Show information to the player
-	 * @param {State} state Reference to the current game state
-	 * @param {number} id Current player ID
-	 */
-	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
-		throw new Error('Unimplemented');
-	}
-
-	// #endregion
 
 	/**
 	 * The team that this role WINS with.
