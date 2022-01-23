@@ -29,23 +29,23 @@ function werewolfString(wolves) {
 	return `The werewolves are: ${makeList(wolves)}`;
 }
 
-/**
- * Returns the player names of the dream wolf, if one exists in the game
- * @param {State} state
- * @returns {string | null}
- */
-function getDreamWolf(state) {
-	for (let i = 0; i < state.numPlayers; i++) {
-		if (state.getPlayer(i).currentRole.role === Roles.DREAM_WOLF) {
-			return state.getName(i);
-		}
-	}
-	return null;
-}
-
 export class WerewolfWake extends WakeOrder {
 	constructor() {
-		super([2, 0]);
+		super([2, 0], 'Werewolves');
+	}
+
+	/**
+     * Returns the player names of the dream wolf, if one exists in the game
+     * @param {State} state
+     * @returns {string | null}
+     */
+	static #getDreamWolf(state) {
+		for (let i = 0; i < state.numPlayers; i++) {
+			if (state.getPlayer(i).currentRole.role === Roles.DREAM_WOLF) {
+				return state.getName(i);
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -60,7 +60,7 @@ export class WerewolfWake extends WakeOrder {
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		const wolves = getAllWerewolves(state);
 		giveInfo(werewolfString(wolves));
-		const dream = getDreamWolf(state);
+		const dream = WerewolfWake.#getDreamWolf(state);
 		if (dream !== null) {
 			giveInfo(`However, ${dream} is a dream wolf`);
 		}
@@ -75,7 +75,7 @@ export class WerewolfWake extends WakeOrder {
 
 export class MysticWolfWake extends WakeOrder {
 	constructor() {
-		super([2, 1]);
+		super([2, 1], 'Mystic Wolf');
 	}
 
 	/**
@@ -88,18 +88,6 @@ export class MysticWolfWake extends WakeOrder {
 	 * @param {number} id Current player ID
 	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
-		const wolves = getAllWerewolves(state);
-		giveInfo(werewolfString(wolves));
-		const dream = getDreamWolf(state);
-		if (dream !== null) {
-			giveInfo(`However, ${dream} is a dream wolf and does not know the identity of the other werewolves.`);
-		}
-		if (wolves.length === 1) {
-			const pick = await pickCenters(1);
-			if (pick.length === 1) {
-				giveInfo(`The center card you picked was ${state.getCenter(pick[0]).roleName}`);
-			}
-		}
 		const view = await pickPlayers(1, false);
 		if (view.length === 1) {
 			giveInfo(`The card ${state.getName(view[0])} has is ${state.getPlayer(view[0]).currentRole.roleName}`);
@@ -109,7 +97,7 @@ export class MysticWolfWake extends WakeOrder {
 
 export class MinionWake extends WakeOrder {
 	constructor() {
-		super([3]);
+		super([3], 'Minion');
 	}
 
 	/**
@@ -136,7 +124,7 @@ export class MinionWake extends WakeOrder {
 // #region Villagers
 export class SentinelWake extends WakeOrder {
 	constructor() {
-		super([0]);
+		super([0], 'Sentinel');
 	}
 
 	/**
@@ -159,7 +147,7 @@ export class SentinelWake extends WakeOrder {
 
 export class MasonWake extends WakeOrder {
 	constructor() {
-		super([4]);
+		super([4], 'Masons');
 	}
 
 	/**
@@ -188,7 +176,7 @@ export class MasonWake extends WakeOrder {
 
 export class SeerWake extends WakeOrder {
 	constructor() {
-		super([5, 1]);
+		super([5, 1], 'Seer');
 	}
 
 	/**
@@ -222,7 +210,7 @@ export class SeerWake extends WakeOrder {
 
 export class ApprenticeSeerWake extends WakeOrder {
 	constructor() {
-		super([5, 2]);
+		super([5, 2], 'Apprentice Seer');
 	}
 
 	/**
@@ -245,7 +233,7 @@ export class ApprenticeSeerWake extends WakeOrder {
 
 export class RobberWake extends WakeOrder {
 	constructor() {
-		super([6, 1]);
+		super([6, 1], 'Robber');
 	}
 
 	/**
@@ -274,7 +262,7 @@ export class RobberWake extends WakeOrder {
 
 export class WitchWake extends WakeOrder {
 	constructor() {
-		super([6, 2]);
+		super([6, 2], 'Witch');
 	}
 
 	/**
@@ -309,7 +297,7 @@ export class WitchWake extends WakeOrder {
 
 export class TroublemakerWake extends WakeOrder {
 	constructor() {
-		super([7]);
+		super([7], 'Troublemaker');
 	}
 
 	/**
@@ -331,7 +319,7 @@ export class TroublemakerWake extends WakeOrder {
 
 export class DrunkWake extends WakeOrder {
 	constructor() {
-		super([8]);
+		super([8], 'Drunk');
 	}
 
 	/**
@@ -357,7 +345,7 @@ export class DrunkWake extends WakeOrder {
 
 export class InsomniacWake extends WakeOrder {
 	constructor() {
-		super([9]);
+		super([9], 'Insomniac');
 	}
 
 	/**
@@ -380,7 +368,7 @@ export class InsomniacWake extends WakeOrder {
 
 export class RevealerWake extends WakeOrder {
 	constructor() {
-		super([10]);
+		super([10], 'Revealer');
 	}
 
 	/**

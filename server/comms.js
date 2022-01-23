@@ -63,10 +63,10 @@ export default class Communicator {
 
 	/**
 	 * Wake up a player
-	 * @param {Roles} role Player Role
+	 * @param {string} wakeName Wake order name
 	 */
-	roleStart(role) {
-		this.#broadcast('roleStart', JSON.stringify({ role }));
+	roleStart(wakeName) {
+		this.#broadcast('roleStart', JSON.stringify({ role: wakeName }));
 	}
 
 	/**

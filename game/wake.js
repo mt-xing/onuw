@@ -1,6 +1,9 @@
 import State from './state.js';
 
 export default class WakeOrder {
+	/** @type {string} */
+	#name;
+
 	/**
 	 * Wake order.
 	 *
@@ -17,13 +20,22 @@ export default class WakeOrder {
      * It makes life easier to pass around the constructor itself as an argument
      * until the night phase and to only construct each wake order once.
      *
-	 * @param {number[]} wakeOrder
+	 * @param {number[]} [wakeOrder]
+     * @param {string} [name]
 	 */
-	constructor(wakeOrder) {
+	constructor(wakeOrder, name) {
 		if (this.constructor === WakeOrder) {
 			throw new Error('Role is an abstract class');
 		}
+		if (wakeOrder === undefined || name === undefined) {
+			throw new Error('Wake order requires an actual wake order lmao');
+		}
 		this.wakeOrder = wakeOrder;
+		this.#name = name;
+	}
+
+	get displayName() {
+		return this.#name;
 	}
 
 	/**

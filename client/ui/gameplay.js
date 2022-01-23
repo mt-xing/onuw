@@ -124,7 +124,7 @@ export default class Gameplay {
 	 * @param {string} raw
 	 */
 	#roleStart(raw) {
-		/** @type {{role: Roles}} */
+		/** @type {{role: string}} */
 		const { role } = JSON.parse(raw);
 		this.#nightStatus.startRole(role);
 	}
