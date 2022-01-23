@@ -1,6 +1,67 @@
-import Role, { Modifiers, Roles, Teams } from './role.js';
+import { Modifiers, Roles, Teams } from './role.js';
 import State, { CENTER_SIZE } from './state.js';
-import { assertUnreachable, makeList } from './utils.js';
+import { makeList } from './utils.js';
+
+export default class WakeOrder {
+	/**
+     * @type {number[]}
+     */
+	wakeOrder;
+
+	/**
+	 * Create a new wake order object
+	 * @param {number[]} wakeOrder
+	 */
+	constructor(wakeOrder) {
+		if (this.constructor === WakeOrder) {
+			throw new Error('Role is an abstract class');
+		}
+		this.wakeOrder = wakeOrder;
+	}
+
+	/**
+	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
+	 * Number of players and whether self selection is allowed to ids
+	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
+	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
+	 * @param {(msg: string) => void} giveInfo Show information to the player
+	 * @param {State} state Reference to the current game state
+	 * @param {number} id Current player ID
+	 */
+	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
+		throw new Error('Unimplemented');
+	}
+
+	/**
+	 * Comparator method for wake orders, after null has been filtered
+	 * @param {number[]} a
+	 * @param {number[]} b
+	 * @returns {number}
+	 */
+	static sortWakeOrder(a, b) {
+		if (a.length === 0) {
+			if (b.length === 0) {
+				return 0;
+			}
+			return b[0];
+		}
+		if (b.length === 0) {
+			return a[0];
+		}
+		// Both are non-zero length
+		const aIsShorter = a.length < b.length;
+		const shorterLength = aIsShorter ? a.length : b.length;
+		for (let i = 0; i < shorterLength; i++) {
+			if (a[i] !== b[i]) {
+				return a[i] - b[i];
+			}
+		}
+		if (a.length === b.length) {
+			return 0;
+		}
+		return aIsShorter ? a[shorterLength] : b[shorterLength];
+	}
+}
 
 // #region Werewolves
 
@@ -42,14 +103,9 @@ function getDreamWolf(state) {
 	return null;
 }
 
-export class Werewolf extends Role {
+export class WerewolfWake extends WakeOrder {
 	constructor() {
-		super(
-			Roles.WEREWOLF,
-			'The bad guy',
-			'You will see who else started as a werewolf. Work together to fool the villagers.',
-			[2, 0],
-		);
+		super([2, 0]);
 	}
 
 	/**
@@ -77,14 +133,9 @@ export class Werewolf extends Role {
 	}
 }
 
-export class MysticWolf extends Role {
+export class MysticWolfWake extends WakeOrder {
 	constructor() {
-		super(
-			Roles.MYSTIC_WOLF,
-			'The transcendent bad guy',
-			'You will see the other werewolves. You may also look at another player\'s card to help you fool the villagers.',
-			[2, 1],
-		);
+		super([2, 1]);
 	}
 
 	/**
@@ -116,36 +167,9 @@ export class MysticWolf extends Role {
 	}
 }
 
-export class DreamWolf extends Role {
+export class MinionWake extends WakeOrder {
 	constructor() {
-		super(
-			Roles.DREAM_WOLF,
-			'The sleepy bad guy',
-			'You did not wake up in time for the werewolf roll call. You do not know the other werewolves (but they know you).',
-			null,
-		);
-	}
-
-	/**
-	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
-	 * Number of players and whether self selection is allowed to ids
-	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
-	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
-	 * @param {(msg: string) => void} giveInfo Show information to the player
-	 * @param {State} state Reference to the current game state
-	 * @param {number} id Current player ID
-	 */
-	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {}
-}
-
-export class Minion extends Role {
-	constructor() {
-		super(
-			Roles.MINION,
-			'You\'re a huge werewolf stan',
-			'You will see the other werewolves. You need to protect them, even if it costs you your life.',
-			[3],
-		);
+		super([3]);
 	}
 
 	/**
@@ -170,14 +194,9 @@ export class Minion extends Role {
 // #endregion
 
 // #region Villagers
-export class Sentinel extends Role {
+export class SentinelWake extends WakeOrder {
 	constructor() {
-		super(
-			Roles.SENTINEL,
-			'Protector',
-			'You may choose one other player to guard. That player\'s role will no longer be touched (may not be swapped, changed, and even the player themselves may not look at it)',
-			[0],
-		);
+		super([0]);
 	}
 
 	/**
@@ -198,14 +217,9 @@ export class Sentinel extends Role {
 	}
 }
 
-export class Mason extends Role {
+export class MasonWake extends WakeOrder {
 	constructor() {
-		super(
-			Roles.MASON,
-			'Twins',
-			'There are exactly two masons. You will get to see each other. If you do not see the other mason, the other mason started in the center.',
-			[4],
-		);
+		super([4]);
 	}
 
 	/**
@@ -232,14 +246,9 @@ export class Mason extends Role {
 	}
 }
 
-export class Seer extends Role {
+export class SeerWake extends WakeOrder {
 	constructor() {
-		super(
-			Roles.SEER,
-			'Transcendent, or just a cheater',
-			'You may choose to either view two cards from the center or one other player\'s role.',
-			[5, 1],
-		);
+		super([5, 1]);
 	}
 
 	/**
@@ -271,14 +280,9 @@ export class Seer extends Role {
 	}
 }
 
-export class ApprenticeSeer extends Role {
+export class ApprenticeSeerWake extends WakeOrder {
 	constructor() {
-		super(
-			Roles.APPRENTICE_SEER,
-			'Transcendent, but only kinda',
-			'You may view one card from the center.',
-			[5, 2],
-		);
+		super([5, 2]);
 	}
 
 	/**
@@ -299,14 +303,9 @@ export class ApprenticeSeer extends Role {
 	}
 }
 
-export class Robber extends Role {
+export class RobberWake extends WakeOrder {
 	constructor() {
-		super(
-			Roles.ROBBER,
-			'Stealer of roles',
-			'You may steal (and view) one other player\'s role, taking on their role and giving them yours',
-			[6, 1],
-		);
+		super([6, 1]);
 	}
 
 	/**
@@ -319,7 +318,7 @@ export class Robber extends Role {
 	 * @param {number} id Current player ID
 	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
-		if (this.modifiers.has(Modifiers.SENTINEL)) {
+		if (state.getPlayer(id).currentRole.modifiers.has(Modifiers.SENTINEL)) {
 			giveInfo('Your role has been guarded by the sentinel. You will not be swapping roles tonight.');
 			return;
 		}
@@ -333,14 +332,9 @@ export class Robber extends Role {
 	}
 }
 
-export class Witch extends Role {
+export class WitchWake extends WakeOrder {
 	constructor() {
-		super(
-			Roles.WITCH,
-			'Does some magic or something, idk',
-			'You may view one role from the center. If you do, you must swap it with any player of your choice.',
-			[6, 2],
-		);
+		super([6, 2]);
 	}
 
 	/**
@@ -373,14 +367,9 @@ export class Witch extends Role {
 	}
 }
 
-export class Troublemaker extends Role {
+export class TroublemakerWake extends WakeOrder {
 	constructor() {
-		super(
-			Roles.TROUBLEMAKER,
-			'Screws with people',
-			'You may exchange the roles of two other players.',
-			[7],
-		);
+		super([7]);
 	}
 
 	/**
@@ -400,14 +389,9 @@ export class Troublemaker extends Role {
 	}
 }
 
-export class Drunk extends Role {
+export class Drunk extends WakeOrder {
 	constructor() {
-		super(
-			Roles.DRUNK,
-			'You have no idea what you\'re doing',
-			'You must pick a role from the center to exchange with your own. You do not get to see your new role.',
-			[8],
-		);
+		super([8]);
 	}
 
 	/**
@@ -420,7 +404,7 @@ export class Drunk extends Role {
 	 * @param {number} id Current player ID
 	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
-		if (this.modifiers.has(Modifiers.SENTINEL)) {
+		if (state.getPlayer(id).currentRole.modifiers.has(Modifiers.SENTINEL)) {
 			giveInfo('Your role has been guarded by the sentinel. You will not be swapping roles tonight.');
 			return;
 		}
@@ -431,14 +415,9 @@ export class Drunk extends Role {
 	}
 }
 
-export class Insomniac extends Role {
+export class Insomniac extends WakeOrder {
 	constructor() {
-		super(
-			Roles.INSOMNIAC,
-			'You can\'t fall asleep. Don\'t we all?',
-			'You get to wake up in the night and see your own role.',
-			[9],
-		);
+		super([9]);
 	}
 
 	/**
@@ -451,7 +430,7 @@ export class Insomniac extends Role {
 	 * @param {number} id Current player ID
 	 */
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
-		if (this.modifiers.has(Modifiers.SENTINEL)) {
+		if (state.getPlayer(id).currentRole.modifiers.has(Modifiers.SENTINEL)) {
 			giveInfo('Your role has been guarded by the sentinel. You will not see your current role tonight.');
 			return;
 		}
@@ -459,14 +438,9 @@ export class Insomniac extends Role {
 	}
 }
 
-export class Revealer extends Role {
+export class RevealerWake extends WakeOrder {
 	constructor() {
-		super(
-			Roles.REVEALER,
-			'Never learned how to keep your hands to yourself',
-			'You may reveal one other player\'s role. If it\'s on the villager team, it will also be revealed to all other players.',
-			[10],
-		);
+		super([10]);
 	}
 
 	/**
@@ -495,66 +469,3 @@ export class Revealer extends Role {
 	}
 }
 // #endregion
-
-export class Tanner extends Role {
-	constructor() {
-		super(
-			Roles.TANNER,
-			'2meirl4meirl',
-			'You want to die. You win if and only if you are killed. You do not wake up during the night.',
-			null,
-		);
-	}
-
-	/**
-	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
-	 * Number of players and whether self selection is allowed to ids
-	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
-	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
-	 * @param {(msg: string) => void} giveInfo Show information to the player
-	 * @param {State} state Reference to the current game state
-	 * @param {number} id Current player ID
-	 */
-	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {}
-}
-/**
- * Factory to construct a role object from a role ID
- * @param {Roles} role Role ID
- * @returns {Role}
- */
-export function constructRole(role) {
-	switch (role) {
-	case Roles.WEREWOLF:
-		return new Werewolf();
-	case Roles.MYSTIC_WOLF:
-		return new MysticWolf();
-	case Roles.DREAM_WOLF:
-		return new DreamWolf();
-	case Roles.MINION:
-		return new Minion();
-	case Roles.SENTINEL:
-		return new Sentinel();
-	case Roles.MASON:
-		return new Mason();
-	case Roles.SEER:
-		return new Seer();
-	case Roles.APPRENTICE_SEER:
-		return new ApprenticeSeer();
-	case Roles.ROBBER:
-		return new Robber();
-	case Roles.WITCH:
-		return new Witch();
-	case Roles.TROUBLEMAKER:
-		return new Troublemaker();
-	case Roles.DRUNK:
-		return new Drunk();
-	case Roles.INSOMNIAC:
-		return new Insomniac();
-	case Roles.REVEALER:
-		return new Revealer();
-	case Roles.TANNER:
-		return new Tanner();
-	default:
-		return assertUnreachable(role);
-	}
-}
