@@ -52,6 +52,7 @@ button {
 .intro div {
 	margin-bottom: 50px;
 	margin-top: 10px;
+	text-align: center;
 }
 
 .intro button, .connection button, .disconnect button {
@@ -1028,5 +1029,14 @@ button {
 		box-shadow: none;
 		border-top: 1px black solid;
 		border-left: 1px black solid;
+	}
+}
+
+@media(max-width: 500px) {
+	.intro h1 {
+		font-size: 30vw;
+	}
+	.intro div button {
+		font-size: 4vw;
 	}
 }
