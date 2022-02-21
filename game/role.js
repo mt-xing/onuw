@@ -152,8 +152,6 @@ export const Teams = Object.freeze({
 
 const TEAM_MULT = /** @type {const} */(100);
 
-export const MAX_ROLES = 18;
-
 /**
  * List of all possible roles
  * @readonly
@@ -192,6 +190,11 @@ export const MultiRoles = {
 	[Roles.WEREWOLF]: { type: 'up to', number: 2 },
 	[Roles.MASON]: { type: 'all', number: 2 },
 };
+
+export const MAX_ROLES = Object.keys(Roles).length
+	+ Object.keys(MultiRoles).map((x) => parseInt(x, 10)).map(
+		(x) => (MultiRoles[/** @type {Roles} */(x)]?.number ?? 0),
+	).reduce((a, x) => a + x - 1, 0);
 
 /**
  * Lookup from role id to name of role
