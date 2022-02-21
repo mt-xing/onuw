@@ -176,6 +176,7 @@ export const Roles = Object.freeze({
 	INSOMNIAC: /** @type {8} */(Teams.VILLAGER * TEAM_MULT + 8),
 	REVEALER: /** @type {9} */(Teams.VILLAGER * TEAM_MULT + 9),
 	HUNTER: /** @type {10} */(Teams.VILLAGER * TEAM_MULT + 10),
+	VILLAGER: /** @type {99} */(Teams.VILLAGER * TEAM_MULT + 99),
 
 	// lol
 	TANNER: /** @type {200} */(Teams.TANNER * TEAM_MULT),
@@ -189,6 +190,7 @@ export const Roles = Object.freeze({
 export const MultiRoles = {
 	[Roles.WEREWOLF]: { type: 'up to', number: 2 },
 	[Roles.MASON]: { type: 'all', number: 2 },
+	[Roles.VILLAGER]: { type: 'up to', number: 3 },
 };
 
 export const MAX_ROLES = Object.keys(Roles).length

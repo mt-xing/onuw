@@ -173,6 +173,17 @@ export class Hunter extends Role {
 		);
 	}
 }
+
+export class Villager extends Role {
+	constructor() {
+		super(
+			Roles.VILLAGER,
+			'Just a villager',
+			'You don\'t do anything. This role sucks. Tell the game host to stop picking this role.',
+			null,
+		);
+	}
+}
 // #endregion
 
 export class Tanner extends Role {
@@ -220,10 +231,12 @@ export function constructRole(role) {
 		return new Insomniac();
 	case Roles.REVEALER:
 		return new Revealer();
-	case Roles.TANNER:
-		return new Tanner();
 	case Roles.HUNTER:
 		return new Hunter();
+	case Roles.VILLAGER:
+		return new Villager();
+	case Roles.TANNER:
+		return new Tanner();
 	default:
 		return assertUnreachable(role);
 	}
