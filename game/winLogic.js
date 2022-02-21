@@ -22,6 +22,16 @@ export default function computeWinner(rolesID, votes) {
 	const killedPlayers = votesForPlayer
 		.map((v, i) => (v === maxVotes && v > 1 ? i : NaN))
 		.filter((x) => !Number.isNaN(x));
+	// If hunter died, need to add their vote too
+	if (allRoles.has(Roles.HUNTER)) {
+		killedPlayers.forEach((pid) => {
+			if (rolesID[pid] !== Roles.HUNTER) { return; }
+			const hunterVotedFor = votes[pid];
+			if (killedPlayers.indexOf(hunterVotedFor) === -1) {
+				killedPlayers.push(hunterVotedFor);
+			}
+		});
+	}
 
 	// There is a tanner
 	if (allRoles.has(Roles.TANNER)) {

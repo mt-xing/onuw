@@ -162,6 +162,17 @@ export class Revealer extends Role {
 		);
 	}
 }
+
+export class Hunter extends Role {
+	constructor() {
+		super(
+			Roles.HUNTER,
+			'Bringing others down with you',
+			'If you die, the person you voted for dies too. You do not wake up during the night.',
+			null,
+		);
+	}
+}
 // #endregion
 
 export class Tanner extends Role {
@@ -211,6 +222,8 @@ export function constructRole(role) {
 		return new Revealer();
 	case Roles.TANNER:
 		return new Tanner();
+	case Roles.HUNTER:
+		return new Hunter();
 	default:
 		return assertUnreachable(role);
 	}

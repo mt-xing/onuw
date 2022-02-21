@@ -152,7 +152,7 @@ export const Teams = Object.freeze({
 
 const TEAM_MULT = /** @type {const} */(100);
 
-export const MAX_ROLES = 17;
+export const MAX_ROLES = 18;
 
 /**
  * List of all possible roles
@@ -177,6 +177,7 @@ export const Roles = Object.freeze({
 	DRUNK: /** @type {7} */(Teams.VILLAGER * TEAM_MULT + 7),
 	INSOMNIAC: /** @type {8} */(Teams.VILLAGER * TEAM_MULT + 8),
 	REVEALER: /** @type {9} */(Teams.VILLAGER * TEAM_MULT + 9),
+	HUNTER: /** @type {10} */(Teams.VILLAGER * TEAM_MULT + 10),
 
 	// lol
 	TANNER: /** @type {200} */(Teams.TANNER * TEAM_MULT),

@@ -110,6 +110,14 @@ const winTests = {
 		[4, 0, 4, 4, 0, 0],
 		[Teams.TANNER],
 	],
+	'kill hunter kills werewolf': [
+		[Roles.WEREWOLF, Roles.MASON, Roles.MASON, Roles.HUNTER], [3, 3, 3, 0],
+		[Teams.VILLAGER],
+	],
+	'kill hunter kills villager': [
+		[Roles.WEREWOLF, Roles.MASON, Roles.MASON, Roles.HUNTER], [3, 3, 3, 1],
+		[Teams.WEREWOLF],
+	],
 };
 
 export default function runWinTests() {
