@@ -294,7 +294,7 @@ export class WitchWake extends WakeOrder {
 
 export class TroublemakerWake extends WakeOrder {
 	constructor() {
-		super([7], 'Troublemaker');
+		super([7, 1], 'Troublemaker');
 	}
 
 	/**
@@ -312,6 +312,60 @@ export class TroublemakerWake extends WakeOrder {
 		if (cards.length === 2) {
 			state.swap(cards[0], cards[1]);
 		}
+	}
+}
+
+export class VillageIdiotWake extends WakeOrder {
+	constructor() {
+		super([7, 2], 'Village Idiot');
+	}
+
+	/**
+	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
+	 * Number of players and whether self selection is allowed to ids
+	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
+	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
+	 * @param {(msg: string) => void} giveInfo Show information to the player
+	 * @param {State} state Reference to the current game state
+	 * @param {number} id Current player ID
+	 */
+	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
+		giveInfo('You may cycle the roles of all other players one place clockwise (shifting down the player list) or counterclockwise (shifting up the player list). This does not affect your role.');
+		const choice = await pickChoice(['Clockwise', 'Counterclockwise']);
+		if (choice !== 0 && choice !== 1) { return; }
+		const clockwise = choice === 0;
+
+		/**
+		 * @param {number} pid
+		 * @returns {boolean}
+		 */
+		const isEligible = (pid) => pid !== id
+			&& !state.getPlayer(pid).currentRole.modifiers.has(Modifiers.SENTINEL);
+
+		/**
+		 * @param {number} pid
+		 * @returns {number}
+		 */
+		const getPrevPlayerInCycle = (pid) => {
+			const candidate = !clockwise ? pid + 1 : pid - 1;
+
+			if (candidate >= state.numPlayers) {
+				return getPrevPlayerInCycle(-1);
+			}
+			if (candidate < 0) {
+				return getPrevPlayerInCycle(state.numPlayers);
+			}
+			if (!isEligible(candidate)) {
+				return getPrevPlayerInCycle(candidate);
+			}
+			return candidate;
+		};
+
+		Array.from(Array(state.numPlayers).keys()) // All Player IDs
+			.map((pid) => (isEligible(pid) ? getPrevPlayerInCycle(pid) : pid)) // PID they're getting
+			.map((pRole) => state.getPlayer(pRole).currentRole) // Role they're getting
+			// eslint-disable-next-line no-param-reassign
+			.forEach((newRole, pid) => { state.getPlayer(pid).currentRole = newRole; });
 	}
 }
 

@@ -172,10 +172,11 @@ export const Roles = Object.freeze({
 	ROBBER: /** @type {4} */(Teams.VILLAGER * TEAM_MULT + 4),
 	WITCH: /** @type {5} */(Teams.VILLAGER * TEAM_MULT + 5),
 	TROUBLEMAKER: /** @type {6} */(Teams.VILLAGER * TEAM_MULT + 6),
-	DRUNK: /** @type {7} */(Teams.VILLAGER * TEAM_MULT + 7),
-	INSOMNIAC: /** @type {8} */(Teams.VILLAGER * TEAM_MULT + 8),
-	REVEALER: /** @type {9} */(Teams.VILLAGER * TEAM_MULT + 9),
-	HUNTER: /** @type {10} */(Teams.VILLAGER * TEAM_MULT + 10),
+	VILLAGE_IDIOT: /** @type {7} */(Teams.VILLAGER * TEAM_MULT + 7),
+	DRUNK: /** @type {8} */(Teams.VILLAGER * TEAM_MULT + 8),
+	INSOMNIAC: /** @type {9} */(Teams.VILLAGER * TEAM_MULT + 9),
+	REVEALER: /** @type {10} */(Teams.VILLAGER * TEAM_MULT + 10),
+	HUNTER: /** @type {11} */(Teams.VILLAGER * TEAM_MULT + 11),
 	VILLAGER: /** @type {99} */(Teams.VILLAGER * TEAM_MULT + 99),
 
 	// lol

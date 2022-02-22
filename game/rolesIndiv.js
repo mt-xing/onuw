@@ -2,7 +2,8 @@ import Role, { Roles } from './role.js';
 import { assertUnreachable } from './utils.js';
 import {
 	ApprenticeSeerWake, DrunkWake, InsomniacWake, MasonWake, MinionWake, MysticWolfWake,
-	RevealerWake, RobberWake, SeerWake, SentinelWake, TroublemakerWake, WerewolfWake, WitchWake,
+	RevealerWake, RobberWake, SeerWake, SentinelWake, TroublemakerWake, VillageIdiotWake,
+	WerewolfWake, WitchWake,
 } from './wakesIndiv.js';
 
 // #region Werewolves
@@ -130,6 +131,17 @@ export class Troublemaker extends Role {
 	}
 }
 
+export class VillageIdiot extends Role {
+	constructor() {
+		super(
+			Roles.VILLAGE_IDIOT,
+			'Big dumb',
+			'You may cycle the roles of ALL other players either clockwise or counterclockwise',
+			[VillageIdiotWake],
+		);
+	}
+}
+
 export class Drunk extends Role {
 	constructor() {
 		super(
@@ -225,6 +237,8 @@ export function constructRole(role) {
 		return new Witch();
 	case Roles.TROUBLEMAKER:
 		return new Troublemaker();
+	case Roles.VILLAGE_IDIOT:
+		return new VillageIdiot();
 	case Roles.DRUNK:
 		return new Drunk();
 	case Roles.INSOMNIAC:
