@@ -219,7 +219,7 @@ export class ApprenticeSeerWake extends WakeOrder {
 	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
 		giveInfo('You may view one role from the center');
 		const cards = await pickCenters(1);
-		if (pickCenters.length === 1) {
+		if (cards.length === 1) {
 			const role = state.getCenter(cards[0]);
 			giveInfo(`The role you selected in the center was ${role.roleName}`);
 		}
