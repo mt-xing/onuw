@@ -1,4 +1,5 @@
 import { Modifiers, Roles, Teams } from './role.js';
+import { constructRole } from './rolesIndiv.js';
 import State, { CENTER_SIZE } from './state.js';
 import { makeList } from './utils.js';
 import WakeOrder from './wake.js';
@@ -223,6 +224,57 @@ export class ApprenticeSeerWake extends WakeOrder {
 			const role = state.getCenter(cards[0]);
 			giveInfo(`The role you selected in the center was ${role.roleName}`);
 		}
+	}
+}
+
+export class ParanormalInvestigatorWake extends WakeOrder {
+	constructor() {
+		super([5, 3], 'Paranormal Investigator');
+	}
+
+	/**
+	 * @param {(num: number, allowSelf: boolean) => Promise<number[]>} pickPlayers
+	 * Number of players and whether self selection is allowed to ids
+	 * @param {(num: number) => Promise<number[]>} pickCenters Number of cards to pick to ids
+	 * @param {(choices: string[]) => Promise<number>} pickChoice Array of choices to id of choice
+	 * @param {(msg: string) => void} giveInfo Show information to the player
+	 * @param {State} state Reference to the current game state
+	 * @param {number} id Current player ID
+	 */
+	async act(pickPlayers, pickCenters, pickChoice, giveInfo, state, id) {
+		giveInfo('You may view the roles of up to two other players. If you see a werewolf or a tanner, you will stop and become that role.');
+
+		/**
+		 * @param {number} left
+		 */
+		const prompt = async (left) => {
+			switch (left) {
+			case 2:
+				giveInfo('You may view one player\'s role to begin');
+				break;
+			case 1:
+				giveInfo('You may view one more player\'s role');
+				break;
+			default:
+				return;
+			}
+			const choice = await pickPlayers(1, false);
+			if (choice.length === 1) {
+				const selectedPlayer = choice[0];
+				const role = state.getPlayer(selectedPlayer).currentRole;
+				giveInfo(`The role that ${state.getName(selectedPlayer)} has is ${role.roleName}`);
+				if (role.winTeam === Teams.VILLAGER) {
+					await prompt(left - 1);
+				} else {
+					// You saw someone bad
+					giveInfo(`Since this player is not on the villager team, you now become a ${role.roleName}`);
+					// eslint-disable-next-line no-param-reassign
+					state.getPlayer(id).currentRole = constructRole(role.role);
+					giveInfo('Your night ends here');
+				}
+			}
+		};
+		await prompt(2);
 	}
 }
 

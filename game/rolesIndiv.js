@@ -2,6 +2,7 @@ import Role, { Roles } from './role.js';
 import { assertUnreachable } from './utils.js';
 import {
 	ApprenticeSeerWake, DrunkWake, InsomniacWake, MasonWake, MinionWake, MysticWolfWake,
+	ParanormalInvestigatorWake,
 	RevealerWake, RobberWake, SeerWake, SentinelWake, TroublemakerWake, VillageIdiotWake,
 	WerewolfWake, WitchWake,
 } from './wakesIndiv.js';
@@ -81,7 +82,7 @@ export class Seer extends Role {
 		super(
 			Roles.SEER,
 			'Transcendent, or just a cheater',
-			'You may choose to either view two cards from the center or one other player\'s role.',
+			'You may choose to either view two roles from the center or one other player\'s role.',
 			[SeerWake],
 		);
 	}
@@ -92,8 +93,19 @@ export class ApprenticeSeer extends Role {
 		super(
 			Roles.APPRENTICE_SEER,
 			'Transcendent, but only kinda',
-			'You may view one card from the center.',
+			'You may view one role from the center.',
 			[ApprenticeSeerWake],
+		);
+	}
+}
+
+export class ParanormalInvestigator extends Role {
+	constructor() {
+		super(
+			Roles.PARANORMAL_INVESTIGATOR,
+			'Something about curiosity and cats?',
+			'You may look at the roles of up to two other players. If you see a werewolf or tanner, you become one.',
+			[ParanormalInvestigatorWake],
 		);
 	}
 }
@@ -231,6 +243,8 @@ export function constructRole(role) {
 		return new Seer();
 	case Roles.APPRENTICE_SEER:
 		return new ApprenticeSeer();
+	case Roles.PARANORMAL_INVESTIGATOR:
+		return new ParanormalInvestigator();
 	case Roles.ROBBER:
 		return new Robber();
 	case Roles.WITCH:
