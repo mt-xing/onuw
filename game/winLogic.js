@@ -45,29 +45,12 @@ export default function computeWinner(rolesID, votes) {
 		(r) => r.killTeam === Teams.WEREWOLF,
 	);
 
-	const votesForPlayerRaw = votes.map((_) => 0);
-	votes.forEach((v) => votesForPlayerRaw[v]++);
-	const votesForPlayer = votesForPlayerRaw.map((x) => (x > 1 ? x : 0));
-
-	const maxVotes = votesForPlayer.reduce((a, x) => (x > a ? x : a), -1);
-	const killedPlayers = votesForPlayer
-		.map((v, i) => (v === maxVotes && v > 1 ? i : NaN))
-		.filter((x) => !Number.isNaN(x));
-	// If hunter died, need to add their vote too
-	if (allRoles.has(Roles.HUNTER)) {
-		killedPlayers.forEach((pid) => {
-			if (rolesID[pid] !== Roles.HUNTER) { return; }
-			const hunterVotedFor = votes[pid];
-			if (killedPlayers.indexOf(hunterVotedFor) === -1) {
-				killedPlayers.push(hunterVotedFor);
-			}
-		});
-	}
+	const killedPlayers = Array.from(computeKilled(rolesID, votes));
 
 	// There is a tanner
 	if (allRoles.has(Roles.TANNER)) {
 		// No one was killed
-		if (maxVotes <= 1) {
+		if (killedPlayers.length === 0) {
 			if (hasWerewolfNonMinion) { return [Teams.WEREWOLF]; }
 			return [Teams.VILLAGER];
 		}
@@ -98,7 +81,7 @@ export default function computeWinner(rolesID, votes) {
 	}
 
 	// If no werewolves and no one died => villagers win
-	if (!hasWerewolfNonMinion && maxVotes <= 1) {
+	if (!hasWerewolfNonMinion && killedPlayers.length === 0) {
 		return [Teams.VILLAGER];
 	}
 
