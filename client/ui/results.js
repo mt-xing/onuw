@@ -1,6 +1,7 @@
 import { Roles, roleToName, Teams } from '../../game/role.js';
 import { constructRole } from '../../game/rolesIndiv.js';
 import { assertUnreachable, makeList } from '../../game/utils.js';
+import { computeKilled } from '../../game/winLogic.js';
 import Dom from '../dom.js';
 import OnuwGame from '../game.js';
 
@@ -91,6 +92,14 @@ export default function showResults(outerDom, votes, playerRoles, winTeam, game,
 		return [voteCount, vfb, finalR];
 	});
 
+	// Killed Players
+	const killed = computeKilled(playerRoles, votes);
+	const killedPlayersWrap = Dom.section(Dom.h2(killed.size === 1 ? 'Killed Player' : 'Killed Players'), 'winTeams');
+	const killedPlayers = killed.size === 0
+		? [Dom.p('No one', 'hidden')]
+		: Array.from(killed).map((t) => Dom.p(game.getPlayerName(t), 'hidden'));
+	killedPlayers.forEach((wt) => killedPlayersWrap.appendChild(wt));
+
 	// Win Teams
 	const winningTeamsWrap = Dom.section(Dom.h2(winTeam.length === 1 ? 'Winning Team' : 'Winning Teams'), 'winTeams');
 	const winningTeams = winTeam.length === 0
@@ -110,8 +119,11 @@ export default function showResults(outerDom, votes, playerRoles, winTeam, game,
 	winningTeams.forEach((wt) => winningTeamsWrap.appendChild(wt));
 
 	// Verdict
+	const youWon = winTeam.some((w) => yourRole.winTeam === w) && (
+		yourRole.winTeam !== Teams.TANNER || killed.has(game.playerID)
+	);
 	const verdict = Dom.section(Dom.h2(
-		winTeam.some((w) => yourRole.winTeam === w) ? 'You Win 👍' : 'You Lose 👎',
+		youWon ? 'You Win 👍' : 'You Lose 👎',
 	), 'verdict');
 
 	/**
@@ -133,9 +145,11 @@ export default function showResults(outerDom, votes, playerRoles, winTeam, game,
 	// 5) Vote counts
 	// 6) Voted for by
 	// 7) Final roles
-	// 8) Winning teams wrap
-	// 9) Winning teams
-	// 10) Verdict
+	// 8) Killed players wrap
+	// 9) Killed player
+	// 10) Winning teams wrap
+	// 11) Winning teams
+	// 12) Verdict
 	forceDom(dom);
 	dom.style.transform = 'translateX(0)scale(1)';
 	showSection(finalRoleWrap, 1000);
@@ -159,15 +173,19 @@ export default function showResults(outerDom, votes, playerRoles, winTeam, game,
 		// eslint-disable-next-line camelcase
 		voteCounts0_votedForBy1_finalRoles2.forEach(([_, _a, fr]) => { forceDom(fr); fr.classList.add('shown'); });
 	}, 6000);
-	showSection(winningTeamsWrap, 7000);
+	showSection(killedPlayersWrap, 7000);
+	setTimeout(() => {
+		killedPlayers.forEach((wt) => { forceDom(wt); wt.classList.add('shown'); });
+	}, 8000);
+	showSection(winningTeamsWrap, 9000);
 	setTimeout(() => {
 		winningTeams.forEach((wt) => { forceDom(wt); wt.classList.add('shown'); });
-	}, 8000);
-	showSection(verdict, 9000);
+	}, 10000);
+	showSection(verdict, 11000);
 
 	if (game.playerID === 0 && restart !== undefined) {
 		// Add restart button
 		const w = Dom.section(Dom.button('Play Again?', restart));
-		showSection(w, 10000);
+		showSection(w, 12000);
 	}
 }

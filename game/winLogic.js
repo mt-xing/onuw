@@ -2,6 +2,37 @@ import { Roles, Teams } from './role.js';
 import { constructRole } from './rolesIndiv.js';
 
 /**
+ * Compute the who was killed in a game of onuw
+ * @param {Roles[]} rolesID Array of player roles
+ * @param {number[]} votes Array of player IDs each player voted to kill
+ * @returns {Set<number>} Killed player IDs
+ */
+export function computeKilled(rolesID, votes) {
+	const allRoles = new Set(rolesID);
+
+	const votesForPlayerRaw = votes.map((_) => 0);
+	votes.forEach((v) => votesForPlayerRaw[v]++);
+	const votesForPlayer = votesForPlayerRaw.map((x) => (x > 1 ? x : 0));
+
+	const maxVotes = votesForPlayer.reduce((a, x) => (x > a ? x : a), -1);
+	const killedPlayers = votesForPlayer
+		.map((v, i) => (v === maxVotes && v > 1 ? i : NaN))
+		.filter((x) => !Number.isNaN(x));
+	// If hunter died, need to add their vote too
+	if (allRoles.has(Roles.HUNTER)) {
+		killedPlayers.forEach((pid) => {
+			if (rolesID[pid] !== Roles.HUNTER) { return; }
+			const hunterVotedFor = votes[pid];
+			if (killedPlayers.indexOf(hunterVotedFor) === -1) {
+				killedPlayers.push(hunterVotedFor);
+			}
+		});
+	}
+
+	return new Set(killedPlayers);
+}
+
+/**
  * Compute the winner for a game of onuw
  * @param {Roles[]} rolesID Array of player roles
  * @param {number[]} votes Array of player IDs each player voted to kill
