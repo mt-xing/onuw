@@ -219,6 +219,7 @@ export default class Connections {
 	 * @param {string} id
 	 */
 	createYes(id) {
+		window.onbeforeunload = () => 'Are you sure you want to leave the game?';
 		this.#game.playerID = 0;
 		this.#game.code = id;
 		this.#clearCurr();
@@ -298,6 +299,7 @@ export default class Connections {
 	 * @param {string[]} players
 	 */
 	joinYes(playerID, players) {
+		window.onbeforeunload = () => 'Are you sure you want to leave the game?';
 		players.forEach((name, i) => {
 			this.#game.addPlayer(i, name);
 		});

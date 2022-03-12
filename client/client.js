@@ -26,5 +26,3 @@ socket.on('disconn', () => {
 socket.on('disconnect', () => {
 	disconnect(gameDom);
 });
-
-window.onbeforeunload = () => 'Are you sure you want to leave the game?';
