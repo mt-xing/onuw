@@ -10,7 +10,9 @@ export default class Socket {
 	constructor(url) {
 		// @ts-ignore
 		// eslint-disable-next-line no-undef
-		this.#socket = io(url);
+		this.#socket = io(url, {
+			closeOnBeforeunload: false,
+		});
 		this.#socket.on('connect', () => {
 			console.debug(`Socket connected; id: ${this.#socket.id}`);
 		});
